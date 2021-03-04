@@ -41,8 +41,14 @@ ApplicationWindow {
             }
 
             MenuItem {
+                text: "Default"
+                //enabled: atem.connected()
+                onClicked: atem.connectToSwitcher("192.168.0.48", 2000)
+            }
+
+            MenuItem {
                 text: "Disconnect"
-                enabled: atem.connected()
+                //enabled: atem.connected()
                 onClicked: atem.disconnectFromSwitcher();
             }
 
@@ -127,11 +133,44 @@ ApplicationWindow {
         }
 
         RowLayout {
-            Button {
+            CheckBox {
+                text: "Key1"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.setUpstreamKeyOnAir(0, checked)
+                }
+            }
+            CheckBox {
+                text: "KeyOnChange"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.setUpstreamKeyOnNextTransition(0, true)
+                }
+            }
+
+            CheckBox {
+                id: btnFTB
                 text: "FTB"
+                display: AbstractButton.TextUnderIcon
                 onClicked: {
                     var me=atem.mixEffect(0);
                     me.toggleFadeToBlack();
+                }
+            }
+            Button {
+                id: btnCut
+                text: "Cut"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.cut();
+                }
+            }
+            Button {
+                id: btnAuto
+                text: "Auto"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.autoTransition();
                 }
             }
         }
@@ -157,6 +196,7 @@ ApplicationWindow {
                 console.debug(me.programInput())
                 console.debug(me.previewInput())
                 console.debug(me.upstreamKeyCount())
+                btnFTB.checked=me.fadeToBlackEnabled();
             } else {
                 console.debug("No Mixer!")
             }
@@ -173,7 +213,17 @@ ApplicationWindow {
 
         onProgramInputChanged: console.debug("Program:" +newIndex)
         onPreviewInputChanged: console.debug("Preview:" +newIndex)
-        onFadeToBlackChanged: console.debug("FTB"+fading)
+        onFadeToBlackChanged: {
+            console.debug("FTB"+fading+enabled)
+            var me=atem.mixEffect(0);
+            if (fading) {
+                btnFTB.text=me.fadeToBlackFrameCount();
+            } else {
+                btnFTB.text="FTB"
+            }
+            btnFTB.tristate=fading
+            btnFTB.checked=me.fadeToBlackEnabled();
+        }
     }
 
 }

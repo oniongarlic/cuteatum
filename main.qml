@@ -173,6 +173,20 @@ ApplicationWindow {
                     me.autoTransition();
                 }
             }
+            Button {
+                id: btnStreamStart
+                text: "Stream"
+                onClicked: {
+                    atem.startStreaming();
+                }
+            }
+            Button {
+                id: btnStreamStop
+                text: "Stop"
+                onClicked: {
+                    atem.stopStreaming();
+                }
+            }
         }
 
     }

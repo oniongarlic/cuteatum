@@ -1,5 +1,5 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
+import QtQuick 2.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
@@ -13,14 +13,21 @@ ApplicationWindow {
     visible: true
     title: qsTr("CuteAtum")
 
+    background: Rectangle {
+       gradient: Gradient {
+         GradientStop { position: 0; color: "#afafaf" }
+         GradientStop { position: 1; color: "#505050" }
+       }
+    }
+
     Dialog {
         id: nyaDialog
         standardButtons: StandardButton.Ok | StandardButton.Cancel
         title: "Connect to switcher"
         TextField {
             id: ip
+            inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
             placeholderText: "Switcher IP"
-
         }
 
         onAccepted: {
@@ -55,6 +62,17 @@ ApplicationWindow {
             MenuItem {
                 text: "Quit"
                 onClicked: Qt.quit();
+            }
+        }
+    }
+
+    footer: ToolBar {
+        RowLayout {
+            anchors.fill: parent
+            Label {
+                id: conMsg
+                text: ""
+                Layout.fillWidth: true
             }
         }
     }
@@ -173,6 +191,9 @@ ApplicationWindow {
                     me.autoTransition();
                 }
             }
+        }
+
+        RowLayout {
             Button {
                 id: btnStreamStart
                 text: "Stream"
@@ -189,11 +210,28 @@ ApplicationWindow {
             }
         }
 
+        Slider {
+            orientation: Qt.Vertical
+            to: 10000
+            from: 0
+            stepSize: 100
+            onMoved: {
+              var me=atem.mixEffect(0);
+              me.setTransitionPosition(value);
+            }
+            onPressedChanged: {
+              if (!pressed) {
+                value=0;
+                var me=atem.mixEffect(0);
+                me.setTransitionPosition(0);
+              }
+            }
+        }
+
     }
 
     Component.onCompleted: {
         atem.setDebugEnabled(true);
-
     }
 
     AtemConnection {
@@ -214,10 +252,12 @@ ApplicationWindow {
             } else {
                 console.debug("No Mixer!")
             }
+            conMsg.text=productInformation();
         }
 
         onDisconnected: {
             console.debug("Disconnected")
+            conMsg.text='';
         }
 
     }

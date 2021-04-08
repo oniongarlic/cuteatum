@@ -64,6 +64,16 @@ ApplicationWindow {
                 onClicked: Qt.quit();
             }
         }
+        Menu {
+            title: "Audio"
+            MenuItem {
+                checkable: true
+                text: "Monitor"
+                onCheckedChanged: {
+                    atem.setAudioLevelsEnabled(checked)
+                }
+            }
+        }
     }
 
     footer: ToolBar {
@@ -81,7 +91,7 @@ ApplicationWindow {
         id: programGroup
         onClicked: {
             var me=atem.mixEffect(0);
-            me.changeProgramInput(button.text)
+            me.changeProgramInput(button.inputID)
         }
     }
 
@@ -89,7 +99,7 @@ ApplicationWindow {
         id: previewGroup
         onClicked: {
             var me=atem.mixEffect(0);
-            me.changePreviewInput(button.text)
+            me.changePreviewInput(button.inputID)
         }
     }
 
@@ -101,24 +111,34 @@ ApplicationWindow {
                 text: "Program"
             }
 
-            RadioButton {
-                text: "1"                
+            InputButton {
+                text: "C1"
+                inputID: 1
                 ButtonGroup.group: programGroup
             }
-            RadioButton {
-                text: "2"
+            InputButton {
+                text: "C2"
+                inputID: 2
                 ButtonGroup.group: programGroup
             }
-            RadioButton {
-                text: "3"
+            InputButton {
+                text: "C3"
+                inputID: 3
                 ButtonGroup.group: programGroup
             }
-            RadioButton {
-                text: "4"
+            InputButton {
+                text: "C4"
+                inputID: 4
                 ButtonGroup.group: programGroup
             }
-            RadioButton {
-                text: "3010"
+            InputButton {
+                text: "Still"
+                inputID: 3010
+                ButtonGroup.group: programGroup
+            }
+            InputButton {
+                text: "Color"
+                inputID: 3011
                 ButtonGroup.group: programGroup
             }
         }
@@ -128,24 +148,34 @@ ApplicationWindow {
                 text: "Preview"
             }
 
-            RadioButton {
-                text: "1"
+            InputButton {
+                text: "C1"
+                inputID: 1
                 ButtonGroup.group: previewGroup
             }
-            RadioButton {
-                text: "2"
+            InputButton {
+                text: "C2"
+                inputID: 2
                 ButtonGroup.group: previewGroup
             }
-            RadioButton {
-                text: "3"
+            InputButton {
+                text: "C3"
+                inputID: 3
                 ButtonGroup.group: previewGroup
             }
-            RadioButton {
-                text: "4"
+            InputButton {
+                text: "C4"
+                inputID: 4
                 ButtonGroup.group: previewGroup
             }
-            RadioButton {
-                text: "3010"
+            InputButton {
+                text: "Still"
+                inputID: 3010
+                ButtonGroup.group: previewGroup
+            }
+            InputButton {
+                text: "Color"
+                inputID: 3011
                 ButtonGroup.group: previewGroup
             }
         }
@@ -208,6 +238,24 @@ ApplicationWindow {
                     atem.stopStreaming();
                 }
             }
+            Label {
+                text: atem.streamingDatarate/1000
+            }
+
+            Button {
+                id: btnRecStart
+                text: "Record"
+                onClicked: {
+                    atem.startRecording();
+                }
+            }
+            Button {
+                id: btnRecStop
+                text: "Stop"
+                onClicked: {
+                    atem.stopRecording();
+                }
+            }
         }
 
         Slider {
@@ -260,6 +308,12 @@ ApplicationWindow {
             conMsg.text='';
         }
 
+        onTimeChanged: console.debug("Time: "+ getTime())
+
+        onAudioLevelsChanged: {
+            console.debug("AudioLevel")
+        }
+
     }
 
     Connections {
@@ -268,8 +322,10 @@ ApplicationWindow {
         onProgramInputChanged: console.debug("Program:" +newIndex)
         onPreviewInputChanged: console.debug("Preview:" +newIndex)
         onFadeToBlackChanged: {
-            console.debug("FTB"+fading+enabled)
             var me=atem.mixEffect(0);
+
+            console.debug("FTB"+fading+enabled+me.fadeToBlackFrameCount())
+
             if (fading) {
                 btnFTB.text=me.fadeToBlackFrameCount();
             } else {

@@ -14,10 +14,10 @@ ApplicationWindow {
     title: qsTr("CuteAtum")
 
     background: Rectangle {
-       gradient: Gradient {
-         GradientStop { position: 0; color: "#afafaf" }
-         GradientStop { position: 1; color: "#505050" }
-       }
+        gradient: Gradient {
+            GradientStop { position: 0; color: "#bfa0a0" }
+            GradientStop { position: 1; color: "#605050" }
+        }
     }
 
     Dialog {
@@ -54,6 +54,11 @@ ApplicationWindow {
             }
 
             MenuItem {
+                text: "Emulator"
+                onClicked: atem.connectToSwitcher("192.168.1.89", 2000)
+            }
+
+            MenuItem {
                 text: "Disconnect"
                 //enabled: atem.connected()
                 onClicked: atem.disconnectFromSwitcher();
@@ -83,12 +88,25 @@ ApplicationWindow {
                 id: conMsg
                 text: ""
                 Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft
+            }
+            Label {
+                id: infoMsg
+                text: ""
+                Layout.fillWidth: true
+            }
+            Label {
+                Layout.fillWidth: false
+                visible: atem.streamingDatarate>0
+                text: atem.streamingDatarate/1000/1000 + " Mbps"
+                Layout.alignment: Qt.AlignRight
             }
         }
     }
 
     ButtonGroup {
         id: programGroup
+        property int activeInput;
         onClicked: {
             var me=atem.mixEffect(0);
             me.changeProgramInput(button.inputID)
@@ -97,20 +115,26 @@ ApplicationWindow {
 
     ButtonGroup {
         id: previewGroup
+        property int activeInput;
         onClicked: {
             var me=atem.mixEffect(0);
             me.changePreviewInput(button.inputID)
         }
     }
 
-    ColumnLayout {
+    GridLayout {
         id: container
+        rowSpacing: 2
+        columnSpacing: 4
+        columns: 1
+        rows: 4
+        anchors.fill: parent
 
         RowLayout {
-            Label {
-                text: "Program"
-            }
-
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            Layout.margins: 4
+            spacing: 4
             InputButton {
                 text: "C1"
                 inputID: 1
@@ -136,53 +160,76 @@ ApplicationWindow {
                 inputID: 3010
                 ButtonGroup.group: programGroup
             }
-            InputButton {
-                text: "Color"
-                inputID: 3011
-                ButtonGroup.group: programGroup
+            ColumnLayout {
+                InputButton {
+                    text: "Color 1"
+                    inputID: 3011
+                    ButtonGroup.group: programGroup
+                }
+                InputButton {
+                    text: "Color 2"
+                    inputID: 3012
+                    ButtonGroup.group: programGroup
+                }
             }
         }
 
         RowLayout {
-            Label {
-                text: "Preview"
-            }
-
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            Layout.margins: 4
+            spacing: 4
             InputButton {
                 text: "C1"
                 inputID: 1
+                isPreview: true
                 ButtonGroup.group: previewGroup
             }
             InputButton {
                 text: "C2"
                 inputID: 2
+                isPreview: true
                 ButtonGroup.group: previewGroup
             }
             InputButton {
                 text: "C3"
                 inputID: 3
+                isPreview: true
                 ButtonGroup.group: previewGroup
             }
             InputButton {
                 text: "C4"
                 inputID: 4
+                isPreview: true
                 ButtonGroup.group: previewGroup
             }
             InputButton {
                 text: "Still"
                 inputID: 3010
+                isPreview: true
                 ButtonGroup.group: previewGroup
             }
-            InputButton {
-                text: "Color"
-                inputID: 3011
-                ButtonGroup.group: previewGroup
+            ColumnLayout {
+                spacing: 2
+                InputButton {
+                    text: "Color 1"
+                    inputID: 3011
+                    isPreview: true
+                    ButtonGroup.group: previewGroup
+                }
+                InputButton {
+                    text: "Color 2"
+                    inputID: 3012
+                    isPreview: true
+                    ButtonGroup.group: previewGroup
+                }
             }
         }
 
         RowLayout {
+            Layout.fillWidth: true
             CheckBox {
-                text: "Key1"
+                text: "Key"
                 onClicked: {
                     var me=atem.mixEffect(0);
                     me.setUpstreamKeyOnAir(0, checked)
@@ -192,11 +239,11 @@ ApplicationWindow {
                 text: "KeyOnChange"
                 onClicked: {
                     var me=atem.mixEffect(0);
-                    me.setUpstreamKeyOnNextTransition(0, true)
+                    me.setUpstreamKeyOnNextTransition(0, checked)
                 }
             }
 
-            CheckBox {
+            BlinkButton {
                 id: btnFTB
                 text: "FTB"
                 display: AbstractButton.TextUnderIcon
@@ -224,6 +271,7 @@ ApplicationWindow {
         }
 
         RowLayout {
+            spacing: 4
             Button {
                 id: btnStreamStart
                 text: "Stream"
@@ -237,9 +285,6 @@ ApplicationWindow {
                 onClicked: {
                     atem.stopStreaming();
                 }
-            }
-            Label {
-                text: atem.streamingDatarate/1000
             }
 
             Button {
@@ -259,20 +304,21 @@ ApplicationWindow {
         }
 
         Slider {
+            Layout.fillHeight: true
             orientation: Qt.Vertical
             to: 10000
             from: 0
             stepSize: 100
             onMoved: {
-              var me=atem.mixEffect(0);
-              me.setTransitionPosition(value);
+                var me=atem.mixEffect(0);
+                me.setTransitionPosition(value);
             }
             onPressedChanged: {
-              if (!pressed) {
-                value=0;
-                var me=atem.mixEffect(0);
-                me.setTransitionPosition(0);
-              }
+                if (!pressed) {
+                    value=0;
+                    var me=atem.mixEffect(0);
+                    me.setTransitionPosition(0);
+                }
             }
         }
 
@@ -293,10 +339,10 @@ ApplicationWindow {
 
             if (me) {
                 meCon.target=me
-                console.debug(me.programInput())
-                console.debug(me.previewInput())
-                console.debug(me.upstreamKeyCount())
-                btnFTB.checked=me.fadeToBlackEnabled();
+                console.debug("Program is"+me.programInput())
+                console.debug("Preview is"+me.previewInput())
+                console.debug("Keys: "+me.upstreamKeyCount())
+                btnFTB.enabled=me.fadeToBlackEnabled();
             } else {
                 console.debug("No Mixer!")
             }

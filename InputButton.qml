@@ -12,13 +12,14 @@ Button {
     Layout.fillWidth: true
 
     property int inputID: 0
+    property bool compact: false
     property bool isPreview: false
 
     onCheckedChanged: console.debug("ABC"+checked)
 
     background: Rectangle {
-        implicitWidth: 80
-        implicitHeight: inputID>3010 ? 25 : 60
+        implicitWidth: btn.compact ? 60 : 80
+        implicitHeight: btn.compact ? 25 : 60
         color: isPreview ? "#20e520" : "#e52020"
         border.width: 2
         border.color: btn.checked ? "#90e520" : "#101010"

@@ -160,15 +160,23 @@ ApplicationWindow {
                 inputID: 3010
                 ButtonGroup.group: programGroup
             }
+                InputButton {
+                    text: "Black"
+                    inputID: 0
+                    compact: true
+                    ButtonGroup.group: programGroup
+                }
             ColumnLayout {
                 InputButton {
                     text: "Color 1"
-                    inputID: 3011
+                    inputID: 2001
+                    compact: true
                     ButtonGroup.group: programGroup
                 }
                 InputButton {
                     text: "Color 2"
-                    inputID: 3012
+                    inputID: 2002
+                    compact: true
                     ButtonGroup.group: programGroup
                 }
             }
@@ -209,18 +217,27 @@ ApplicationWindow {
                 isPreview: true
                 ButtonGroup.group: previewGroup
             }
+                InputButton {
+                    text: "Black"
+                    inputID: 0
+                    isPreview: true
+                    compact: true
+                    ButtonGroup.group: previewGroup
+                }
             ColumnLayout {
                 spacing: 2
                 InputButton {
                     text: "Color 1"
-                    inputID: 3011
+                    inputID: 2001
                     isPreview: true
+                    compact: true
                     ButtonGroup.group: previewGroup
                 }
                 InputButton {
                     text: "Color 2"
-                    inputID: 3012
+                    inputID: 2002
                     isPreview: true
+                    compact: true
                     ButtonGroup.group: previewGroup
                 }
             }
@@ -266,6 +283,13 @@ ApplicationWindow {
                 onClicked: {
                     var me=atem.mixEffect(0);
                     me.autoTransition();
+                }
+            }
+            CheckBox {
+                text: "DVEKey"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.setDVEKeyEnabled(checked)
                 }
             }
         }
@@ -342,7 +366,7 @@ ApplicationWindow {
                 console.debug("Program is"+me.programInput())
                 console.debug("Preview is"+me.previewInput())
                 console.debug("Keys: "+me.upstreamKeyCount())
-                btnFTB.enabled=me.fadeToBlackEnabled();
+                btnFTB.checked=me.fadeToBlackEnabled();
             } else {
                 console.debug("No Mixer!")
             }

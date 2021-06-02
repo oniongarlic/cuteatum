@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.2
 
 import org.bm 1.0
+import org.tal.servicediscovery 1.0
 
 ApplicationWindow {
     width: 800
@@ -17,6 +18,13 @@ ApplicationWindow {
         gradient: Gradient {
             GradientStop { position: 0; color: "#bfa0a0" }
             GradientStop { position: 1; color: "#605050" }
+        }
+    }
+
+    ServiceDiscovery {
+        id: sd
+        Component.onCompleted: {
+            sd.startDiscovery();
         }
     }
 
@@ -405,5 +413,4 @@ ApplicationWindow {
             btnFTB.checked=me.fadeToBlackEnabled();
         }
     }
-
 }

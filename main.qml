@@ -137,6 +137,7 @@ ApplicationWindow {
         columns: 1
         rows: 4
         anchors.fill: parent
+        enabled: atem.connected
 
         RowLayout {
             Layout.fillWidth: true

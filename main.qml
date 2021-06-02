@@ -23,24 +23,72 @@ ApplicationWindow {
 
     ServiceDiscovery {
         id: sd
+
+        onServicesFound: {
+            var devs=getDevices();
+
+            deviceModel.clear();
+
+            for (var i=0; i<devs.length; i++) {
+                console.log("Array item:", devs[i])
+                deviceModel.append({"name": devs[i].name, "deviceIP": devs[i].ip, "port": devs[i].port})
+            }
+
+            // XXX: Static default test devices
+            deviceModel.append({"name": "ATEM Mini Pro", "deviceIP": "192.168.1.99", "port": 9910})
+            deviceModel.append({"name": "ATEM Mini Pro ISO", "deviceIP": "192.168.0.49", "port": 9910})
+        }
+
         Component.onCompleted: {
             sd.startDiscovery();
         }
+    }
+
+    ListModel {
+        id: deviceModel
     }
 
     Dialog {
         id: nyaDialog
         standardButtons: StandardButton.Ok | StandardButton.Cancel
         title: "Connect to switcher"
-        TextField {
-            id: ip
-            inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
-            placeholderText: "Switcher IP"
+        ColumnLayout {
+            TextField {
+                id: ipText
+                inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
+                placeholderText: "Switcher IP"
+            }
+            Tumbler {
+                id: deviceListView
+                height: ip.height*3
+                width: nyaDialog.width
+                clip: true
+                model: deviceModel
+                delegate: Component {
+                    Rectangle {
+                        color: "white"                        
+                        MouseArea {
+                            anchors.fill: parent
+                            Label {
+                                text: deviceIP
+                                anchors.fill: parent
+                            }
+                            onDoubleClicked: {
+                                console.debug("DBL")
+                                var dev=deviceModel.get(deviceListView.currentIndex)
+                                ipText.text=dev.deviceIP
+                                nyaDialog.close();
+                                atem.connectToSwitcher(dev.deviceIP, 2000)
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         onAccepted: {
             nyaDialog.close();
-            atem.connectToSwitcher(ip.text, 2000)
+            atem.connectToSwitcher(ipText.text, 2000)
         }
     }
 
@@ -169,12 +217,12 @@ ApplicationWindow {
                 inputID: 3010
                 ButtonGroup.group: programGroup
             }
-                InputButton {
-                    text: "Black"
-                    inputID: 0
-                    compact: true
-                    ButtonGroup.group: programGroup
-                }
+            InputButton {
+                text: "Black"
+                inputID: 0
+                compact: true
+                ButtonGroup.group: programGroup
+            }
             ColumnLayout {
                 InputButton {
                     text: "Color 1"
@@ -226,13 +274,13 @@ ApplicationWindow {
                 isPreview: true
                 ButtonGroup.group: previewGroup
             }
-                InputButton {
-                    text: "Black"
-                    inputID: 0
-                    isPreview: true
-                    compact: true
-                    ButtonGroup.group: previewGroup
-                }
+            InputButton {
+                text: "Black"
+                inputID: 0
+                isPreview: true
+                compact: true
+                ButtonGroup.group: previewGroup
+            }
             ColumnLayout {
                 spacing: 2
                 InputButton {

@@ -11,6 +11,7 @@ public:
     explicit ServiceDiscovery(QObject *parent = nullptr);
 
     Q_INVOKABLE void startDiscovery();
+    Q_INVOKABLE QVariantList getDevices() const;
 
 signals:
     void servicesFound();
@@ -21,7 +22,8 @@ public slots:
     void onAllForNow(const QDBusMessage& reply);
 
 protected:
-    QDBusInterface *m_interface;
+    QDBusInterface *m_interface;    
+    QVariantList m_devices;
 };
 
 #endif // SERVICEDISCOVERY_H

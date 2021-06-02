@@ -7,21 +7,30 @@ Button {
     checkable: true
 
     property color checkedColor: "red"
-    property color notCheckedColor: "green"
-    property color blinkColor: "white"
+    property color notCheckedColor: "green"    
 
     background: Rectangle {
         id: btnBg
         implicitHeight: 50
         implicitWidth: 60
 
-        ColorAnimation on color {
+        SequentialAnimation on color {
             running: btn.state=='on'
-            from: "green"
-            to: "red"
-            duration: 600
             loops: Animation.Infinite
-            onRunningChanged: console.debug(running)
+            ColorAnimation {
+                from: "black"
+                to: "red"
+                duration: 800
+                easing.type: Easing.InOutCubic
+                onRunningChanged: console.debug(running)
+            }
+            ColorAnimation {
+                from: "red"
+                to: "black"
+                duration: 800
+                easing.type: Easing.InOutQuad
+                onRunningChanged: console.debug(running)
+            }
         }
     }
 

@@ -6,6 +6,8 @@ Button {
     id: btn
     checkable: true
 
+    property bool tristate: false
+
     property color checkedColor: "red"
     property color notCheckedColor: "green"    
 
@@ -20,34 +22,46 @@ Button {
             ColorAnimation {
                 from: "black"
                 to: "red"
-                duration: 800
+                duration: 600
                 easing.type: Easing.InOutCubic
                 onRunningChanged: console.debug(running)
             }
             ColorAnimation {
                 from: "red"
                 to: "black"
-                duration: 800
+                duration: 600
                 easing.type: Easing.InOutQuad
                 onRunningChanged: console.debug(running)
             }
         }
+        ColorAnimation {
+            running: btn.state=='tristate'
+            from: "#ff0000"
+            to: "#af0000"
+            duration: 600
+            easing.type: Easing.InOutQuad
+            onRunningChanged: console.debug(running)
+        }
     }
 
-    onStateChanged: console.debug(state)
+    onStateChanged: console.debug("BlinkButtonState is: "+state)
 
     states: [
         State {
             name: "off"
-            when: !btn.checked
+            when: !btn.checked && !tristate
             PropertyChanges {
                 target: btnBg
                 color: btn.notCheckedColor
             }
         },        
         State {
+            name: "tristate"
+            when: tristate
+        },
+        State {
             name: "on"
-            when: btn.checked
+            when: btn.checked && !tristate
         }
     ]
 

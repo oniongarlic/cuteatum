@@ -37,6 +37,7 @@ ApplicationWindow {
             // XXX: Static default test devices
             deviceModel.append({"name": "ATEM Mini Pro", "deviceIP": "192.168.1.99", "port": 9910})
             deviceModel.append({"name": "ATEM Mini Pro ISO", "deviceIP": "192.168.0.49", "port": 9910})
+            deviceModel.append({"name": "Emulator", "deviceIP": "192.168.1.89", "port": 9910})
         }
 
         Component.onCompleted: {
@@ -55,30 +56,41 @@ ApplicationWindow {
         ColumnLayout {
             TextField {
                 id: ipText
+                Layout.fillWidth: true
                 inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
                 placeholderText: "Switcher IP"
             }
-            Tumbler {
-                id: deviceListView
-                height: ip.height*3
-                width: nyaDialog.width
-                clip: true
-                model: deviceModel
-                delegate: Component {
-                    Rectangle {
-                        color: "white"                        
-                        MouseArea {
-                            anchors.fill: parent
+            Frame {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.minimumHeight: ipText.height*2
+                Layout.maximumHeight: ipText.height*3
+                ColumnLayout {
+                    anchors.fill: parent
+                    ListView {
+                        id: deviceListView
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: deviceModel
+                        clip: true
+                        delegate: Component {
                             Label {
-                                text: deviceIP
-                                anchors.fill: parent
-                            }
-                            onDoubleClicked: {
-                                console.debug("DBL")
-                                var dev=deviceModel.get(deviceListView.currentIndex)
-                                ipText.text=dev.deviceIP
-                                nyaDialog.close();
-                                atem.connectToSwitcher(dev.deviceIP, 2000)
+                                text: name+"("+deviceIP+")"
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onDoubleClicked: {
+                                        console.debug("DBCL")
+                                        var dev=deviceModel.get(index)
+                                        ipText.text=dev.deviceIP
+                                        nyaDialog.close();
+                                        atem.connectToSwitcher(dev.deviceIP, 2000)
+                                    }
+                                    onClicked: {
+                                        console.debug("CL")
+                                        var dev=deviceModel.get(index)
+                                        ipText.text=dev.deviceIP
+                                    }
+                                }
                             }
                         }
                     }
@@ -98,31 +110,25 @@ ApplicationWindow {
 
             MenuItem {
                 text: "Connect..."
+                enabled: !atem.connected
                 onClicked: {
                     nyaDialog.open();
                 }
             }
 
             MenuItem {
-                text: "Default"
-                //enabled: atem.connected()
-                onClicked: atem.connectToSwitcher("192.168.0.48", 2000)
-            }
-
-            MenuItem {
-                text: "Emulator"
-                onClicked: atem.connectToSwitcher("192.168.1.89", 2000)
-            }
-
-            MenuItem {
                 text: "Disconnect"
-                //enabled: atem.connected()
+                enabled: atem.connected
                 onClicked: atem.disconnectFromSwitcher();
             }
 
             MenuItem {
                 text: "Quit"
-                onClicked: Qt.quit();
+                onClicked: {
+                    if (atem.connected)
+                        atem.disconnectFromSwitcher();
+                    Qt.quit();
+                }
             }
         }
         Menu {
@@ -153,7 +159,7 @@ ApplicationWindow {
             }
             Label {
                 Layout.fillWidth: false
-                visible: atem.streamingDatarate>0
+                visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingDatarate/1000/1000 + " Mbps"
                 Layout.alignment: Qt.AlignRight
             }

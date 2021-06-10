@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.2
 
 import org.bm 1.0
+import org.tal.servicediscovery 1.0
 
 ApplicationWindow {
     width: 800
@@ -20,19 +21,86 @@ ApplicationWindow {
         }
     }
 
+    ServiceDiscovery {
+        id: sd
+
+        onServicesFound: {
+            var devs=getDevices();
+
+            deviceModel.clear();
+
+            for (var i=0; i<devs.length; i++) {
+                console.log("Array item:", devs[i])
+                deviceModel.append({"name": devs[i].name, "deviceIP": devs[i].ip, "port": devs[i].port})
+            }
+
+            // XXX: Static default test devices
+            deviceModel.append({"name": "ATEM Mini Pro", "deviceIP": "192.168.1.99", "port": 9910})
+            deviceModel.append({"name": "ATEM Mini Pro ISO", "deviceIP": "192.168.0.49", "port": 9910})
+            deviceModel.append({"name": "Emulator", "deviceIP": "192.168.1.89", "port": 9910})
+        }
+
+        Component.onCompleted: {
+            sd.startDiscovery();
+        }
+    }
+
+    ListModel {
+        id: deviceModel
+    }
+
     Dialog {
         id: nyaDialog
         standardButtons: StandardButton.Ok | StandardButton.Cancel
         title: "Connect to switcher"
-        TextField {
-            id: ip
-            inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
-            placeholderText: "Switcher IP"
+        ColumnLayout {
+            TextField {
+                id: ipText
+                Layout.fillWidth: true
+                inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
+                placeholderText: "Switcher IP"
+            }
+            Frame {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.minimumHeight: ipText.height*2
+                Layout.maximumHeight: ipText.height*3
+                ColumnLayout {
+                    anchors.fill: parent
+                    ListView {
+                        id: deviceListView
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: deviceModel
+                        clip: true
+                        delegate: Component {
+                            Label {
+                                text: name+"("+deviceIP+")"
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onDoubleClicked: {
+                                        console.debug("DBCL")
+                                        var dev=deviceModel.get(index)
+                                        ipText.text=dev.deviceIP
+                                        nyaDialog.close();
+                                        atem.connectToSwitcher(dev.deviceIP, 2000)
+                                    }
+                                    onClicked: {
+                                        console.debug("CL")
+                                        var dev=deviceModel.get(index)
+                                        ipText.text=dev.deviceIP
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         onAccepted: {
             nyaDialog.close();
-            atem.connectToSwitcher(ip.text, 2000)
+            atem.connectToSwitcher(ipText.text, 2000)
         }
     }
 
@@ -42,31 +110,25 @@ ApplicationWindow {
 
             MenuItem {
                 text: "Connect..."
+                enabled: !atem.connected
                 onClicked: {
                     nyaDialog.open();
                 }
             }
 
             MenuItem {
-                text: "Default"
-                //enabled: atem.connected()
-                onClicked: atem.connectToSwitcher("192.168.0.48", 2000)
-            }
-
-            MenuItem {
-                text: "Emulator"
-                onClicked: atem.connectToSwitcher("192.168.1.89", 2000)
-            }
-
-            MenuItem {
                 text: "Disconnect"
-                //enabled: atem.connected()
+                enabled: atem.connected
                 onClicked: atem.disconnectFromSwitcher();
             }
 
             MenuItem {
                 text: "Quit"
-                onClicked: Qt.quit();
+                onClicked: {
+                    if (atem.connected)
+                        atem.disconnectFromSwitcher();
+                    Qt.quit();
+                }
             }
         }
         Menu {
@@ -104,7 +166,7 @@ ApplicationWindow {
             }
             Label {
                 Layout.fillWidth: false
-                visible: atem.streamingDatarate>0
+                visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingDatarate/1000/1000 + " Mbps"
                 Layout.alignment: Qt.AlignRight
             }
@@ -136,6 +198,7 @@ ApplicationWindow {
         columns: 1
         rows: 4
         anchors.fill: parent
+        enabled: atem.connected
 
         RowLayout {
             Layout.fillWidth: true
@@ -167,12 +230,12 @@ ApplicationWindow {
                 inputID: 3010
                 ButtonGroup.group: programGroup
             }
-                InputButton {
-                    text: "Black"
-                    inputID: 0
-                    compact: true
-                    ButtonGroup.group: programGroup
-                }
+            InputButton {
+                text: "Black"
+                inputID: 0
+                compact: true
+                ButtonGroup.group: programGroup
+            }
             ColumnLayout {
                 InputButton {
                     text: "Color 1"
@@ -224,13 +287,13 @@ ApplicationWindow {
                 isPreview: true
                 ButtonGroup.group: previewGroup
             }
-                InputButton {
-                    text: "Black"
-                    inputID: 0
-                    isPreview: true
-                    compact: true
-                    ButtonGroup.group: previewGroup
-                }
+            InputButton {
+                text: "Black"
+                inputID: 0
+                isPreview: true
+                compact: true
+                ButtonGroup.group: previewGroup
+            }
             ColumnLayout {
                 spacing: 2
                 InputButton {
@@ -422,5 +485,4 @@ ApplicationWindow {
             console.debug("FTB property status is "+status)
         }
     }
-
 }

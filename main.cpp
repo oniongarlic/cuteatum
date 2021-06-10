@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
     //qmlRegisterType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey");
-    //qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
+    qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
     //qmlRegisterType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl");
 
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");

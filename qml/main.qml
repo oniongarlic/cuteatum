@@ -135,9 +135,16 @@ ApplicationWindow {
             title: "Audio"
             MenuItem {
                 checkable: true
-                text: "Monitor"
+                text: "Levels"
                 onCheckedChanged: {
                     atem.setAudioLevelsEnabled(checked)
+                }
+            }
+            MenuItem {
+                checkable: true
+                text: "Monitor"
+                onCheckedChanged: {
+                    atem.setAudioMonitorEnabled(checked)
                 }
             }
         }
@@ -230,6 +237,10 @@ ApplicationWindow {
             mqttClient.publishActive(1)
         }
 
+        onAudioInputChanged: {
+            console.debug("AudioInput changed "+index + " "+input)
+        }
+
         onDisconnected: {
             console.debug("Disconnected")
             conMsg.text='';
@@ -241,6 +252,7 @@ ApplicationWindow {
         onAudioLevelsChanged: {
             console.debug("AudioLevel")
         }        
+
 
     }
 
@@ -269,6 +281,10 @@ ApplicationWindow {
             btnFTB.tristate=fading
             btnFTB.checked=me.fadeToBlackEnabled();
             mqttClient.publishActive(me.fadeToBlackEnabled() ? 1 : 0)
+        }
+
+        onFadeToBlackStatusChanged: {
+            console.debug("FTB property status is "+status)
         }
     }
 

@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
     qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
     //qmlRegisterType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey");
-
     //qmlRegisterType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");

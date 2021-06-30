@@ -11,6 +11,7 @@ Currently experimental and not ready for any kind of production use. Very much w
 ## Requirements
 
 * Qt 5.15
+* QtMQTT
 * libqatemcontrol fork
 
 ## Tested switchers:

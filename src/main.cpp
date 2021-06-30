@@ -7,6 +7,7 @@
 #include <qatemmixeffect.h>
 
 #include "servicediscovery.h"
+#include "cutemqttclient.h"
 
 int main(int argc, char *argv[])
 {
@@ -30,13 +31,16 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
+    qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
     //qmlRegisterType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey");
-    //qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
+
     //qmlRegisterType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
+
+    qmlRegisterType<CuteMqttClient>("org.tal.mqtt", 1, 0, "MqttClient");
 
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

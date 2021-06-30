@@ -7,19 +7,19 @@ import QtQuick.Dialogs 1.2
 
 import org.bm 1.0
 import org.tal.servicediscovery 1.0
+import org.tal.mqtt 1.0
 
 ApplicationWindow {
+    id: root
     width: 800
     height: 480
     visible: true
     title: qsTr("CuteAtum")
 
-    background: Rectangle {
-        gradient: Gradient {
-            GradientStop { position: 0; color: "#bfa0a0" }
-            GradientStop { position: 1; color: "#605050" }
-        }
-    }
+    // MQTT
+    property string mqttHostname: "127.0.0.1"
+
+
 
     ServiceDiscovery {
         id: sd
@@ -166,257 +166,49 @@ ApplicationWindow {
         }
     }
 
-    ButtonGroup {
-        id: programGroup
-        property int activeInput;
-        onClicked: {
-            var me=atem.mixEffect(0);
-            me.changeProgramInput(button.inputID)
-        }
-    }
-
-    ButtonGroup {
-        id: previewGroup
-        property int activeInput;
-        onClicked: {
-            var me=atem.mixEffect(0);
-            me.changePreviewInput(button.inputID)
-        }
-    }
-
-    GridLayout {
-        id: container
-        rowSpacing: 2
-        columnSpacing: 4
-        columns: 1
-        rows: 4
+    StackView {
+        id: rootStack
         anchors.fill: parent
-        enabled: atem.connected
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            Layout.margins: 4
-            spacing: 4
-            InputButton {
-                text: "C1"
-                inputID: 1
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "C2"
-                inputID: 2
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "C3"
-                inputID: 3
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "C4"
-                inputID: 4
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "Still"
-                inputID: 3010
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "Black"
-                inputID: 0
-                compact: true
-                ButtonGroup.group: programGroup
-            }
-            ColumnLayout {
-                InputButton {
-                    text: "Color 1"
-                    inputID: 2001
-                    compact: true
-                    ButtonGroup.group: programGroup
-                }
-                InputButton {
-                    text: "Color 2"
-                    inputID: 2002
-                    compact: true
-                    ButtonGroup.group: programGroup
-                }
-            }
+        initialItem: mainView
+        focus: true;
+        onCurrentItemChanged: {
+            console.debug("*** view is "+currentItem)
         }
+    }
 
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            Layout.margins: 4
-            spacing: 4
-            InputButton {
-                text: "C1"
-                inputID: 1
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "C2"
-                inputID: 2
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "C3"
-                inputID: 3
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "C4"
-                inputID: 4
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "Still"
-                inputID: 3010
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "Black"
-                inputID: 0
-                isPreview: true
-                compact: true
-                ButtonGroup.group: previewGroup
-            }
-            ColumnLayout {
-                spacing: 2
-                InputButton {
-                    text: "Color 1"
-                    inputID: 2001
-                    isPreview: true
-                    compact: true
-                    ButtonGroup.group: previewGroup
-                }
-                InputButton {
-                    text: "Color 2"
-                    inputID: 2002
-                    isPreview: true
-                    compact: true
-                    ButtonGroup.group: previewGroup
-                }
-            }
+    Component {
+        id: mainView
+        PageMain {
+
         }
-
-        RowLayout {
-            Layout.fillWidth: true
-            CheckBox {
-                text: "Key"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setUpstreamKeyOnAir(0, checked)
-                }
-            }
-            CheckBox {
-                text: "KeyOnChange"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setUpstreamKeyOnNextTransition(0, checked)
-                }
-            }
-
-            BlinkButton {
-                id: btnFTB
-                text: "FTB"
-                display: AbstractButton.TextUnderIcon
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.toggleFadeToBlack();
-                }
-            }
-            Button {
-                id: btnCut
-                text: "Cut"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.cut();
-                }
-            }
-            Button {
-                id: btnAuto
-                text: "Auto"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.autoTransition();
-                }
-            }
-            CheckBox {
-                text: "DVEKey"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setDVEKeyEnabled(checked)
-                }
-            }
-        }
-
-        RowLayout {
-            spacing: 4
-            Button {
-                id: btnStreamStart
-                text: "Stream"
-                onClicked: {
-                    atem.startStreaming();
-                }
-            }
-            Button {
-                id: btnStreamStop
-                text: "Stop"
-                onClicked: {
-                    atem.stopStreaming();
-                }
-            }
-
-            Button {
-                id: btnRecStart
-                text: "Record"
-                onClicked: {
-                    atem.startRecording();
-                }
-            }
-            Button {
-                id: btnRecStop
-                text: "Stop"
-                onClicked: {
-                    atem.stopRecording();
-                }
-            }
-        }
-
-        Slider {
-            Layout.fillHeight: true
-            orientation: Qt.Vertical
-            to: 10000
-            from: 0
-            stepSize: 100
-            onMoved: {
-                var me=atem.mixEffect(0);
-                me.setTransitionPosition(value);
-            }
-            onPressedChanged: {
-                if (!pressed) {
-                    value=0;
-                    var me=atem.mixEffect(0);
-                    me.setTransitionPosition(0);
-                }
-            }
-        }
-
     }
 
     Component.onCompleted: {
         atem.setDebugEnabled(true);
+        mqttClient.setHostname(mqttHostname)
+        mqttClient.setPort(1883)
+        mqttClient.connectToHost();
+    }
+
+    function cutTransition() {
+        var me=atem.mixEffect(0);
+        me.cut();
+    }
+
+    function setProgram(i) {
+        var me=atem.mixEffect(0);
+        me.changeProgramInput(i)
+    }
+
+    function setPreview(i) {
+        var me=atem.mixEffect(0);
+        me.changePreviewInput(i)
     }
 
     AtemConnection {
         id: atem
+
+        property string deviceID: ""
 
         onConnected: {
             console.debug("Connected!")
@@ -433,27 +225,36 @@ ApplicationWindow {
             } else {
                 console.debug("No Mixer!")
             }
-            conMsg.text=productInformation();
+            deviceID=address();
+            conMsg.text=productInformation()+" ("+address()+")";
+            mqttClient.publishActive(1)
         }
 
         onDisconnected: {
             console.debug("Disconnected")
             conMsg.text='';
+            mqttClient.publishActive(0)
         }
 
         onTimeChanged: console.debug("Time: "+ getTime())
 
         onAudioLevelsChanged: {
             console.debug("AudioLevel")
-        }
+        }        
 
     }
 
     Connections {
         id: meCon
 
-        onProgramInputChanged: console.debug("Program:" +newIndex)
-        onPreviewInputChanged: console.debug("Preview:" +newIndex)
+        onProgramInputChanged: {
+            console.debug("Program:" +newIndex)
+            mqttClient.publishProgram(newIndex)
+        }
+        onPreviewInputChanged: {
+            console.debug("Preview:" +newIndex)
+            mqttClient.publishPreview(newIndex)
+        }
         onFadeToBlackChanged: {
             var me=atem.mixEffect(0);
 
@@ -461,11 +262,61 @@ ApplicationWindow {
 
             if (fading) {
                 btnFTB.text=me.fadeToBlackFrameCount();
+                mqttClient.publishActive(2)
             } else {
                 btnFTB.text="FTB"
             }
             btnFTB.tristate=fading
             btnFTB.checked=me.fadeToBlackEnabled();
+            mqttClient.publishActive(me.fadeToBlackEnabled() ? 1 : 0)
         }
     }
+
+    MqttClient {
+        id: mqttClient
+        clientId: "cuteatum"
+        hostname: mqttHostname
+        // port: "1883"
+
+        readonly property string topicBase: "cuteatum/"+atem.deviceID+"/"
+
+        Component.onCompleted: {
+            console.debug("MQTT")
+        }
+
+        onConnected: {
+            console.debug("MQTT: Connected")
+            publishActive(0)
+            setWillTopic(topicBase+"active")
+            setWillMessage(0)
+        }
+
+        onDisconnected: {
+            console.debug("MQTT: Disconnected")
+        }
+
+        onErrorChanged: console.debug("MQTT: Error "+ error)
+
+        onStateChanged: console.debug("MQTT: State "+state)
+
+        onPingResponseReceived: console.debug("MQTT: Ping")
+
+        onMessageSent: console.debug("MQTT: Sent "+id)
+
+        function publishActive(i) {
+            publish(topicBase+"active", i, 1, true)
+        }
+        function publishProgram(i) {
+            publish(topicBase+"program", i)
+        }
+        function publishPreview(i) {
+            publish(topicBase+"preview", i)
+        }
+        function publishFTB(i) {
+            publish(topicBase+"ftb", i)
+        }
+
+
+    }
+
 }

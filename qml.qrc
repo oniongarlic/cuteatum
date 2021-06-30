@@ -3,5 +3,6 @@
         <file>qml/main.qml</file>
         <file>qml/BlinkButton.qml</file>
         <file>qml/InputButton.qml</file>
+        <file>qml/PageMain.qml</file>
     </qresource>
 </RCC>

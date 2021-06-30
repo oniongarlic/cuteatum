@@ -225,15 +225,17 @@ ApplicationWindow {
 
             if (me) {
                 meCon.target=me
-                console.debug("Program is"+me.programInput())
-                console.debug("Preview is"+me.previewInput())
+                console.debug("Program is: "+me.programInput())
+                console.debug("Preview is: "+me.previewInput())
                 console.debug("Keys: "+me.upstreamKeyCount())
-                btnFTB.checked=me.fadeToBlackEnabled();
+                meCon.program=me.programInput();
+                meCon.preview=me.previewInput();
+                //mainView.ftb=me.fadeToBlackEnabled();
             } else {
                 console.debug("No Mixer!")
             }
-            deviceID=address();
-            conMsg.text=productInformation()+" ("+address()+")";
+            deviceID=hostname();
+            conMsg.text=productInformation()+" ("+hostname()+")";
             mqttClient.publishActive(1)
         }
 
@@ -259,28 +261,28 @@ ApplicationWindow {
     Connections {
         id: meCon
 
+        property int program;
+        property int preview;
+        property bool ftb;
+        property bool ftb_fading: false;
+        property int ftb_frame;
+
         onProgramInputChanged: {
             console.debug("Program:" +newIndex)
+            program=newIndex;
             mqttClient.publishProgram(newIndex)
         }
         onPreviewInputChanged: {
             console.debug("Preview:" +newIndex)
+            preview=newIndex;
             mqttClient.publishPreview(newIndex)
         }
         onFadeToBlackChanged: {
             var me=atem.mixEffect(0);
-
-            console.debug("FTB"+fading+enabled+me.fadeToBlackFrameCount())
-
-            if (fading) {
-                btnFTB.text=me.fadeToBlackFrameCount();
-                mqttClient.publishActive(2)
-            } else {
-                btnFTB.text="FTB"
-            }
-            btnFTB.tristate=fading
-            btnFTB.checked=me.fadeToBlackEnabled();
-            mqttClient.publishActive(me.fadeToBlackEnabled() ? 1 : 0)
+            ftb_fading=fading
+            ftb_frame=me.fadeToBlackFrameCount();
+            ftb=me.fadeToBlackEnabled();
+            mqttClient.publishFTB(me.fadeToBlackEnabled() ? 1 : 0)
         }
 
         onFadeToBlackStatusChanged: {

@@ -9,6 +9,10 @@ Page {
     id: mainPage
     objectName: "main"
 
+    property alias ftb: btnFTB.checked
+    property int program;
+    property int preview;
+
     background: Rectangle {
         gradient: Gradient {
             GradientStop { position: 0; color: "#bfa0a0" }
@@ -35,17 +39,17 @@ Page {
     // Still
     Keys.onDigit9Pressed: root.setProgram(3010)
 
-    ButtonGroup {
+    InputButtonGroup {
         id: programGroup
-        property int activeInput;
+        activeInput: meCon.program;
         onClicked: {
             root.setProgram(button.inputID)
         }
     }
 
-    ButtonGroup {
+    InputButtonGroup {
         id: previewGroup
-        property int activeInput;
+        activeInput: meCon.preview;
         onClicked: {
             root.setPreview(button.inputID)
         }
@@ -192,12 +196,14 @@ Page {
 
             BlinkButton {
                 id: btnFTB
-                text: "FTB"
+                text: !meCon.ftb_fading ? "FTB" : meCon.ftb_frame
                 display: AbstractButton.TextUnderIcon
                 onClicked: {
                     var me=atem.mixEffect(0);
                     me.toggleFadeToBlack();
                 }
+                tristate: meCon.ftb_fading
+                checked: meCon.ftb
             }
             Button {
                 id: btnCut

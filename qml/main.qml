@@ -3,7 +3,6 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
-import QtQuick.Dialogs 1.2
 
 import org.bm 1.0
 import org.tal.servicediscovery 1.0
@@ -18,8 +17,6 @@ ApplicationWindow {
 
     // MQTT
     property string mqttHostname: "127.0.0.1"
-
-
 
     ServiceDiscovery {
         id: sd
@@ -51,9 +48,11 @@ ApplicationWindow {
 
     Dialog {
         id: nyaDialog
-        standardButtons: StandardButton.Ok | StandardButton.Cancel
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        width: parent.width/3
         title: "Connect to switcher"
         ColumnLayout {
+            anchors.fill: parent
             TextField {
                 id: ipText
                 Layout.fillWidth: true
@@ -63,8 +62,8 @@ ApplicationWindow {
             Frame {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: ipText.height*2
-                Layout.maximumHeight: ipText.height*3
+                Layout.minimumHeight: ipText.height*4
+                Layout.maximumHeight: ipText.height*5
                 ColumnLayout {
                     anchors.fill: parent
                     ListView {
@@ -94,12 +93,20 @@ ApplicationWindow {
                             }
                         }
                     }
+
+                }
+            }
+            Button {
+                text: "Refresh"
+                onClicked: {
+                    sd.startDiscovery();
                 }
             }
         }
 
         onAccepted: {
-            nyaDialog.close();
+            console.debug(result)
+            nyaDialog.close();            
             atem.connectToSwitcher(ipText.text, 2000)
         }
     }

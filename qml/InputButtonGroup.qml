@@ -3,10 +3,7 @@ import QtQuick.Controls 2.12
 
 ButtonGroup {
     id: programGroup
-    property int activeInput: meCon.program;
-    onClicked: {
-        root.setProgram(button.inputID)
-    }
+    property int activeInput: meCon.program;    
     onActiveInputChanged: {
         for (var i = 0; i < buttons.length; ++i) {
             if (buttons[i].inputID == activeInput)

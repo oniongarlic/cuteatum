@@ -357,6 +357,13 @@ ApplicationWindow {
 
         onMediaInfoChanged: console.debug(info)
 
+        onStreamingDatarateChanged: {
+            if (atem.streamingDatarate>0)
+                mqttClient.publishOnAir(atem.streamingDatarate);
+            else
+                mqttClient.publishOnAir(0);
+        }
+
     }
 
     Connections {
@@ -437,8 +444,8 @@ ApplicationWindow {
         function publishTimeCode(i) {
             publish(topicBase+"time", i)
         }
-
-
+        function publishOnAir(i) {
+            publish(topicBase+"onair", i)
+        }
     }
-
 }

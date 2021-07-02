@@ -285,7 +285,16 @@ ApplicationWindow {
 
             console.debug(audioChannelCount())
 
-//            console.debug(inputInfos())
+            var topo=topology();
+            console.debug("ME:"+topo.MEs)
+            console.debug("SR:"+topo.sources)
+            console.debug("CG:"+topo.colorGenerators)
+            console.debug("AU:"+topo.auxBusses)
+            console.debug("DO:"+topo.downstreamKeyers)
+            console.debug("UP:"+topo.upstreamKeyers)
+            console.debug("ST:"+topo.stingers)
+            console.debug("DVE:"+topo.DVEs)
+            console.debug("SS:"+topo.supersources)
 
             var me=atem.mixEffect(0);
 
@@ -303,6 +312,19 @@ ApplicationWindow {
             deviceID=hostname();
             conMsg.text=productInformation()+" ("+hostname()+")";
             mqttClient.publishActive(1)
+
+            var inputs=inputInfoCount();
+            console.debug("INPUTS: "+inputs)
+            for (var i=0; i<inputs; i++) {
+                var input=inputInfo(i);
+                console.debug("*INPUT* "+i)
+                console.debug("IDX:"+input.index)
+                console.debug("TA:"+input.tally)
+                console.debug("ET:"+input.externalType)
+                console.debug("IT:"+input.internalType)
+                console.debug("LTX:"+input.longText)
+                console.debug("STX:"+input.shortText)
+            }
         }
 
         onAudioInputChanged: {

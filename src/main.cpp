@@ -51,7 +51,12 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 
-    qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");    
+    qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
+
+    qRegisterMetaType<QAtem::InputInfo>();
+    qRegisterMetaType<QAtem::Topology>();
+    qRegisterMetaType<quint16>();
+    qRegisterMetaType<QMap<quint16,QAtem::InputInfo>>();
 
     qmlRegisterType<CuteMqttClient>("org.tal.mqtt", 1, 0, "MqttClient");
 

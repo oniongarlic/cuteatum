@@ -1,4 +1,4 @@
-QT += quick dbus mqtt
+QT += quick quickcontrols2 dbus mqtt
 
 CONFIG += c++11
 

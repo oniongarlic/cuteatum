@@ -6,6 +6,8 @@
 
 #include <QQmlPropertyMap>
 
+#include <QQuickStyle>
+
 #include <QSettings>
 
 #include <qatemconnection.h>
@@ -39,6 +41,8 @@ int main(int argc, char *argv[])
     Settings settings;
 
     QQmlApplicationEngine engine;   
+
+    QQuickStyle::setStyle("Material");
 
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
     qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");

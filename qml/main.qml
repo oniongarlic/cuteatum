@@ -20,6 +20,8 @@ ApplicationWindow {
     property string mqttHostname: "localhost"
     property int mqttPort: 1883
 
+    property int sTime: 0
+
     ServiceDiscovery {
         id: sd
 
@@ -46,6 +48,10 @@ ApplicationWindow {
 
     ListModel {
         id: deviceModel
+    }
+
+    ListModel {
+        id: atemSources
     }
 
     Dialog {
@@ -191,6 +197,11 @@ ApplicationWindow {
                 Layout.fillWidth: true
             }
             Label {
+                id: timeMsg
+                text: sTime
+                Layout.fillWidth: true
+            }
+            Label {
                 Layout.fillWidth: false
                 visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingDatarate/1000/1000 + " Mbps"
@@ -265,6 +276,17 @@ ApplicationWindow {
             console.debug("Connected!")
             console.debug(productInformation())
 
+            console.debug(colorGeneratorColor(0))
+            console.debug(colorGeneratorColor(1))
+
+            console.debug(tallyIndexCount())
+
+            console.debug(mediaPlayerType(0))
+
+            console.debug(audioChannelCount())
+
+//            console.debug(inputInfos())
+
             var me=atem.mixEffect(0);
 
             if (me) {
@@ -296,13 +318,22 @@ ApplicationWindow {
         onTimeChanged: {
             var tc=getTime();
             console.debug("ATEM Time: "+ tc)
+            sTime=tc;
             mqttClient.publishTimeCode(tc)
         }
 
         onAudioLevelsChanged: {
             console.debug("AudioLevel")
-        }        
+        }
 
+        onSwitcherWarning: {
+            console.debug(warningString)
+            infoMsg.text=warningString;
+        }
+
+        onInputInfoChanged: console.debug(info)
+
+        onMediaInfoChanged: console.debug(info)
 
     }
 

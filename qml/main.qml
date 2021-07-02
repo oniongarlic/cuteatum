@@ -53,6 +53,10 @@ ApplicationWindow {
         standardButtons: Dialog.Ok | Dialog.Cancel
         width: parent.width/3
         title: "Connect to switcher"
+
+        x: Math.round((parent.width - width) / 2)
+        y: Math.round((parent.height - height) / 2)
+
         ColumnLayout {
             anchors.fill: parent
             TextField {
@@ -114,6 +118,7 @@ ApplicationWindow {
     }
 
     menuBar: MenuBar {
+        enabled: rootStack.depth<2
         Menu {
             title: "File"
 
@@ -131,6 +136,17 @@ ApplicationWindow {
                 onClicked: atem.disconnectFromSwitcher();
             }
 
+            MenuSeparator {
+
+            }
+
+            MenuItem {
+                text: "Settings..."
+                onClicked: {
+                    return rootStack.push(settingsView)
+                }
+            }
+
             MenuItem {
                 text: "Quit"
                 onClicked: {
@@ -142,6 +158,7 @@ ApplicationWindow {
         }
         Menu {
             title: "Audio"
+            enabled: atem.connected
             MenuItem {
                 checkable: true
                 text: "Levels"
@@ -195,6 +212,13 @@ ApplicationWindow {
     Component {
         id: mainView
         PageMain {
+
+        }
+    }
+
+    Component {
+        id: settingsView
+        PageSettings {
 
         }
     }

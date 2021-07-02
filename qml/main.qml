@@ -16,7 +16,9 @@ ApplicationWindow {
     title: qsTr("CuteAtum")
 
     // MQTT
-    property string mqttHostname: "127.0.0.1"
+    property bool mqttEnabled: false
+    property string mqttHostname: "localhost"
+    property int mqttPort: 1883
 
     ServiceDiscovery {
         id: sd
@@ -197,11 +199,22 @@ ApplicationWindow {
         }
     }
 
+    function loadSettings() {
+        mqttEnabled=settings.getSettingsBool("mqttEnabled", true)
+        mqttHostname=settings.getSettingsStr("mqttHostname", "localhost");
+        mqttPort=settings.getSettingsStr("mqttPort", "localhost");
+    }
+
     Component.onCompleted: {
+        loadSettings();
+
         atem.setDebugEnabled(true);
+
         mqttClient.setHostname(mqttHostname)
-        mqttClient.setPort(1883)
-        mqttClient.connectToHost();
+        mqttClient.setPort(mqttPort)
+        if (mqttEnabled) {
+            mqttClient.connectToHost();
+        }
     }
 
     function cutTransition() {
@@ -256,7 +269,11 @@ ApplicationWindow {
             mqttClient.publishActive(0)
         }
 
-        onTimeChanged: console.debug("Time: "+ getTime())
+        onTimeChanged: {
+            var tc=getTime();
+            console.debug("ATEM Time: "+ tc)
+            mqttClient.publishTimeCode(tc)
+        }
 
         onAudioLevelsChanged: {
             console.debug("AudioLevel")
@@ -339,6 +356,9 @@ ApplicationWindow {
         }
         function publishFTB(i) {
             publish(topicBase+"ftb", i)
+        }
+        function publishTimeCode(i) {
+            publish(topicBase+"time", i)
         }
 
 

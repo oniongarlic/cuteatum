@@ -9,10 +9,12 @@ CONFIG += c++11
 SOURCES += \
         src/cutemqttclient.cpp \
         src/main.cpp \
+        src/settings.cpp \
         src/servicediscovery.cpp
 
 HEADERS += \
     src/cutemqttclient.h \
+    src/settings.h \
     src/servicediscovery.h
 
 INCLUDEPATH += /usr/local/include

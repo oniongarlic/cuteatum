@@ -1,5 +1,12 @@
+#include <QtQuick>
+#include <QtQml>
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+
+#include <QQmlPropertyMap>
+
+#include <QSettings>
 
 #include <qatemconnection.h>
 #include <qatemcameracontrol.h>
@@ -8,6 +15,7 @@
 
 #include "servicediscovery.h"
 #include "cutemqttclient.h"
+#include "settings.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,7 +36,9 @@ int main(int argc, char *argv[])
                  "Unable to auto discover ATEM devices on the network.\n");
     }
 
-    QQmlApplicationEngine engine;
+    Settings settings;
+
+    QQmlApplicationEngine engine;   
 
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
     qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
@@ -40,6 +50,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");    
 
     qmlRegisterType<CuteMqttClient>("org.tal.mqtt", 1, 0, "MqttClient");
+
+    engine.rootContext()->setContextProperty("settings", &settings);
 
     const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

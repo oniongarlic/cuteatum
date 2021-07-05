@@ -94,13 +94,23 @@ Page {
                 inputID: 3010
                 ButtonGroup.group: programGroup
             }
-            InputButton {
-                text: "Black"
-                inputID: 0
-                compact: true
-                ButtonGroup.group: programGroup
+            ColumnLayout {
+                spacing: 2
+                InputButton {
+                    text: "Black"
+                    inputID: 0
+                    compact: true
+                    ButtonGroup.group: programGroup
+                }
+                InputButton {
+                    text: "Bars"
+                    inputID: 1000
+                    compact: true
+                    ButtonGroup.group: programGroup
+                }
             }
             ColumnLayout {
+                spacing: 2
                 InputButton {
                     text: "Color 1"
                     inputID: 2001
@@ -151,12 +161,22 @@ Page {
                 isPreview: true
                 ButtonGroup.group: previewGroup
             }
-            InputButton {
-                text: "Black"
-                inputID: 0
-                isPreview: true
-                compact: true
-                ButtonGroup.group: previewGroup
+            ColumnLayout {
+                spacing: 2
+                InputButton {
+                    text: "Black"
+                    inputID: 0
+                    isPreview: true
+                    compact: true
+                    ButtonGroup.group: previewGroup
+                }
+                InputButton {
+                    text: "Bars"
+                    inputID: 1000
+                    isPreview: true
+                    compact: true
+                    ButtonGroup.group: previewGroup
+                }
             }
             ColumnLayout {
                 spacing: 2

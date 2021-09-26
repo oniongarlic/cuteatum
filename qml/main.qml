@@ -237,7 +237,7 @@ ApplicationWindow {
     function loadSettings() {
         mqttEnabled=settings.getSettingsBool("mqttEnabled", true)
         mqttHostname=settings.getSettingsStr("mqttHostname", "localhost");
-        mqttPort=settings.getSettingsStr("mqttPort", "localhost");
+        mqttPort=settings.getSettingsInt("mqttPort", 1883);
     }
 
     Component.onCompleted: {

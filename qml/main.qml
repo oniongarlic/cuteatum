@@ -57,7 +57,7 @@ ApplicationWindow {
     Dialog {
         id: nyaDialog
         standardButtons: Dialog.Ok | Dialog.Cancel
-        width: parent.width/3
+        width: parent.width/2
         title: "Connect to switcher"
 
         x: Math.round((parent.width - width) / 2)
@@ -294,7 +294,7 @@ ApplicationWindow {
             console.debug("UP:"+topo.upstreamKeyers)
             console.debug("ST:"+topo.stingers)
             console.debug("DVE:"+topo.DVEs)
-            console.debug("SS:"+topo.supersources)
+            console.debug("SS:"+topo.supersources)                        
 
             var me=atem.mixEffect(0);
 
@@ -305,6 +305,9 @@ ApplicationWindow {
                 console.debug("Keys: "+me.upstreamKeyCount())
                 meCon.program=me.programInput();
                 meCon.preview=me.previewInput();
+
+                dumpMixerState()
+
                 //mainView.ftb=me.fadeToBlackEnabled();
             } else {
                 console.debug("No Mixer!")
@@ -327,6 +330,17 @@ ApplicationWindow {
             }
         }
 
+        function dumpMixerState() {
+            var me=atem.mixEffect(0);
+
+            console.debug("upstreamKeyOnAir: "+ me.upstreamKeyOnAir(0))
+            console.debug("upstreamKeyType: "+ me.upstreamKeyType(0))
+            console.debug("upstreamKeyFillSource: "+ me.upstreamKeyFillSource(0))
+            console.debug("upstreamKeyKeySource: "+ me.upstreamKeyKeySource(0))
+            console.debug("Program is: "+me.programInput())
+            console.debug("Preview is: "+me.previewInput())
+        }
+
         onAudioInputChanged: {
             console.debug("AudioInput changed "+index + " "+input)
         }
@@ -342,6 +356,8 @@ ApplicationWindow {
             console.debug("ATEM Time: "+ tc)
             sTime=tc;
             mqttClient.publishTimeCode(tc)
+
+            dumpMixerState()
         }
 
         onAudioLevelsChanged: {

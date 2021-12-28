@@ -234,8 +234,9 @@ ApplicationWindow {
         }
     }
 
-    ButtonGroup {
+    InputButtonGroup {
         id: outputGroup
+        activeInput: 0
         onClicked: {
             atem.setAuxSource(0, button.inputID);
         }
@@ -439,6 +440,12 @@ ApplicationWindow {
                 mqttClient.publishOnAir(0);
         }
 
+        onAuxSourceChanged: {
+            console.debug("AUX:"+aux+" = "+source)
+            outputGroup.activeInput=source
+            mqttClient.publishOutput(source)
+        }
+
     }
 
     Connections {
@@ -471,6 +478,8 @@ ApplicationWindow {
         onFadeToBlackStatusChanged: {
             console.debug("FTB property status is "+status)
         }
+
+
     }
 
     MqttClient {
@@ -512,6 +521,9 @@ ApplicationWindow {
         }
         function publishPreview(i) {
             publish(topicBase+"preview", i)
+        }
+        function publishOutput(i) {
+            publish(topicBase+"output", i)
         }
         function publishFTB(i) {
             publish(topicBase+"ftb", i)

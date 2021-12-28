@@ -195,6 +195,61 @@ Page {
                     ButtonGroup.group: previewGroup
                 }
             }
+        }        
+
+        InputButtonGroup {
+            id: upstreamKeyFillSourceGroup
+            // activeInput: meCon.preview;
+            onClicked: {
+                var me=atem.mixEffect(0);
+                me.setUpstreamKeyFillSource(0, button.inputID)
+            }
+        }
+
+        InputButtonGroup {
+            id: upstreamKeySourceGroup
+            // activeInput: meCon.preview;
+            onClicked: {
+                var me=atem.mixEffect(0);
+                me.setUpstreamKeyKeySource(0, button.inputID)
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            Layout.margins: 4
+            spacing: 4
+            InputButton {
+                text: "C1"
+                inputID: 1
+                isPreview: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "C2"
+                inputID: 2
+                isPreview: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "C3"
+                inputID: 3
+                isPreview: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "C4"
+                inputID: 4
+                isPreview: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Still"
+                inputID: 3010
+                isPreview: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
         }
 
         RowLayout {
@@ -211,6 +266,13 @@ Page {
                 onClicked: {
                     var me=atem.mixEffect(0);
                     me.setUpstreamKeyOnNextTransition(0, checked)
+                }
+            }
+            CheckBox {
+                text: "DVEKey"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.setDVEKeyEnabled(checked)
                 }
             }
 
@@ -239,13 +301,6 @@ Page {
                 onClicked: {
                     var me=atem.mixEffect(0);
                     me.autoTransition();
-                }
-            }
-            CheckBox {
-                text: "DVEKey"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setDVEKeyEnabled(checked)
                 }
             }
         }

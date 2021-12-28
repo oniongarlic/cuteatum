@@ -180,6 +180,65 @@ ApplicationWindow {
                 }
             }
         }
+        Menu {
+            title: "Output"
+            enabled: atem.connected
+            InputMenuItem {
+                checkable: true
+                text: "Multiview"
+                inputID: 9001
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Program"
+                inputID: 10010
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Preview"
+                inputID: 10011
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Input 1"
+                inputID: 1
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Input 2"
+                inputID: 2
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Input 3"
+                inputID: 3
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Input 4"
+                inputID: 4
+                ButtonGroup.group: outputGroup
+            }
+            InputMenuItem {
+                checkable: true
+                text: "Direct input 1"
+                inputID: 11001
+                ButtonGroup.group: outputGroup
+            }
+        }
+    }
+
+    ButtonGroup {
+        id: outputGroup
+        onClicked: {
+            atem.setAuxSource(0, button.inputID);
+        }
     }
 
     footer: ToolBar {

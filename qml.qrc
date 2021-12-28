@@ -6,5 +6,6 @@
         <file>qml/PageMain.qml</file>
         <file>qml/InputButtonGroup.qml</file>
         <file>qml/PageSettings.qml</file>
+        <file>qml/InputMenuItem.qml</file>
     </qresource>
 </RCC>

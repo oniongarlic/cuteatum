@@ -9,7 +9,7 @@ Button {
     property bool tristate: false
 
     property color checkedColor: "red"
-    property color notCheckedColor: "green"    
+    property color notCheckedColor: "green"
 
     background: Rectangle {
         id: btnBg

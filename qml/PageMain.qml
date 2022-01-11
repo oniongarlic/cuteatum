@@ -195,7 +195,7 @@ Page {
                     ButtonGroup.group: previewGroup
                 }
             }
-        }        
+        }
 
         InputButtonGroup {
             id: upstreamKeyFillSourceGroup
@@ -276,6 +276,68 @@ Page {
                 }
             }
 
+            ColumnLayout {
+
+                RowLayout {
+                    SpinBox {
+                        id: dveXPos
+                        editable: true
+                        from: -125
+                        to: 125
+                        onValueModified: {
+                            var me=atem.mixEffect(0);
+                            me.setUpstreamKeyDVEPosition(0, value/10.0, me.upstreamKeyDVEYPosition(0))
+                        }
+                    }
+
+                    SpinBox {
+                        id: dveYPos
+                        editable: true
+                        from: -70
+                        to: 70
+                        onValueModified: {
+                            var me=atem.mixEffect(0);
+                            me.setUpstreamKeyDVEPosition(0, me.upstreamKeyDVEXPosition(0), value/10.0)
+                        }
+                    }
+                }
+
+                CheckBox {
+                    id: lockAspect
+                    text: "Lock"
+                    checked: true
+                }
+
+                RowLayout {
+
+                    SpinBox {
+                        id: dveXSize
+                        editable: true
+                        from: 0
+                        to: 100
+                        onValueModified: {
+                            var me=atem.mixEffect(0);
+                            var v=value/100.0;
+                            me.setUpstreamKeyDVESize(0, v, lockAspect ? v : me.upstreamKeyDVEYSize(0))
+                        }
+                    }
+
+                    SpinBox {
+                        id: dveYSize
+                        editable: true
+                        from: 0
+                        to: 100
+                        onValueModified: {
+                            var me=atem.mixEffect(0);
+                            var v=value/100.0;
+                            me.setUpstreamKeyDVESize(0, lockAspect ? v : me.upstreamKeyDVEXSize(0), v)
+                        }
+                    }
+
+                }
+
+            }
+
             BlinkButton {
                 id: btnFTB
                 text: !meCon.ftb_fading ? "FTB" : meCon.ftb_frame
@@ -343,8 +405,8 @@ Page {
                 onClicked: {
                     atem.stopRecording();
                 }
-            }            
-        }        
+            }
+        }
         
         PropertyAnimation {
             id: easingTransition

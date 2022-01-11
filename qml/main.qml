@@ -502,6 +502,22 @@ ApplicationWindow {
             console.debug("FTB property status is "+status)
         }
 
+        onUpstreamKeyDVEXPositionChanged: {
+            console.debug("X:"+xPosition)
+        }
+
+        onUpstreamKeyDVEYPositionChanged: {
+            console.debug("Y:"+yPosition)
+        }
+
+        onUpstreamKeyDVEXSizeChanged: {
+            console.debug("XS:"+xSize)
+        }
+
+        onUpstreamKeyDVEYSizeChanged: {
+            console.debug("YS:"+ySize)
+        }
+
     }
 
     MqttClient {

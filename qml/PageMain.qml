@@ -303,6 +303,14 @@ Page {
                     me.autoTransition();
                 }
             }
+            Button {
+                id: btnEasing
+                text: "Easing"
+                enabled: !easingTransition.running
+                onClicked: {
+                    easingTransition.start()
+                }
+            }
         }
 
         RowLayout {
@@ -335,15 +343,34 @@ Page {
                 onClicked: {
                     atem.stopRecording();
                 }
-            }
+            }            
+        }        
+        
+        PropertyAnimation {
+            id: easingTransition
+            duration: 5000
+            easing.type: Easing.InOutBounce
+            target: sliderTbar
+            property: "value"
+            from: 0
+            to: 10000
         }
 
         Slider {
+            id: sliderTbar
             Layout.fillHeight: true
             orientation: Qt.Vertical
             to: 10000
             from: 0
             stepSize: 100
+            enabled: !easingTransition.running
+            onValueChanged: {
+                if (easingTransition.running) {
+                    var me=atem.mixEffect(0);
+                    me.setTransitionPosition(value);
+                }
+            }
+
             onMoved: {
                 var me=atem.mixEffect(0);
                 me.setTransitionPosition(value);

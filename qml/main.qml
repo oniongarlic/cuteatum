@@ -359,10 +359,9 @@ ApplicationWindow {
             var me=atem.mixEffect(0);
 
             if (me) {
-                meCon.target=me
-                console.debug("Program is: "+me.programInput())
-                console.debug("Preview is: "+me.previewInput())
                 console.debug("Keys: "+me.upstreamKeyCount())
+
+                meCon.target=me;
                 meCon.program=me.programInput();
                 meCon.preview=me.previewInput();
 
@@ -415,9 +414,7 @@ ApplicationWindow {
             var tc=getTime();
             console.debug("ATEM Time: "+ tc)
             sTime=tc;
-            mqttClient.publishTimeCode(tc)
-
-            dumpMixerState()
+            mqttClient.publishTimeCode(tc)            
         }
 
         onAudioLevelsChanged: {
@@ -439,6 +436,21 @@ ApplicationWindow {
             else
                 mqttClient.publishOnAir(0);
         }
+        onStreamingCacheChanged: {
+            console.debug("Cache status: "+cache)
+        }
+
+        onRecordingTimeChanged: {
+            console.debug("Recording: "+time)
+        }
+
+        onStreamingTimeChanged: {
+            console.debug("Streaming: "+time)
+        }
+
+        onTimecodeLockedChanged: {
+            console.debug("TimecodeLock"+locked)
+        }
 
         onAuxSourceChanged: {
             console.debug("AUX:"+aux+" = "+source)
@@ -446,6 +458,17 @@ ApplicationWindow {
             mqttClient.publishOutput(source)
         }
 
+    }
+
+    Timer {
+        id: statusPoller
+        interval: 1000
+        repeat: true
+        running: atem.connected && atem.timecodeLocked
+        onTriggered: {
+            atem.requestRecordingStatus();
+            atem.requestStreamingStatus();
+        }
     }
 
     Connections {
@@ -458,12 +481,12 @@ ApplicationWindow {
         property int ftb_frame;
 
         onProgramInputChanged: {
-            console.debug("Program:" +newIndex)
+            console.debug("onProgramInputChanged:" +newIndex)
             program=newIndex;
             mqttClient.publishProgram(newIndex)
         }
         onPreviewInputChanged: {
-            console.debug("Preview:" +newIndex)
+            console.debug("onPreviewInputChanged:" +newIndex)
             preview=newIndex;
             mqttClient.publishPreview(newIndex)
         }
@@ -478,7 +501,6 @@ ApplicationWindow {
         onFadeToBlackStatusChanged: {
             console.debug("FTB property status is "+status)
         }
-
 
     }
 
@@ -509,9 +531,9 @@ ApplicationWindow {
 
         onStateChanged: console.debug("MQTT: State "+state)
 
-        onPingResponseReceived: console.debug("MQTT: Ping")
+        //onPingResponseReceived: console.debug("MQTT: Ping")
 
-        onMessageSent: console.debug("MQTT: Sent "+id)
+        //onMessageSent: console.debug("MQTT: Sent "+id)
 
         function publishActive(i) {
             publish(topicBase+"active", i, 1, true)

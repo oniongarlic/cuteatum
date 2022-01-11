@@ -254,6 +254,24 @@ Page {
 
         RowLayout {
             Layout.fillWidth: true
+
+            ComboBox {
+                // 0 = luma, 1 = chroma, 2 = pattern, 3 = DVE
+                textRole: "text"
+                valueRole: "keyType"
+                model: ListModel {
+                    ListElement { keyType: 0; text: "Luma" }
+                    ListElement { keyType: 1; text: "Chroma" }
+                    ListElement { keyType: 2; text: "Pattern" }
+                    ListElement { keyType: 3; text: "DVE" }
+                }
+                onActivated: {
+                    var me=atem.mixEffect(0);
+                    me.setUpstreamKeyType(0, currentValue)
+                }
+            }
+
+
             CheckBox {
                 text: "Key"
                 onClicked: {

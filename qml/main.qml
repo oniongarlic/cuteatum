@@ -243,7 +243,7 @@ ApplicationWindow {
                 inputID: 11001
                 ButtonGroup.group: outputGroup
             }
-        }
+        }       
     }
 
     InputButtonGroup {
@@ -290,7 +290,7 @@ ApplicationWindow {
                 visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingCache
                 Layout.alignment: Qt.AlignRight
-            }
+            }            
         }
     }
 

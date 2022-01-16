@@ -65,17 +65,19 @@ Page {
 
     GridLayout {
         id: container
-        rowSpacing: 2
-        columnSpacing: 2
+        rowSpacing: 1
+        columnSpacing: 1
         columns: 2
         rows: 4
         anchors.fill: parent
+        anchors.margins: 4
         enabled: atem.connected
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            Layout.margins: 4
+            Layout.fillHeight: true
+            //Layout.alignment: Qt.AlignHCenter
+            Layout.margins: 0
             Layout.column: 0
             Layout.row: 0
             spacing: 2
@@ -105,7 +107,8 @@ Page {
                 ButtonGroup.group: programGroup
             }
             ColumnLayout {
-                spacing: 2
+                spacing: 0
+                Layout.margins: 0
                 InputButton {
                     text: "Black"
                     inputID: 0
@@ -120,7 +123,8 @@ Page {
                 }
             }
             ColumnLayout {
-                spacing: 2
+                spacing: 0
+                Layout.margins: 0
                 InputButton {
                     text: "Color 1"
                     inputID: 2001
@@ -139,7 +143,7 @@ Page {
         RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            Layout.margins: 4
+            Layout.margins: 0
             Layout.column: 0
             Layout.row: 1
             spacing: 2
@@ -174,7 +178,8 @@ Page {
                 ButtonGroup.group: previewGroup
             }
             ColumnLayout {
-                spacing: 2
+                spacing: 0
+                Layout.margins: 0
                 InputButton {
                     text: "Black"
                     inputID: 0
@@ -191,7 +196,8 @@ Page {
                 }
             }
             ColumnLayout {
-                spacing: 2
+                spacing: 0
+                Layout.margins: 0
                 InputButton {
                     text: "Color 1"
                     inputID: 2001
@@ -230,13 +236,12 @@ Page {
         GridLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            Layout.margins: 4
             Layout.column: 0
             Layout.row: 2
             columns: 5
             columnSpacing: 2
             rows: 2
-            rowSpacing: 2
+            rowSpacing: 0
             InputButton {
                 text: "C1"
                 inputID: 1
@@ -466,14 +471,15 @@ Page {
             }
 
             RowLayout {
+                Layout.fillWidth: false
                 Layout.column: 0
                 Layout.row: 4
                 Layout.margins: 4
 
                 ColumnLayout {
+                    Layout.fillWidth: true
 
                     Button {
-                        Layout.fillWidth: true
                         id: btnStreamStart
                         text: "Stream"
                         onClicked: {
@@ -481,7 +487,6 @@ Page {
                         }
                     }
                     Button {
-                        Layout.fillWidth: true
                         id: btnStreamStop
                         text: "Stop"
                         onClicked: {
@@ -492,9 +497,9 @@ Page {
                 }
 
                 ColumnLayout {
+                    Layout.fillWidth: true
 
                     Button {
-                        Layout.fillWidth: true
                         id: btnRecStart
                         text: "Record"
                         onClicked: {
@@ -502,7 +507,6 @@ Page {
                         }
                     }
                     Button {
-                        Layout.fillWidth: true
                         id: btnRecStop
                         text: "Stop"
                         onClicked: {
@@ -512,8 +516,6 @@ Page {
                 }
             }
         }
-
-
         
         PropertyAnimation {
             id: easingTransition

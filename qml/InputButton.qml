@@ -8,9 +8,11 @@ Button {
     id: btn
     autoExclusive: true
     checkable: true
-    anchors.margins: 8
+    anchors.margins: 0
 
     Layout.fillWidth: true
+    Layout.fillHeight: false
+    Layout.margins: 0
 
     property int inputID: 0
     property bool compact: false
@@ -19,7 +21,7 @@ Button {
     onCheckedChanged: console.debug("ABC"+checked)
 
     background: Item {
-        implicitWidth: btn.compact ? 60 : 80
+        implicitWidth: btn.compact ? 50 : 60
         implicitHeight: btn.compact ? 25 : 60
         Rectangle {
             id: btnbg

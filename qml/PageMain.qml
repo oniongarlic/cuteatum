@@ -20,8 +20,8 @@ Page {
         }
     }
 
+    // XXX interferes with input widgets..
     Keys.onSpacePressed: root.cutTransition();
-
     Keys.onReturnPressed: {
         var me=atem.mixEffect(0);
         me.autoTransition();
@@ -38,6 +38,14 @@ Page {
 
     // Still
     Keys.onDigit9Pressed: root.setProgram(3010)
+
+    function setDVEKey(checked) {
+        var me=atem.mixEffect(0);
+        if (keyType.currentValue!==3)
+            me.setUpstreamKeyFlyEnabled(0, checked)
+        else
+            me.setDVEKeyEnabled(checked)
+    }
 
     InputButtonGroup {
         id: programGroup
@@ -58,8 +66,8 @@ Page {
     GridLayout {
         id: container
         rowSpacing: 2
-        columnSpacing: 4
-        columns: 1
+        columnSpacing: 2
+        columns: 2
         rows: 4
         anchors.fill: parent
         enabled: atem.connected
@@ -68,7 +76,9 @@ Page {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
             Layout.margins: 4
-            spacing: 4
+            Layout.column: 0
+            Layout.row: 0
+            spacing: 2
             InputButton {
                 text: "C1"
                 inputID: 1
@@ -130,7 +140,9 @@ Page {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
             Layout.margins: 4
-            spacing: 4
+            Layout.column: 0
+            Layout.row: 1
+            spacing: 2
             InputButton {
                 text: "C1"
                 inputID: 1
@@ -215,93 +227,189 @@ Page {
             }
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
             Layout.margins: 4
-            spacing: 4
+            Layout.column: 0
+            Layout.row: 2
+            columns: 5
+            columnSpacing: 2
+            rows: 2
+            rowSpacing: 2
             InputButton {
                 text: "C1"
                 inputID: 1
                 isPreview: true
+                compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "C2"
                 inputID: 2
                 isPreview: true
+                compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "C3"
                 inputID: 3
                 isPreview: true
+                compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "C4"
                 inputID: 4
                 isPreview: true
+                compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "Still"
                 inputID: 3010
                 isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+
+            InputButton {
+                text: "Color 1"
+                inputID: 2001
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Color 2"
+                inputID: 2002
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+
+            InputButton {
+                text: "Black"
+                inputID: 0
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Bars"
+                inputID: 1000
+                isPreview: true
+                compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
         }
 
         RowLayout {
             Layout.fillWidth: true
+            Layout.column: 0
+            Layout.row: 3
+            Layout.margins: 4
 
-            ComboBox {
-                // 0 = luma, 1 = chroma, 2 = pattern, 3 = DVE
-                textRole: "text"
-                valueRole: "keyType"
-                model: ListModel {
-                    ListElement { keyType: 0; text: "Luma" }
-                    ListElement { keyType: 1; text: "Chroma" }
-                    ListElement { keyType: 2; text: "Pattern" }
-                    ListElement { keyType: 3; text: "DVE" }
+            ColumnLayout {
+                ComboBox {
+                    id: keyType
+                    textRole: "text"
+                    valueRole: "keyType"
+                    model: ListModelKeyType {
+                    }
+                    onActivated: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyType(0, currentValue)
+                        setDVEKey(checked)
+                    }
                 }
-                onActivated: {
-                    var me=atem.mixEffect(0);
-                    me.setUpstreamKeyType(0, currentValue)
+
+                CheckBox {
+                    text: "Key"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyOnAir(0, checked)
+                    }
                 }
+                CheckBox {
+                    text: "KeyOnChange"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyOnNextTransition(0, checked)
+                    }
+                }
+                CheckBox {
+                    text: "DVEKey"
+                    onClicked: {
+                        setDVEKey(checked)
+                    }
+                }
+
             }
 
+            GridLayout {
+                rows: 3
+                columns: 2
 
-            CheckBox {
-                text: "Key"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setUpstreamKeyOnAir(0, checked)
+                Button {
+                    text: "FS"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.runUpstreamKeyTo(0, 3, 0)
+                    }
                 }
-            }
-            CheckBox {
-                text: "KeyOnChange"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setUpstreamKeyOnNextTransition(0, checked)
+                Button {
+                    text: "INF"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.runUpstreamKeyTo(0, 4, 0) // center
+                    }
                 }
-            }
-            CheckBox {
-                text: "DVEKey"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.setDVEKeyEnabled(checked)
+                Button {
+                    text: "A"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.runUpstreamKeyTo(0, 1, 0)
+                    }
+                }
+                Button {
+                    text: "B"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.runUpstreamKeyTo(0, 2, 0)
+                    }
+                }
+                Button {
+                    text: "Set A"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyDVEKeyFrame(0, 1)
+                    }
+                }
+                Button {
+                    text: "Set B"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyDVEKeyFrame(0, 2)
+                    }
+                }
+                Button {
+                    text: "Animate"
+                    onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyDVEKeyFrame(0, 2)
+                    }
                 }
             }
 
             ColumnLayout {
 
-                RowLayout {
+                ColumnLayout {
                     SpinBox {
                         id: dveXPos
                         editable: true
-                        from: -125
-                        to: 125
+                        from: -200
+                        to: 200
                         onValueModified: {
                             var me=atem.mixEffect(0);
                             me.setUpstreamKeyDVEPosition(0, value/10.0, me.upstreamKeyDVEYPosition(0))
@@ -311,8 +419,8 @@ Page {
                     SpinBox {
                         id: dveYPos
                         editable: true
-                        from: -70
-                        to: 70
+                        from: -200
+                        to: 200
                         onValueModified: {
                             var me=atem.mixEffect(0);
                             me.setUpstreamKeyDVEPosition(0, me.upstreamKeyDVEXPosition(0), value/10.0)
@@ -326,7 +434,7 @@ Page {
                     checked: true
                 }
 
-                RowLayout {
+                ColumnLayout {
 
                     SpinBox {
                         id: dveXSize
@@ -343,6 +451,7 @@ Page {
                     SpinBox {
                         id: dveYSize
                         editable: true
+                        visible: !lockAspect.checked
                         from: 0
                         to: 100
                         onValueModified: {
@@ -356,7 +465,185 @@ Page {
 
             }
 
+            RowLayout {
+                Layout.column: 0
+                Layout.row: 4
+                Layout.margins: 4
+
+                ColumnLayout {
+
+                    Button {
+                        Layout.fillWidth: true
+                        id: btnStreamStart
+                        text: "Stream"
+                        onClicked: {
+                            atem.startStreaming();
+                        }
+                    }
+                    Button {
+                        Layout.fillWidth: true
+                        id: btnStreamStop
+                        text: "Stop"
+                        onClicked: {
+                            atem.stopStreaming();
+                        }
+                    }
+
+                }
+
+                ColumnLayout {
+
+                    Button {
+                        Layout.fillWidth: true
+                        id: btnRecStart
+                        text: "Record"
+                        onClicked: {
+                            atem.startRecording();
+                        }
+                    }
+                    Button {
+                        Layout.fillWidth: true
+                        id: btnRecStop
+                        text: "Stop"
+                        onClicked: {
+                            atem.stopRecording();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        
+        PropertyAnimation {
+            id: easingTransition
+            duration: 2000
+            easing.type: Easing.InCubic
+            target: sliderTbar
+            property: "value"
+            from: 0
+            to: 10000
+        }
+
+        ParallelAnimation {
+            id: dveAnimation
+
+            property real xPosStart: 0
+            property real xPosEnd: 0
+
+            property real yPosStart: 0
+            property real yPosEnd: 0
+
+            property real sizeStart: 0
+            property real sizeEnd: 0
+
+            NumberAnimation { from: dveAnimation.xPosStart; to: dveAnimation.xPosEnd; duration: 1000; properties: "value"; target: dveXPos }
+            NumberAnimation { from: dveAnimation.yPosStart; to: dveAnimation.yPosEnd; duration: 1000; properties: "value"; target: dveYPos }
+            NumberAnimation { from: dveAnimation.sizeStart; to: dveAnimation.sizeEnd; duration: 1000; properties: "value"; target: [ dveXSize, dveYSize]}
+        }
+
+
+
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: false
+            Layout.margins: 4
+            Layout.column: 1
+            Layout.row: 0
+            Layout.rowSpan: 4
+
+            Slider {
+                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignHCenter
+                id: sliderTbar
+                orientation: Qt.Vertical
+                to: 10000
+                from: 0
+                stepSize: 100
+                enabled: !easingTransition.running
+                onValueChanged: {
+                    if (easingTransition.running) {
+                        var me=atem.mixEffect(0);
+                        me.setTransitionPosition(value);
+                    }
+                }
+
+                onMoved: {
+                    var me=atem.mixEffect(0);
+                    me.setTransitionPosition(value);
+                }
+                onPressedChanged: {
+                    if (!pressed) {
+                        value=0;
+                        var me=atem.mixEffect(0);
+                        me.setTransitionPosition(0);
+                    }
+                }
+            }
+
+
+            Button {
+                Layout.fillWidth: true
+                id: btnCut
+                text: "Cut"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.cut();
+                }
+            }
+            Button {
+                Layout.fillWidth: true
+                id: btnAuto
+                text: "Auto"
+                onClicked: {
+                    var me=atem.mixEffect(0);
+                    me.autoTransition();
+                }
+            }
+
+            ColumnLayout {
+
+                ComboBox {
+                    id: easingType
+                    textRole: "text"
+                    valueRole: "easingType"
+                    model: ListModelEasing {
+
+                    }
+                    onActivated: {
+                        easingTransition.easing=currentValue
+                    }
+                    Component.onCompleted: {
+                        currentIndex = indexOfValue(Easing.InCubic)
+                    }
+                }
+
+                SpinBox {
+                    Layout.fillWidth: true
+                    id: easingDuration
+                    editable: false
+                    from: 0
+                    to: 10
+                    value: 2
+                    onValueModified: {
+                        easingTransition.duration=value*1000;
+                    }
+                    background.implicitWidth: 100
+                }
+
+                Button {
+                    Layout.fillWidth: true
+                    id: btnEasing
+                    text: "Easing"
+                    enabled: !easingTransition.running
+                    onClicked: {
+                        easingTransition.start()
+                    }
+                }
+            }
+
             BlinkButton {
+                Layout.fillWidth: true
                 id: btnFTB
                 text: !meCon.ftb_fading ? "FTB" : meCon.ftb_frame
                 display: AbstractButton.TextUnderIcon
@@ -367,101 +654,7 @@ Page {
                 tristate: meCon.ftb_fading
                 checked: meCon.ftb
             }
-            Button {
-                id: btnCut
-                text: "Cut"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.cut();
-                }
-            }
-            Button {
-                id: btnAuto
-                text: "Auto"
-                onClicked: {
-                    var me=atem.mixEffect(0);
-                    me.autoTransition();
-                }
-            }
-            Button {
-                id: btnEasing
-                text: "Easing"
-                enabled: !easingTransition.running
-                onClicked: {
-                    easingTransition.start()
-                }
-            }
-        }
 
-        RowLayout {
-            spacing: 4
-            Button {
-                id: btnStreamStart
-                text: "Stream"
-                onClicked: {
-                    atem.startStreaming();
-                }
-            }
-            Button {
-                id: btnStreamStop
-                text: "Stop"
-                onClicked: {
-                    atem.stopStreaming();
-                }
-            }
-
-            Button {
-                id: btnRecStart
-                text: "Record"
-                onClicked: {
-                    atem.startRecording();
-                }
-            }
-            Button {
-                id: btnRecStop
-                text: "Stop"
-                onClicked: {
-                    atem.stopRecording();
-                }
-            }
-        }
-        
-        PropertyAnimation {
-            id: easingTransition
-            duration: 5000
-            easing.type: Easing.InOutBounce
-            target: sliderTbar
-            property: "value"
-            from: 0
-            to: 10000
-        }
-
-        Slider {
-            id: sliderTbar
-            Layout.fillHeight: true
-            orientation: Qt.Vertical
-            to: 10000
-            from: 0
-            stepSize: 100
-            enabled: !easingTransition.running
-            onValueChanged: {
-                if (easingTransition.running) {
-                    var me=atem.mixEffect(0);
-                    me.setTransitionPosition(value);
-                }
-            }
-
-            onMoved: {
-                var me=atem.mixEffect(0);
-                me.setTransitionPosition(value);
-            }
-            onPressedChanged: {
-                if (!pressed) {
-                    value=0;
-                    var me=atem.mixEffect(0);
-                    me.setTransitionPosition(0);
-                }
-            }
         }
 
     }

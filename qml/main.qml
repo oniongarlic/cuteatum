@@ -142,6 +142,18 @@ ApplicationWindow {
                 onClicked: atem.disconnectFromSwitcher();
             }
 
+            MenuItem {
+                text: "Save settings"
+                enabled: atem.connected
+                onClicked: atem.saveSettings();
+            }
+
+            MenuItem {
+                text: "Clear settings"
+                enabled: atem.connected
+                onClicked: atem.clearSettings();
+            }
+
             MenuSeparator {
 
             }
@@ -264,7 +276,19 @@ ApplicationWindow {
             Label {
                 Layout.fillWidth: false
                 visible: atem.streamingDatarate>0 && atem.connected
+                text: atem.streamingTime
+                Layout.alignment: Qt.AlignRight
+            }
+            Label {
+                Layout.fillWidth: false
+                visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingDatarate/1000/1000 + " Mbps"
+                Layout.alignment: Qt.AlignRight
+            }
+            Label {
+                Layout.fillWidth: false
+                visible: atem.streamingDatarate>0 && atem.connected
+                text: atem.streamingCache
                 Layout.alignment: Qt.AlignRight
             }
         }
@@ -354,7 +378,10 @@ ApplicationWindow {
             console.debug("UP:"+topo.upstreamKeyers)
             console.debug("ST:"+topo.stingers)
             console.debug("DVE:"+topo.DVEs)
-            console.debug("SS:"+topo.supersources)                        
+            console.debug("SS:"+topo.supersources)
+
+            requestRecordingStatus();
+            requestStreamingStatus();
 
             var me=atem.mixEffect(0);
 

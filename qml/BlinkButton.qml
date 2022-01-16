@@ -13,7 +13,7 @@ Button {
 
     background: Rectangle {
         id: btnBg
-        implicitHeight: 50
+        implicitHeight: 40
         implicitWidth: 60
 
         SequentialAnimation on color {

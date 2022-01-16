@@ -7,5 +7,7 @@
         <file>qml/InputButtonGroup.qml</file>
         <file>qml/PageSettings.qml</file>
         <file>qml/InputMenuItem.qml</file>
+        <file>qml/ListModelEasing.qml</file>
+        <file>qml/ListModelKeyType.qml</file>
     </qresource>
 </RCC>

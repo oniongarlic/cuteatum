@@ -7,17 +7,20 @@ Button {
     checkable: true
 
     property bool tristate: false
+    property bool compact: false
+
+    property bool blink: true
 
     property color checkedColor: "red"
     property color notCheckedColor: "green"
 
     background: Rectangle {
         id: btnBg
-        implicitHeight: 40
-        implicitWidth: 60
+        implicitWidth: btn.compact ? 50 : 60
+        implicitHeight: btn.compact ? 25 : 60
 
         SequentialAnimation on color {
-            running: btn.state=='on'
+            running: btn.state=='on' && blink
             loops: Animation.Infinite
             ColorAnimation {
                 from: "black"

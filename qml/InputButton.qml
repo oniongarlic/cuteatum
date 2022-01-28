@@ -11,8 +11,8 @@ Button {
     anchors.margins: 0
 
     Layout.fillWidth: true
-    Layout.fillHeight: false
-    Layout.margins: 0
+    Layout.fillHeight: true
+    Layout.margins: 4
 
     property int inputID: 0
     property bool compact: false

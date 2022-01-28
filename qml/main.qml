@@ -22,6 +22,21 @@ ApplicationWindow {
 
     property int sTime: 0
 
+    Shortcut {
+        sequence: StandardKey.FullScreen
+        onActivated: {
+            visibility=Window.FullScreen
+        }
+    }
+
+    Shortcut {
+        sequence: StandardKey.Cancel
+        enabled: root.visibility==Window.FullScreen
+        onActivated: {
+            visibility=Window.Windowed
+        }
+    }
+
     ServiceDiscovery {
         id: sd
 
@@ -178,13 +193,16 @@ ApplicationWindow {
             title: "Audio"
             enabled: atem.connected
             MenuItem {
+                id: audioLevelsMenu
                 checkable: true
                 text: "Levels"
                 onCheckedChanged: {
-                    atem.setAudioLevelsEnabled(checked)
+                    //atem.setAudioLevelsEnabled(checked)
+                    atem.setFairlightAudioLevelsEnabled(checked)
                 }
             }
             MenuItem {
+                id: audioMonitorMenu
                 checkable: true
                 text: "Monitor"
                 onCheckedChanged: {
@@ -243,7 +261,25 @@ ApplicationWindow {
                 inputID: 11001
                 ButtonGroup.group: outputGroup
             }
-        }       
+        }
+    }
+
+    Drawer {
+        id: macroDrawer
+        enabled: atem.connected
+        height: root.height
+        GridLayout {
+            rows: 4
+            columns: 2
+
+            Repeater {
+                model: 12
+                delegate: Button {
+                    text: "M"+(index+1)
+                    onClicked: atem.runMacro(index+1)
+                }
+            }
+        }
     }
 
     InputButtonGroup {
@@ -307,7 +343,7 @@ ApplicationWindow {
     Component {
         id: mainView
         PageMain {
-
+            me0: !atem.connected ? null : atem.mixEffect(0)
         }
     }
 
@@ -390,7 +426,7 @@ ApplicationWindow {
 
                 meCon.target=me;
                 meCon.program=me.programInput();
-                meCon.preview=me.previewInput();
+                meCon.preview=me.previewInput();                
 
                 dumpMixerState()
 
@@ -485,6 +521,11 @@ ApplicationWindow {
             mqttClient.publishOutput(source)
         }
 
+        onAudioMasterLevelsChanged: {
+            console.debug(left)
+            console.debug(right)
+        }
+
     }
 
     Timer {
@@ -528,23 +569,6 @@ ApplicationWindow {
         onFadeToBlackStatusChanged: {
             console.debug("FTB property status is "+status)
         }
-
-        onUpstreamKeyDVEXPositionChanged: {
-            console.debug("X:"+xPosition)
-        }
-
-        onUpstreamKeyDVEYPositionChanged: {
-            console.debug("Y:"+yPosition)
-        }
-
-        onUpstreamKeyDVEXSizeChanged: {
-            console.debug("XS:"+xSize)
-        }
-
-        onUpstreamKeyDVEYSizeChanged: {
-            console.debug("YS:"+ySize)
-        }
-
     }
 
     MqttClient {

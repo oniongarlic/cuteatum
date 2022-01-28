@@ -20,6 +20,8 @@ Page {
         }
     }
 
+    property alias me0: me0.target
+
     // XXX interferes with input widgets..
     Keys.onSpacePressed: root.cutTransition();
     Keys.onReturnPressed: {
@@ -37,7 +39,7 @@ Page {
     Keys.onDigit4Pressed: root.setProgram(4)
 
     // Still
-    Keys.onDigit9Pressed: root.setProgram(3010)
+    Keys.onDigit9Pressed: root.setProgram(3010)       
 
     function setDVEKey(checked) {
         var me=atem.mixEffect(0);
@@ -45,6 +47,44 @@ Page {
             me.setUpstreamKeyFlyEnabled(0, checked)
         else
             me.setDVEKeyEnabled(checked)
+    }
+
+    Connections {
+        id: me0
+        onUpstreamKeyDVEXPositionChanged: {
+            console.debug("X:"+xPosition)
+            dveXPos.enabled=false
+            dveXPos.value=Math.floor(xPosition*100)
+            dveXPos.enabled=true
+        }
+
+        onUpstreamKeyDVEYPositionChanged: {
+            console.debug("Y:"+yPosition)
+            dveYPos.enabled=false
+            dveYPos.value=Math.ceil(yPosition*100)
+            dveYPos.enabled=true
+        }
+
+        onUpstreamKeyDVEXSizeChanged: {
+            console.debug("XS:"+xSize)
+        }
+
+        onUpstreamKeyDVEYSizeChanged: {
+            console.debug("YS:"+ySize)
+        }
+    }
+
+    Connections {
+        id: dsk
+    }
+
+    Connections {
+        target: atem
+        onConnectedChanged: {
+            console.debug("ATEM Main Page: Connected")
+            progColor1.color=""+atem.colorGeneratorColor(0)
+            progColor2.color=""+atem.colorGeneratorColor(1)
+        }
     }
 
     InputButtonGroup {
@@ -130,12 +170,28 @@ Page {
                     inputID: 2001
                     compact: true
                     ButtonGroup.group: programGroup
+                    Rectangle {
+                        id: progColor1
+                        width: 8
+                        height: 8
+                        x: 2
+                        y: 2
+                        visible: atem.connected
+                    }
                 }
                 InputButton {
                     text: "Color 2"
                     inputID: 2002
                     compact: true
                     ButtonGroup.group: programGroup
+                    Rectangle {
+                        id: progColor2
+                        width: 8
+                        height: 8
+                        x: 2
+                        y: 2
+                        visible: atem.connected
+                    }
                 }
             }
         }
@@ -203,7 +259,7 @@ Page {
                     inputID: 2001
                     isPreview: true
                     compact: true
-                    ButtonGroup.group: previewGroup
+                    ButtonGroup.group: previewGroup                    
                 }
                 InputButton {
                     text: "Color 2"
@@ -325,7 +381,7 @@ Page {
                     onActivated: {
                         var me=atem.mixEffect(0);
                         me.setUpstreamKeyType(0, currentValue)
-                        setDVEKey(checked)
+                        setDVEKey(checkDVEKey.checked)
                     }
                 }
 
@@ -344,12 +400,20 @@ Page {
                     }
                 }
                 CheckBox {
+                    id: checkDVEKey
                     text: "DVEKey"
                     onClicked: {
                         setDVEKey(checked)
                     }
                 }
-
+                CheckBox {
+                    id: checkDownstream
+                    text: "DSK1"
+                    onCheckedChanged: {
+                        var dsk=atem.downstreamKey(0);
+                        dsk.setOnAir(checked)
+                    }
+                }
             }
 
             GridLayout {
@@ -358,6 +422,7 @@ Page {
 
                 Button {
                     text: "FS"
+                    Layout.fillWidth: true
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 3, 0)
@@ -365,6 +430,7 @@ Page {
                 }
                 Button {
                     text: "INF"
+                    Layout.fillWidth: true
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 4, 0) // center
@@ -372,6 +438,7 @@ Page {
                 }
                 Button {
                     text: "A"
+                    Layout.fillWidth: true
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 1, 0)
@@ -379,73 +446,79 @@ Page {
                 }
                 Button {
                     text: "B"
+                    Layout.fillWidth: true
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 2, 0)
                     }
                 }
                 Button {
-                    text: "Set A"
+                    text: "Animate"
+                    Layout.fillWidth: true
+                    Layout.columnSpan: 2
                     onClicked: {
+                        var me=atem.mixEffect(0);
+                        me.setUpstreamKeyDVEKeyFrame(0, 2)
+                    }
+                }
+                DelayButton {
+                    text: "Set A"
+                    Layout.fillWidth: true
+                    onActivated: {
                         var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 1)
                     }
                 }
-                Button {
+                DelayButton {
                     text: "Set B"
-                    onClicked: {
+                    Layout.fillWidth: true                    
+                    onActivated: {
                         var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 2)
                     }
                 }
-                Button {
-                    text: "Animate"
-                    onClicked: {
-                        var me=atem.mixEffect(0);
-                        me.setUpstreamKeyDVEKeyFrame(0, 2)
-                    }
-                }
+
             }
 
             ColumnLayout {
 
-                ColumnLayout {
+                RowLayout {
                     SpinBox {
                         id: dveXPos
                         editable: true
-                        from: -200
-                        to: 200
+                        from: -2000
+                        to: 2000
+                        stepSize: 10
+                        wheelEnabled: true
                         onValueModified: {
+                            if (!enabled) return;
                             var me=atem.mixEffect(0);
-                            me.setUpstreamKeyDVEPosition(0, value/10.0, me.upstreamKeyDVEYPosition(0))
+                            me.setUpstreamKeyDVEPosition(0, value/100.0, me.upstreamKeyDVEYPosition(0))
                         }
-                    }
+                    }                    
 
                     SpinBox {
                         id: dveYPos
                         editable: true
-                        from: -200
-                        to: 200
+                        from: -2000
+                        to: 2000
+                        stepSize: 10
+                        wheelEnabled: true
                         onValueModified: {
+                            if (!enabled) return;
                             var me=atem.mixEffect(0);
-                            me.setUpstreamKeyDVEPosition(0, me.upstreamKeyDVEXPosition(0), value/10.0)
+                            me.setUpstreamKeyDVEPosition(0, me.upstreamKeyDVEXPosition(0), value/100.0)
                         }
                     }
                 }
 
-                CheckBox {
-                    id: lockAspect
-                    text: "Lock"
-                    checked: true
-                }
-
-                ColumnLayout {
-
+                RowLayout {
                     SpinBox {
                         id: dveXSize
                         editable: true
                         from: 0
                         to: 100
+                        wheelEnabled: true
                         onValueModified: {
                             var me=atem.mixEffect(0);
                             var v=value/100.0;
@@ -453,12 +526,19 @@ Page {
                         }
                     }
 
+                    CheckBox {
+                        id: lockAspect
+                        // text: "Lock"
+                        checked: true
+                    }
+
                     SpinBox {
                         id: dveYSize
                         editable: true
-                        visible: !lockAspect.checked
+                        //visible: !lockAspect.checked
                         from: 0
                         to: 100
+                        wheelEnabled: true
                         onValueModified: {
                             var me=atem.mixEffect(0);
                             var v=value/100.0;
@@ -543,8 +623,6 @@ Page {
             NumberAnimation { from: dveAnimation.yPosStart; to: dveAnimation.yPosEnd; duration: 1000; properties: "value"; target: dveYPos }
             NumberAnimation { from: dveAnimation.sizeStart; to: dveAnimation.sizeEnd; duration: 1000; properties: "value"; target: [ dveXSize, dveYSize]}
         }
-
-
 
         ColumnLayout {
             Layout.fillHeight: true

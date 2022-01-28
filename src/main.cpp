@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
+    qRegisterMetaType<QAtemDownstreamKey*>("QAtemDownstreamKey");
 
     qRegisterMetaType<QAtem::InputInfo>();
     qRegisterMetaType<QAtem::Topology>();

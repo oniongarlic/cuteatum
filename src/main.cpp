@@ -14,6 +14,7 @@
 #include <qatemcameracontrol.h>
 #include <qatemdownstreamkey.h>
 #include <qatemmixeffect.h>
+#include <qatemfairlight.h>
 
 #include "servicediscovery.h"
 #include "cutemqttclient.h"
@@ -48,6 +49,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
     //qmlRegisterType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey");
     //qmlRegisterType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl");
+    qmlRegisterType<QAtemFairlight>("org.bm", 1, 0, "AtemFairlight");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 

@@ -198,7 +198,7 @@ ApplicationWindow {
                 text: "Levels"
                 onCheckedChanged: {
                     //atem.setAudioLevelsEnabled(checked)
-                    atem.setFairlightAudioLevelsEnabled(checked)
+                    fairlight.setFairlightAudioLevelsEnabled(checked)
                 }
             }
             MenuItem {
@@ -385,7 +385,7 @@ ApplicationWindow {
     function setPreview(i) {
         var me=atem.mixEffect(0);
         me.changePreviewInput(i)
-    }
+    }    
 
     AtemConnection {
         id: atem
@@ -525,7 +525,11 @@ ApplicationWindow {
             console.debug(left)
             console.debug(right)
         }
+    }
 
+    AtemFairlight {
+        id: fairlight
+        atemConnection: atem
     }
 
     Timer {

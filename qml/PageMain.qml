@@ -414,6 +414,13 @@ Page {
                         dsk.setOnAir(checked)
                     }
                 }
+                Button {
+                    text: "Auto-DSK"
+                    onClicked: {
+                        var dsk=atem.downstreamKey(0);
+                        dsk.doAuto();
+                    }
+                }
             }
 
             GridLayout {

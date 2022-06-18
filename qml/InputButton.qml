@@ -14,6 +14,9 @@ Button {
     Layout.fillHeight: true
     Layout.margins: 4
 
+    Layout.minimumHeight: 25
+    Layout.minimumWidth: 40
+
     property int inputID: 0
     property bool compact: false
     property bool isPreview: false

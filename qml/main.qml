@@ -20,7 +20,8 @@ ApplicationWindow {
     property string mqttHostname: "localhost"
     property int mqttPort: 1883
 
-    property int sTime: 0
+    property date atemTime;
+    property string sTime;
 
     Shortcut {
         sequence: StandardKey.FullScreen
@@ -198,7 +199,25 @@ ApplicationWindow {
                 text: "Levels"
                 onCheckedChanged: {
                     //atem.setAudioLevelsEnabled(checked)
-                    fairlight.setFairlightAudioLevelsEnabled(checked)
+                    fairlight.setAudioLevelsEnabled(checked)
+                }
+            }
+            MenuItem {
+                text: "Reset source peaks"
+                onClicked: {
+                    fairlight.resetPeakLevels(true, false)
+                }
+            }
+            MenuItem {
+                text: "Reset master peak"
+                onClicked: {
+                    fairlight.resetPeakLevels(false, true)
+                }
+            }
+            MenuItem {
+                text: "Reset all peak"
+                onClicked: {
+                    fairlight.resetPeakLevels(true, true)
                 }
             }
             MenuItem {
@@ -344,6 +363,8 @@ ApplicationWindow {
         id: mainView
         PageMain {
             me0: !atem.connected ? null : atem.mixEffect(0)
+            fl: !atem.connected ? null : fairlight
+            dsk: !atem.connected ? null : atem.downstreamKey(0)
         }
     }
 
@@ -475,8 +496,8 @@ ApplicationWindow {
 
         onTimeChanged: {
             var tc=getTime();
-            console.debug("ATEM Time: "+ tc)
-            sTime=tc;
+            atemTime=tc;
+            sTime=atemTime.toTimeString();
             mqttClient.publishTimeCode(tc)            
         }
 
@@ -545,6 +566,7 @@ ApplicationWindow {
 
     Connections {
         id: meCon
+        target: null
 
         property int program;
         property int preview;
@@ -552,17 +574,17 @@ ApplicationWindow {
         property bool ftb_fading: false;
         property int ftb_frame;
 
-        onProgramInputChanged: {
+        function onProgramInputChanged(newIndex) {
             console.debug("onProgramInputChanged:" +newIndex)
             program=newIndex;
             mqttClient.publishProgram(newIndex)
         }
-        onPreviewInputChanged: {
+        function onPreviewInputChanged(newIndex) {
             console.debug("onPreviewInputChanged:" +newIndex)
             preview=newIndex;
             mqttClient.publishPreview(newIndex)
         }
-        onFadeToBlackChanged: {
+        function onFadeToBlackChanged(fading) {
             var me=atem.mixEffect(0);
             ftb_fading=fading
             ftb_frame=me.fadeToBlackFrameCount();
@@ -570,7 +592,7 @@ ApplicationWindow {
             mqttClient.publishFTB(me.fadeToBlackEnabled() ? 1 : 0)
         }
 
-        onFadeToBlackStatusChanged: {
+        function onFadeToBlackStatusChanged(status) {
             console.debug("FTB property status is "+status)
         }
     }

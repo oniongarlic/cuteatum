@@ -47,14 +47,14 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
     qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");
-    //qmlRegisterType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey");
-    //qmlRegisterType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl");
+    qmlRegisterUncreatableType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey", "AtemDownstreamKey can not be created");
+    qmlRegisterUncreatableType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl", "AtemCameraControl can not be created");
     qmlRegisterType<QAtemFairlight>("org.bm", 1, 0, "AtemFairlight");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
-    qRegisterMetaType<QAtemDownstreamKey*>("QAtemDownstreamKey");
+    qRegisterMetaType<QAtemDownstreamKey*>("AtemDownstreamKey");
 
     qRegisterMetaType<QAtem::InputInfo>();
     qRegisterMetaType<QAtem::Topology>();

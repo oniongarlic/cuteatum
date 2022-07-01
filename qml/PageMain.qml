@@ -5,6 +5,8 @@ import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.2
 
+import org.bm 1.0
+
 Page {
     id: mainPage
     objectName: "main"
@@ -12,6 +14,10 @@ Page {
     property alias ftb: btnFTB.checked
     property int program;
     property int preview;
+
+    property AtemMixEffect me;
+    property AtemFairlight fl;
+    property AtemDownstreamKey dsk;
 
     background: Rectangle {
         gradient: Gradient {
@@ -80,7 +86,7 @@ Page {
 
     Connections {
         target: atem
-        onConnectedChanged: {
+        function onConnectedChanged() {
             console.debug("ATEM Main Page: Connected")
             progColor1.color=""+atem.colorGeneratorColor(0)
             progColor2.color=""+atem.colorGeneratorColor(1)
@@ -409,15 +415,13 @@ Page {
                 CheckBox {
                     id: checkDownstream
                     text: "DSK1"
-                    onCheckedChanged: {
-                        var dsk=atem.downstreamKey(0);
+                    onCheckedChanged: {                        
                         dsk.setOnAir(checked)
                     }
                 }
                 Button {
                     text: "Auto-DSK"
-                    onClicked: {
-                        var dsk=atem.downstreamKey(0);
+                    onClicked: {                        
                         dsk.doAuto();
                     }
                 }
@@ -626,9 +630,11 @@ Page {
             property real sizeStart: 0
             property real sizeEnd: 0
 
-            NumberAnimation { from: dveAnimation.xPosStart; to: dveAnimation.xPosEnd; duration: 1000; properties: "value"; target: dveXPos }
-            NumberAnimation { from: dveAnimation.yPosStart; to: dveAnimation.yPosEnd; duration: 1000; properties: "value"; target: dveYPos }
-            NumberAnimation { from: dveAnimation.sizeStart; to: dveAnimation.sizeEnd; duration: 1000; properties: "value"; target: [ dveXSize, dveYSize]}
+            property int duration: 1000
+
+            NumberAnimation { from: dveAnimation.xPosStart; to: dveAnimation.xPosEnd; duration: dveAnimation.duration; properties: "value"; target: dveXPos }
+            NumberAnimation { from: dveAnimation.yPosStart; to: dveAnimation.yPosEnd; duration: dveAnimation.duration; properties: "value"; target: dveYPos }
+            NumberAnimation { from: dveAnimation.sizeStart; to: dveAnimation.sizeEnd; duration: dveAnimation.duration; properties: "value"; targets: [ dveXSize, dveYSize ]}
         }
 
         ColumnLayout {

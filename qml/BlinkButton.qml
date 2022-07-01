@@ -1,6 +1,8 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
+import QtQuick.Layouts 1.12
+import QtGraphicalEffects 1.12
 
 Button {
     id: btn
@@ -13,6 +15,11 @@ Button {
 
     property color checkedColor: "red"
     property color notCheckedColor: "green"
+
+    implicitHeight: 25
+
+    Layout.minimumHeight: 25
+    Layout.minimumWidth: 40
 
     background: Rectangle {
         id: btnBg

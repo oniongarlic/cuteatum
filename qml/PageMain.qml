@@ -434,6 +434,7 @@ Page {
                 Button {
                     text: "FS"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 50
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 3, 0)
@@ -442,6 +443,7 @@ Page {
                 Button {
                     text: "INF"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 50
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 4, 0) // center
@@ -450,6 +452,7 @@ Page {
                 Button {
                     text: "A"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 50
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 1, 0)
@@ -458,6 +461,7 @@ Page {
                 Button {
                     text: "B"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 50
                     onClicked: {
                         var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 2, 0)
@@ -466,6 +470,7 @@ Page {
                 Button {
                     text: "Animate"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 100
                     Layout.columnSpan: 2
                     onClicked: {
                         var me=atem.mixEffect(0);
@@ -475,6 +480,7 @@ Page {
                 DelayButton {
                     text: "Set A"
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 50
                     onActivated: {
                         var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 1)
@@ -482,7 +488,8 @@ Page {
                 }
                 DelayButton {
                     text: "Set B"
-                    Layout.fillWidth: true                    
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 50
                     onActivated: {
                         var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 2)
@@ -573,6 +580,7 @@ Page {
                     Button {
                         id: btnStreamStart
                         text: "Stream"
+                        Layout.fillWidth: true
                         onClicked: {
                             atem.startStreaming();
                         }
@@ -580,6 +588,7 @@ Page {
                     Button {
                         id: btnStreamStop
                         text: "Stop"
+                        Layout.fillWidth: true
                         onClicked: {
                             atem.stopStreaming();
                         }
@@ -593,6 +602,7 @@ Page {
                     Button {
                         id: btnRecStart
                         text: "Record"
+                        Layout.fillWidth: true
                         onClicked: {
                             atem.startRecording();
                         }
@@ -600,6 +610,7 @@ Page {
                     Button {
                         id: btnRecStop
                         text: "Stop"
+                        Layout.fillWidth: true
                         onClicked: {
                             atem.stopRecording();
                         }
@@ -747,8 +758,6 @@ Page {
                 tristate: meCon.ftb_fading
                 checked: meCon.ftb
             }
-
         }
-
     }
 }

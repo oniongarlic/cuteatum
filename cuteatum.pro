@@ -17,9 +17,17 @@ HEADERS += \
     src/settings.h \
     src/servicediscovery.h
 
+unix {
 INCLUDEPATH += /usr/local/include
 LIBS += -L/usr/local/lib
 LIBS += -lqatemcontrol
+}
+
+windows {
+INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/qatemcontrol
+LIBS += -L$$[QT_INSTALL_PREFIX]/lib/qatemcontrol
+LIBS += -lqatemcontrol
+}
 
 RESOURCES += qml.qrc
 

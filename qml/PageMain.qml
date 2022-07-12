@@ -31,7 +31,6 @@ Page {
     // XXX interferes with input widgets..
     Keys.onSpacePressed: root.cutTransition();
     Keys.onReturnPressed: {
-        var me=atem.mixEffect(0);
         me.autoTransition();
     }
 
@@ -48,7 +47,6 @@ Page {
     Keys.onDigit9Pressed: root.setProgram(3010)       
 
     function setDVEKey(checked) {
-        var me=atem.mixEffect(0);
         if (keyType.currentValue!==3)
             me.setUpstreamKeyFlyEnabled(0, checked)
         else
@@ -280,8 +278,7 @@ Page {
         InputButtonGroup {
             id: upstreamKeyFillSourceGroup
             // activeInput: meCon.preview;
-            onClicked: {
-                var me=atem.mixEffect(0);
+            onClicked: {                
                 me.setUpstreamKeyFillSource(0, button.inputID)
             }
         }
@@ -289,8 +286,7 @@ Page {
         InputButtonGroup {
             id: upstreamKeySourceGroup
             // activeInput: meCon.preview;
-            onClicked: {
-                var me=atem.mixEffect(0);
+            onClicked: {                
                 me.setUpstreamKeyKeySource(0, button.inputID)
             }
         }
@@ -394,14 +390,14 @@ Page {
                 CheckBox {
                     text: "Key"
                     onClicked: {
-                        var me=atem.mixEffect(0);
+
                         me.setUpstreamKeyOnAir(0, checked)
                     }
                 }
                 CheckBox {
                     text: "KeyOnChange"
                     onClicked: {
-                        var me=atem.mixEffect(0);
+
                         me.setUpstreamKeyOnNextTransition(0, checked)
                     }
                 }
@@ -436,7 +432,7 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onClicked: {
-                        var me=atem.mixEffect(0);
+
                         me.runUpstreamKeyTo(0, 3, 0)
                     }
                 }
@@ -445,7 +441,6 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onClicked: {
-                        var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 4, 0) // center
                     }
                 }
@@ -454,7 +449,6 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onClicked: {
-                        var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 1, 0)
                     }
                 }
@@ -463,7 +457,6 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onClicked: {
-                        var me=atem.mixEffect(0);
                         me.runUpstreamKeyTo(0, 2, 0)
                     }
                 }
@@ -473,7 +466,6 @@ Page {
                     Layout.minimumWidth: 100
                     Layout.columnSpan: 2
                     onClicked: {
-                        var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 2)
                     }
                 }
@@ -482,7 +474,6 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onActivated: {
-                        var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 1)
                     }
                 }
@@ -491,11 +482,9 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onActivated: {
-                        var me=atem.mixEffect(0);
                         me.setUpstreamKeyDVEKeyFrame(0, 2)
                     }
                 }
-
             }
 
             ColumnLayout {
@@ -510,7 +499,6 @@ Page {
                         wheelEnabled: true
                         onValueModified: {
                             if (!enabled) return;
-                            var me=atem.mixEffect(0);
                             me.setUpstreamKeyDVEPosition(0, value/100.0, me.upstreamKeyDVEYPosition(0))
                         }
                     }                    
@@ -524,7 +512,6 @@ Page {
                         wheelEnabled: true
                         onValueModified: {
                             if (!enabled) return;
-                            var me=atem.mixEffect(0);
                             me.setUpstreamKeyDVEPosition(0, me.upstreamKeyDVEXPosition(0), value/100.0)
                         }
                     }
@@ -537,10 +524,11 @@ Page {
                         from: 0
                         to: 100
                         wheelEnabled: true
-                        onValueModified: {
-                            var me=atem.mixEffect(0);
+                        onValueModified: {                            
                             var v=value/100.0;
                             me.setUpstreamKeyDVESize(0, v, lockAspect ? v : me.upstreamKeyDVEYSize(0))
+                            if (lockAspect.checked)
+                                dveYSize.value=value
                         }
                     }
 
@@ -557,15 +545,14 @@ Page {
                         from: 0
                         to: 100
                         wheelEnabled: true
-                        onValueModified: {
-                            var me=atem.mixEffect(0);
+                        onValueModified: {                            
                             var v=value/100.0;
                             me.setUpstreamKeyDVESize(0, lockAspect ? v : me.upstreamKeyDVEXSize(0), v)
+                            if (lockAspect.checked)
+                                dveXSize.value=value
                         }
                     }
-
                 }
-
             }
 
             RowLayout {
@@ -667,19 +654,19 @@ Page {
                 enabled: !easingTransition.running
                 onValueChanged: {
                     if (easingTransition.running) {
-                        var me=atem.mixEffect(0);
+
                         me.setTransitionPosition(value);
                     }
                 }
 
                 onMoved: {
-                    var me=atem.mixEffect(0);
+
                     me.setTransitionPosition(value);
                 }
                 onPressedChanged: {
                     if (!pressed) {
                         value=0;
-                        var me=atem.mixEffect(0);
+
                         me.setTransitionPosition(0);
                     }
                 }
@@ -691,7 +678,7 @@ Page {
                 id: btnCut
                 text: "Cut"
                 onClicked: {
-                    var me=atem.mixEffect(0);
+
                     me.cut();
                 }
             }
@@ -700,7 +687,7 @@ Page {
                 id: btnAuto
                 text: "Auto"
                 onClicked: {
-                    var me=atem.mixEffect(0);
+
                     me.autoTransition();
                 }
             }
@@ -752,7 +739,7 @@ Page {
                 text: !meCon.ftb_fading ? "FTB" : meCon.ftb_frame
                 display: AbstractButton.TextUnderIcon
                 onClicked: {
-                    var me=atem.mixEffect(0);
+
                     me.toggleFadeToBlack();
                 }
                 tristate: meCon.ftb_fading

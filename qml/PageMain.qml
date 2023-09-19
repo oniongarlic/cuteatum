@@ -155,13 +155,13 @@ Page {
                 Layout.margins: 0
                 InputButton {
                     text: "Black"
-                    inputID: 0
+                    inputID: AtemMixEffect.BlackInput
                     compact: true
                     ButtonGroup.group: programGroup
                 }
                 InputButton {
                     text: "Bars"
-                    inputID: 1000
+                    inputID: AtemMixEffect.ColorBarsInput
                     compact: true
                     ButtonGroup.group: programGroup
                 }
@@ -171,7 +171,7 @@ Page {
                 Layout.margins: 0
                 InputButton {
                     text: "Color 1"
-                    inputID: 2001
+                    inputID: AtemMixEffect.ColorGenerator1
                     compact: true
                     ButtonGroup.group: programGroup
                     Rectangle {
@@ -185,7 +185,7 @@ Page {
                 }
                 InputButton {
                     text: "Color 2"
-                    inputID: 2002
+                    inputID: AtemMixEffect.ColorGenerator2
                     compact: true
                     ButtonGroup.group: programGroup
                     Rectangle {

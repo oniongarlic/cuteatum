@@ -232,50 +232,42 @@ ApplicationWindow {
         Menu {
             title: "Output"
             enabled: atem.connected
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Multiview"
                 inputID: 9001
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Program"
                 inputID: 10010
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Preview"
                 inputID: 10011
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Input 1"
                 inputID: 1
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Input 2"
                 inputID: 2
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Input 3"
                 inputID: 3
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Input 4"
                 inputID: 4
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
-                checkable: true
+            InputMenuItem {                
                 text: "Direct input 1"
                 inputID: 11001
                 ButtonGroup.group: outputGroup
@@ -287,14 +279,20 @@ ApplicationWindow {
         id: macroDrawer
         enabled: atem.connected
         height: root.height
+        width: root.width/2.5
         GridLayout {
-            rows: 4
-            columns: 2
-
+            id: macroGrid
+            anchors.fill: parent
+            anchors.margins: 8
+            columns: 4
+            columnSpacing: 8
+            rowSpacing: 8
             Repeater {
-                model: 12
+                model: 24
                 delegate: Button {
-                    text: "M"+(index+1)
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "M "+(index+1)
                     onClicked: atem.runMacro(index+1)
                 }
             }
@@ -551,6 +549,10 @@ ApplicationWindow {
     AtemFairlight {
         id: fairlight
         atemConnection: atem
+
+        onAudioLevelChanged: {
+            console.debug(left +':'+right)
+        }
     }
 
     Timer {

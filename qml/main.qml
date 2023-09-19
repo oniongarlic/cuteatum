@@ -142,7 +142,7 @@ ApplicationWindow {
     menuBar: MenuBar {
         enabled: rootStack.depth<2
         Menu {
-            title: "File"
+            title: "&File"
 
             MenuItem {
                 text: "Connect..."
@@ -182,7 +182,7 @@ ApplicationWindow {
             }
 
             MenuItem {
-                text: "Quit"
+                text: "&Quit"
                 onClicked: {
                     if (atem.connected)
                         atem.disconnectFromSwitcher();
@@ -191,7 +191,7 @@ ApplicationWindow {
             }
         }
         Menu {
-            title: "Audio"
+            title: "&Audio"
             enabled: atem.connected
             MenuItem {
                 id: audioLevelsMenu
@@ -230,7 +230,7 @@ ApplicationWindow {
             }
         }
         Menu {
-            title: "Output"
+            title: "&Output"
             enabled: atem.connected
             InputMenuItem {                
                 text: "Multiview"
@@ -273,6 +273,19 @@ ApplicationWindow {
                 ButtonGroup.group: outputGroup
             }
         }
+        Menu {
+            title: "&Macros"
+            MenuItem {
+                text: "Show interface"
+                action: actionMacros
+            }
+        }
+    }
+
+    Action {
+        id: actionMacros
+        shortcut: "Ctrl+M"
+        onTriggered: macroDrawer.open();
     }
 
     Drawer {

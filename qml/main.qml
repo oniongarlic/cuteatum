@@ -373,7 +373,7 @@ ApplicationWindow {
     Component {
         id: mainView
         PageMain {
-            me0: !atem.connected ? null : atem.mixEffect(0)
+            me: !atem.connected ? null : atem.mixEffect(0)
             fl: !atem.connected ? null : fairlight
             dsk: !atem.connected ? null : atem.downstreamKey(0)
         }
@@ -424,6 +424,9 @@ ApplicationWindow {
 
         property string deviceID: ""
 
+        property int camInputs: 0
+        property int supersources: 0
+
         onConnected: {
             console.debug("Connected!")
             console.debug(productInformation())
@@ -432,6 +435,7 @@ ApplicationWindow {
             console.debug(colorGeneratorColor(1))
 
             console.debug(tallyIndexCount())
+            camInputs=tallyIndexCount()
 
             console.debug(mediaPlayerType(0))
 
@@ -447,6 +451,8 @@ ApplicationWindow {
             console.debug("ST:"+topo.stingers)
             console.debug("DVE:"+topo.DVEs)
             console.debug("SS:"+topo.supersources)
+
+            supersources=topo.supersources
 
             requestRecordingStatus();
             requestStreamingStatus();
@@ -474,13 +480,13 @@ ApplicationWindow {
             console.debug("INPUTS: "+inputs)
             for (var i=0; i<inputs; i++) {
                 var input=inputInfo(i);
-                console.debug("*INPUT* "+i)
-                console.debug("IDX:"+input.index)
-                console.debug("TA:"+input.tally)
-                console.debug("ET:"+input.externalType)
-                console.debug("IT:"+input.internalType)
-                console.debug("LTX:"+input.longText)
-                console.debug("STX:"+input.shortText)
+                console.debug("INPUT: "+i)
+                console.debug(" IDX:"+input.index)
+                console.debug(" TAL:"+input.tally)
+                console.debug(" EXT:"+input.externalType)
+                console.debug(" INT:"+input.internalType)
+                console.debug(" LTX:"+input.longText)
+                console.debug(" STX:"+input.shortText)
             }
         }
 
@@ -564,7 +570,11 @@ ApplicationWindow {
         atemConnection: atem
 
         onAudioLevelChanged: {
-            console.debug(left +':'+right)
+            console.debug(audioSource+':= '+ levelLeft +':'+levelRight)
+        }
+
+        onTallyChanged: {
+            console.debug('audioTally: '+audioSource)
         }
     }
 

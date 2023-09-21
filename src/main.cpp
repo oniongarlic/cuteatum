@@ -10,11 +10,11 @@
 
 #include <QSettings>
 
-#include <qatemconnection.h>
-#include <qatemcameracontrol.h>
-#include <qatemdownstreamkey.h>
-#include <qatemmixeffect.h>
-#include <qatemfairlight.h>
+#include <QAtemControl/qatemconnection.h>
+#include <QAtemControl/qatemcameracontrol.h>
+#include <QAtemControl/qatemdownstreamkey.h>
+#include <QAtemControl/qatemmixeffect.h>
+#include <QAtemControl/qatemfairlight.h>
 
 #include "servicediscovery.h"
 #include "cutemqttclient.h"

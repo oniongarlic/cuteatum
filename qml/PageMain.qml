@@ -132,7 +132,7 @@ Page {
             GridLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                columns: 8
+                columns: atem.camInputs<10 ? 8 : 10
                 columnSpacing: 2
                 rowSpacing: 2
                 Repeater {
@@ -225,7 +225,7 @@ Page {
             GridLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                columns: 8
+                columns: atem.camInputs<10 ? 8 : 10
                 columnSpacing: 2
                 rowSpacing: 2
                 Repeater {
@@ -241,6 +241,20 @@ Page {
                         ButtonGroup.group: previewGroup
                     }
                 }
+            }
+            InputButton {
+                text: "SS1"
+                inputID: AtemMixEffect.SuperSource1
+                visible: atem.supersources>0
+                isPreview: true
+                ButtonGroup.group: previewGroup
+            }
+            InputButton {
+                text: "SS2"
+                inputID: AtemMixEffect.SuperSource2
+                visible: atem.supersources>1
+                isPreview: true
+                ButtonGroup.group: previewGroup
             }
             InputButton {
                 text: "Still"

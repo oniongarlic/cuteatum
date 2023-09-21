@@ -26,8 +26,6 @@ Page {
         }
     }
 
-    property alias me0: me0.target
-
     // XXX interferes with input widgets..
     Keys.onSpacePressed: root.cutTransition();
     Keys.onReturnPressed: {
@@ -43,8 +41,12 @@ Page {
     Keys.onDigit3Pressed: root.setProgram(3)
     Keys.onDigit4Pressed: root.setProgram(4)
 
-    // Still
-    Keys.onDigit9Pressed: root.setProgram(3010)       
+    Keys.onDigit5Pressed: root.setProgram(5)
+    Keys.onDigit6Pressed: root.setProgram(6)
+    Keys.onDigit7Pressed: root.setProgram(7)
+    Keys.onDigit8Pressed: root.setProgram(8)
+
+    Keys.onDigit9Pressed: root.setProgram(9)
 
     function setDVEKey(checked) {
         if (keyType.currentValue!==3)
@@ -55,6 +57,8 @@ Page {
 
     Connections {
         id: me0
+        target: me
+
         onUpstreamKeyDVEXPositionChanged: {
             console.debug("X:"+xPosition)
             dveXPos.enabled=false
@@ -125,29 +129,40 @@ Page {
             Layout.column: 0
             Layout.row: 0
             spacing: 2
+            GridLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                columns: 8
+                columnSpacing: 2
+                rowSpacing: 2
+                Repeater {
+                    model: atem.camInputs
+                    delegate: inputButtonComponent
+                }
+                Component {
+                    id: inputButtonComponent
+                    InputButton {
+                        text: "C"+(index+1)
+                        inputID: index+1
+                        ButtonGroup.group: programGroup
+                    }
+                }
+            }
             InputButton {
-                text: "C1"
-                inputID: 1
+                text: "SS1"
+                inputID: AtemMixEffect.SuperSource1
+                visible: atem.supersources>0
                 ButtonGroup.group: programGroup
             }
             InputButton {
-                text: "C2"
-                inputID: 2
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "C3"
-                inputID: 3
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "C4"
-                inputID: 4
+                text: "SS2"
+                inputID: AtemMixEffect.SuperSource2
+                visible: atem.supersources>1
                 ButtonGroup.group: programGroup
             }
             InputButton {
                 text: "Still"
-                inputID: 3010
+                inputID: AtemMixEffect.MediaPlayer1
                 ButtonGroup.group: programGroup
             }
             ColumnLayout {
@@ -207,29 +222,25 @@ Page {
             Layout.column: 0
             Layout.row: 1
             spacing: 2
-            InputButton {
-                text: "C1"
-                inputID: 1
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "C2"
-                inputID: 2
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "C3"
-                inputID: 3
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButton {
-                text: "C4"
-                inputID: 4
-                isPreview: true
-                ButtonGroup.group: previewGroup
+            GridLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                columns: 8
+                columnSpacing: 2
+                rowSpacing: 2
+                Repeater {
+                    model: atem.camInputs
+                    delegate: previewinputButtonComponent
+                }
+                Component {
+                    id: previewinputButtonComponent
+                    InputButton {
+                        text: "C"+(index+1)
+                        inputID: index+1
+                        isPreview: true
+                        ButtonGroup.group: previewGroup
+                    }
+                }
             }
             InputButton {
                 text: "Still"
@@ -263,7 +274,7 @@ Page {
                     inputID: 2001
                     isPreview: true
                     compact: true
-                    ButtonGroup.group: previewGroup                    
+                    ButtonGroup.group: previewGroup
                 }
                 InputButton {
                     text: "Color 2"
@@ -278,7 +289,7 @@ Page {
         InputButtonGroup {
             id: upstreamKeyFillSourceGroup
             // activeInput: meCon.preview;
-            onClicked: {                
+            onClicked: {
                 me.setUpstreamKeyFillSource(0, button.inputID)
             }
         }
@@ -286,7 +297,7 @@ Page {
         InputButtonGroup {
             id: upstreamKeySourceGroup
             // activeInput: meCon.preview;
-            onClicked: {                
+            onClicked: {
                 me.setUpstreamKeyKeySource(0, button.inputID)
             }
         }
@@ -411,13 +422,13 @@ Page {
                 CheckBox {
                     id: checkDownstream
                     text: "DSK1"
-                    onCheckedChanged: {                        
+                    onCheckedChanged: {
                         dsk.setOnAir(checked)
                     }
                 }
                 Button {
                     text: "Auto-DSK"
-                    onClicked: {                        
+                    onClicked: {
                         dsk.doAuto();
                     }
                 }
@@ -501,7 +512,7 @@ Page {
                             if (!enabled) return;
                             me.setUpstreamKeyDVEPosition(0, value/100.0, me.upstreamKeyDVEYPosition(0))
                         }
-                    }                    
+                    }
 
                     SpinBox {
                         id: dveYPos
@@ -524,7 +535,7 @@ Page {
                         from: 0
                         to: 100
                         wheelEnabled: true
-                        onValueModified: {                            
+                        onValueModified: {
                             var v=value/100.0;
                             me.setUpstreamKeyDVESize(0, v, lockAspect ? v : me.upstreamKeyDVEYSize(0))
                             if (lockAspect.checked)
@@ -545,7 +556,7 @@ Page {
                         from: 0
                         to: 100
                         wheelEnabled: true
-                        onValueModified: {                            
+                        onValueModified: {
                             var v=value/100.0;
                             me.setUpstreamKeyDVESize(0, lockAspect ? v : me.upstreamKeyDVEXSize(0), v)
                             if (lockAspect.checked)

@@ -21,20 +21,28 @@ Drawer {
     Keys.onDigit7Pressed: atem.runMacro(7)
     Keys.onDigit8Pressed: atem.runMacro(8)
     Keys.onDigit9Pressed: atem.runMacro(9)
-    GridLayout {
-        id: macroGrid
+    ColumnLayout {
         anchors.fill: parent
         anchors.margins: 8
-        columns: 4
-        columnSpacing: 8
-        rowSpacing: 8
-        Repeater {
-            model: 24
-            delegate: Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                text: "M "+(index+1)
-                onClicked: atem.runMacro(index+1)
+        CheckBox {
+            text: "Repeat"
+            onClicked: atem.setMacroRepeating(checked)
+        }
+        GridLayout {
+            id: macroGrid
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            columns: 4
+            columnSpacing: 8
+            rowSpacing: 8
+            Repeater {
+                model: 24
+                delegate: Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "M "+(index+1)
+                    onClicked: atem.runMacro(index+1)
+                }
             }
         }
     }

@@ -36,6 +36,7 @@ Page {
     Keys.onDigit0Pressed: root.setProgram(0)
 
     // Inputs
+    Keys.enabled: atem.connected
     Keys.onDigit1Pressed: root.setProgram(1)
     Keys.onDigit2Pressed: root.setProgram(2)
     Keys.onDigit3Pressed: root.setProgram(3)
@@ -108,6 +109,87 @@ Page {
         activeInput: meCon.preview;
         onClicked: {
             root.setPreview(button.inputID)
+        }
+    }
+
+    InputButtonGroup {
+        id: upstreamKeyFillSourceGroup
+        // activeInput: meCon.preview;
+        onClicked: {
+            me.setUpstreamKeyFillSource(0, button.inputID)
+        }
+    }
+
+    InputButtonGroup {
+        id: upstreamKeySourceGroup
+        // activeInput: meCon.preview;
+        onClicked: {
+            me.setUpstreamKeyKeySource(0, button.inputID)
+        }
+    }
+
+    Drawer {
+        id: keySourceDrawer
+        width: parent.width/1.5
+
+        RowLayout {
+            anchors.fill: parent
+            GridLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                columns: atem.camInputs<10 ? 8 : 10
+                columnSpacing: 2
+                rowSpacing: 2
+                Repeater {
+                    model: atem.camInputs
+                    delegate: upstreamKeyFillButtonComponent
+                }
+                Component {
+                    id: upstreamKeyFillButtonComponent
+                    InputButton {
+                        text: "C"+(index+1)
+                        inputID: index+1
+                        isPreview: true
+                        compact: true
+                        ButtonGroup.group: upstreamKeyFillSourceGroup
+                    }
+                }
+            }
+            InputButton {
+                text: "Still"
+                inputID: 3010
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Color 1"
+                inputID: 2001
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Color 2"
+                inputID: 2002
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Black"
+                inputID: 0
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
+            InputButton {
+                text: "Bars"
+                inputID: 1000
+                isPreview: true
+                compact: true
+                ButtonGroup.group: upstreamKeyFillSourceGroup
+            }
         }
     }
 
@@ -300,98 +382,6 @@ Page {
             }
         }
 
-        InputButtonGroup {
-            id: upstreamKeyFillSourceGroup
-            // activeInput: meCon.preview;
-            onClicked: {
-                me.setUpstreamKeyFillSource(0, button.inputID)
-            }
-        }
-
-        InputButtonGroup {
-            id: upstreamKeySourceGroup
-            // activeInput: meCon.preview;
-            onClicked: {
-                me.setUpstreamKeyKeySource(0, button.inputID)
-            }
-        }
-
-        GridLayout {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            Layout.column: 0
-            Layout.row: 2
-            columns: 5
-            columnSpacing: 2
-            rows: 2
-            rowSpacing: 0
-            InputButton {
-                text: "C1"
-                inputID: 1
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-            InputButton {
-                text: "C2"
-                inputID: 2
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-            InputButton {
-                text: "C3"
-                inputID: 3
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-            InputButton {
-                text: "C4"
-                inputID: 4
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-            InputButton {
-                text: "Still"
-                inputID: 3010
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-
-            InputButton {
-                text: "Color 1"
-                inputID: 2001
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-            InputButton {
-                text: "Color 2"
-                inputID: 2002
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-
-            InputButton {
-                text: "Black"
-                inputID: 0
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-            InputButton {
-                text: "Bars"
-                inputID: 1000
-                isPreview: true
-                compact: true
-                ButtonGroup.group: upstreamKeyFillSourceGroup
-            }
-        }
-
         RowLayout {
             Layout.fillWidth: true
             Layout.column: 0
@@ -411,39 +401,21 @@ Page {
                         setDVEKey(checkDVEKey.checked)
                     }
                 }
+                Button {
+                    text: "Key1 sources"
+                    onClicked: keySourceDrawer.open()
+                }
 
                 CheckBox {
-                    text: "Key"
+                    text: "Key1"
                     onClicked: {
-
                         me.setUpstreamKeyOnAir(0, checked)
                     }
                 }
                 CheckBox {
                     text: "KeyOnChange"
                     onClicked: {
-
                         me.setUpstreamKeyOnNextTransition(0, checked)
-                    }
-                }
-                CheckBox {
-                    id: checkDVEKey
-                    text: "DVEKey"
-                    onClicked: {
-                        setDVEKey(checked)
-                    }
-                }
-                CheckBox {
-                    id: checkDownstream
-                    text: "DSK1"
-                    onCheckedChanged: {
-                        dsk.setOnAir(checked)
-                    }
-                }
-                Button {
-                    text: "Auto-DSK"
-                    onClicked: {
-                        dsk.doAuto();
                     }
                 }
             }
@@ -457,7 +429,6 @@ Page {
                     Layout.fillWidth: true
                     Layout.minimumWidth: 50
                     onClicked: {
-
                         me.runUpstreamKeyTo(0, 3, 0)
                     }
                 }
@@ -513,7 +484,34 @@ Page {
             }
 
             ColumnLayout {
-
+                Label {
+                    text: "DVE"
+                }
+                RowLayout {
+                    CheckBox {
+                        id: checkDVEKey
+                        text: "Key"
+                        onClicked: {
+                            setDVEKey(checked)
+                        }
+                    }
+                    CheckBox {
+                        id: checkDownstream
+                        text: "DSK1"
+                        onCheckedChanged: {
+                            dsk.setOnAir(checked)
+                        }
+                    }
+                    Button {
+                        text: "Auto"
+                        onClicked: {
+                            dsk.doAuto();
+                        }
+                    }
+                }
+                Label {
+                    text: "DVE Position"
+                }
                 RowLayout {
                     SpinBox {
                         id: dveXPos
@@ -588,7 +586,10 @@ Page {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-
+                    spacing: 4
+                    Label {
+                        text: "Streaming"
+                    }
                     Button {
                         id: btnStreamStart
                         text: "Stream"
@@ -605,12 +606,9 @@ Page {
                             atem.stopStreaming();
                         }
                     }
-
-                }
-
-                ColumnLayout {
-                    Layout.fillWidth: true
-
+                    Label {
+                        text: "Recording"
+                    }
                     Button {
                         id: btnRecStart
                         text: "Record"
@@ -764,7 +762,6 @@ Page {
                 text: !meCon.ftb_fading ? "FTB" : meCon.ftb_frame
                 display: AbstractButton.TextUnderIcon
                 onClicked: {
-
                     me.toggleFadeToBlack();
                 }
                 tristate: meCon.ftb_fading

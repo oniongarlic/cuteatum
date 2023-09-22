@@ -112,25 +112,25 @@ Page {
         }
     }
 
-    InputButtonGroup {
-        id: upstreamKeyFillSourceGroup
-        // activeInput: meCon.preview;
-        onClicked: {
-            me.setUpstreamKeyFillSource(0, button.inputID)
-        }
-    }
-
-    InputButtonGroup {
-        id: upstreamKeySourceGroup
-        // activeInput: meCon.preview;
-        onClicked: {
-            me.setUpstreamKeyKeySource(0, button.inputID)
-        }
-    }
-
     Drawer {
         id: keySourceDrawer
         width: parent.width/1.5
+
+        property int key: 0
+
+        InputButtonGroup {
+            id: upstreamKeyFillSourceGroup
+            onClicked: {
+                me.setUpstreamKeyFillSource(key, button.inputID)
+            }
+        }
+
+        InputButtonGroup {
+            id: upstreamKeySourceGroup
+            onClicked: {
+                me.setUpstreamKeyKeySource(key, button.inputID)
+            }
+        }
 
         RowLayout {
             anchors.fill: parent
@@ -157,35 +157,35 @@ Page {
             }
             InputButton {
                 text: "Still"
-                inputID: 3010
+                inputID: AtemMixEffect.MediaPlayer1
                 isPreview: true
                 compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "Color 1"
-                inputID: 2001
+                inputID: AtemMixEffect.ColorGenerator1
                 isPreview: true
                 compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "Color 2"
-                inputID: 2002
+                inputID: AtemMixEffect.ColorGenerator2
                 isPreview: true
                 compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "Black"
-                inputID: 0
+                inputID: AtemMixEffect.BlackInput
                 isPreview: true
                 compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup
             }
             InputButton {
                 text: "Bars"
-                inputID: 1000
+                inputID: AtemMixEffect.ColorBarsInput
                 isPreview: true
                 compact: true
                 ButtonGroup.group: upstreamKeyFillSourceGroup

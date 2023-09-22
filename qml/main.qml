@@ -292,7 +292,17 @@ ApplicationWindow {
         id: macroDrawer
         enabled: atem.connected
         height: root.height
-        width: root.width/2.5
+        width: root.width/2
+        Keys.enabled: atem.connected
+        Keys.onDigit1Pressed: atem.runMacro(1)
+        Keys.onDigit2Pressed: atem.runMacro(2)
+        Keys.onDigit3Pressed: atem.runMacro(3)
+        Keys.onDigit4Pressed: atem.runMacro(4)
+        Keys.onDigit5Pressed: atem.runMacro(5)
+        Keys.onDigit6Pressed: atem.runMacro(6)
+        Keys.onDigit7Pressed: atem.runMacro(7)
+        Keys.onDigit8Pressed: atem.runMacro(8)
+        Keys.onDigit9Pressed: atem.runMacro(9)
         GridLayout {
             id: macroGrid
             anchors.fill: parent
@@ -323,6 +333,8 @@ ApplicationWindow {
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
+            anchors.margins: 2
+            spacing: 2
             Label {
                 id: conMsg
                 text: ""
@@ -356,7 +368,24 @@ ApplicationWindow {
                 visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingCache
                 Layout.alignment: Qt.AlignRight
-            }            
+            }
+            ColumnLayout {
+                Layout.preferredWidth: 100
+                Layout.minimumWidth: 60
+                Layout.maximumWidth: 200
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight
+                ProgressBar {
+                    id: audioLevelMainLeft
+                    from: 0
+                    to: 100
+                }
+                ProgressBar {
+                    id: audioLevelMainRight
+                    from: 0
+                    to: 100
+                }
+            }
         }
     }
 
@@ -562,6 +591,8 @@ ApplicationWindow {
         onAudioMasterLevelsChanged: {
             console.debug(left)
             console.debug(right)
+            audioLevelMainLeft.value=left/65535
+            audioLevelMainRight.value=right/65535
         }
     }
 

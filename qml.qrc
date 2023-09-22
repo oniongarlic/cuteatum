@@ -9,5 +9,7 @@
         <file>qml/InputMenuItem.qml</file>
         <file>qml/ListModelEasing.qml</file>
         <file>qml/ListModelKeyType.qml</file>
+        <file>qml/drawers/KeySourceDrawer.qml</file>
+        <file>qml/drawers/MacroDrawer.qml</file>
     </qresource>
 </RCC>

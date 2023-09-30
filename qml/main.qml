@@ -4,6 +4,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
 
+import "drawers"
+
 import org.bm 1.0
 import org.tal.servicediscovery 1.0
 import org.tal.mqtt 1.0
@@ -288,28 +290,9 @@ ApplicationWindow {
         onTriggered: macroDrawer.open();
     }
 
-    Drawer {
+    MacroDrawer {
         id: macroDrawer
-        enabled: atem.connected
-        height: root.height
-        width: root.width/2.5
-        GridLayout {
-            id: macroGrid
-            anchors.fill: parent
-            anchors.margins: 8
-            columns: 4
-            columnSpacing: 8
-            rowSpacing: 8
-            Repeater {
-                model: 24
-                delegate: Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "M "+(index+1)
-                    onClicked: atem.runMacro(index+1)
-                }
-            }
-        }
+        enabled: atem.connected        
     }
 
     InputButtonGroup {
@@ -323,6 +306,8 @@ ApplicationWindow {
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
+            anchors.margins: 2
+            spacing: 2
             Label {
                 id: conMsg
                 text: ""
@@ -356,7 +341,24 @@ ApplicationWindow {
                 visible: atem.streamingDatarate>0 && atem.connected
                 text: atem.streamingCache
                 Layout.alignment: Qt.AlignRight
-            }            
+            }
+            ColumnLayout {
+                Layout.preferredWidth: 100
+                Layout.minimumWidth: 60
+                Layout.maximumWidth: 200
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight
+                ProgressBar {
+                    id: audioLevelMainLeft
+                    from: 0
+                    to: 100
+                }
+                ProgressBar {
+                    id: audioLevelMainRight
+                    from: 0
+                    to: 100
+                }
+            }
         }
     }
 
@@ -562,6 +564,8 @@ ApplicationWindow {
         onAudioMasterLevelsChanged: {
             console.debug(left)
             console.debug(right)
+            audioLevelMainLeft.value=left/65535
+            audioLevelMainRight.value=right/65535
         }
     }
 

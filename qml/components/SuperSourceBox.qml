@@ -10,7 +10,7 @@ Rectangle {
     border.color: "#8c57d4e1"
     border.width: 4
 
-    property int dragMargin: 32
+    property int dragMargin: 16
 
     property int boxId: 1
     property double defaultX: 0
@@ -57,6 +57,10 @@ Rectangle {
             }
         }
 
+        onClicked: {
+            cropRect.focus=true
+        }
+
         onPressAndHold: {
 
         }
@@ -78,5 +82,41 @@ Rectangle {
         anchors.centerIn: parent
         color: "black"
         font.pixelSize: 24
+    }
+
+    Rectangle {
+        id: bottomRightDrag
+        anchors.horizontalCenter: cropRect.right
+        anchors.verticalCenter: cropRect.bottom
+        color: "#4c57d4e1"
+        border.color: "#8c57d4e1"
+        border.width: 2
+        width: dragMargin
+        height: dragMargin
+        radius: dragMargin/2
+
+        MouseArea {
+            id: bRD
+            anchors.fill: bottomRightDrag
+            drag.target: parent
+            drag.threshold: 1
+
+            onPositionChanged: {
+                if(drag.active){
+                    cropRect.width = cropRect.width + mouseX
+                    cropRect.height = cropRect.height + mouseY
+
+                    if (cropRect.width < dragMargin)
+                        cropRect.width = dragMargin
+                    else if (cropRect.width > cropRect.parent.width-cropRect.x)
+                        cropRect.width=cropRect.parent.width-cropRect.x
+
+                    if (cropRect.height < dragMargin)
+                        cropRect.height = dragMargin
+                    else if (cropRect.height > cropRect.parent.height-cropRect.y)
+                        cropRect.height=cropRect.parent.height-cropRect.y
+                }
+            }
+        }
     }
 }

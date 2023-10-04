@@ -19,7 +19,7 @@ Page {
 
     property AtemMixEffect me;
     property AtemFairlight fl;
-    property AtemDownstreamKey dsk;
+    property AtemDownstreamKey dsk;    
 
     background: Rectangle {
         gradient: Gradient {
@@ -118,6 +118,17 @@ Page {
         id: keySourceDrawer
         me: mainPage.me
         key: 0
+    }
+
+    SuperSourceDrawer {
+        id: ssDrawer
+        // superSourceId: 1
+    }
+
+    Action {
+        id: actionSuperSource
+        shortcut: "Ctrl+F"
+        onTriggered: ssDrawer.open();
     }
 
     GridLayout {

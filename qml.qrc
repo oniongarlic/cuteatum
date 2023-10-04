@@ -11,5 +11,7 @@
         <file>qml/ListModelKeyType.qml</file>
         <file>qml/drawers/KeySourceDrawer.qml</file>
         <file>qml/drawers/MacroDrawer.qml</file>
+        <file>qml/drawers/SuperSourceDrawer.qml</file>
+        <file>qml/components/SuperSourceBox.qml</file>
     </qresource>
 </RCC>

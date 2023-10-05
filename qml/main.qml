@@ -281,7 +281,7 @@ ApplicationWindow {
                 text: "Show interface"
                 action: actionMacros
             }
-        }
+        }        
     }
 
     Action {
@@ -378,6 +378,7 @@ ApplicationWindow {
             me: !atem.connected ? null : atem.mixEffect(0)
             fl: !atem.connected ? null : fairlight
             dsk: !atem.connected ? null : atem.downstreamKey(0)
+            ss: !atem.connected ? null : superSource
         }
     }
 
@@ -585,6 +586,10 @@ ApplicationWindow {
     AtemSuperSource {
         id: superSource
         atemConnection: atem
+        // superSourceID: 0
+        onSuperSourceChanged: {
+            console.debug("SuperSource updated for box: "+boxid)
+        }
     }
 
     Timer {

@@ -7,16 +7,20 @@ Rectangle {
     width: parent.width*defaulWidth
     height: parent.height*defaulHeight
     color: "#4c57d4e1"
-    border.color: "#8c57d4e1"
+    border.color: enabled ? "#40f440e0" : "#f44040e0"
     border.width: 4
 
     property int dragMargin: 16
+
+    property bool enabled: true
 
     property int boxId: 1
     property double defaultX: 0
     property double defaultY: 0
     property double defaulWidth: 0.5
     property double defaulHeight: 0.5
+
+    signal clicked()
 
     function mapNormalizedRect() {
         return Qt.rect(cropRect.x/parent.width,
@@ -50,7 +54,7 @@ Rectangle {
             console.debug(wheel.angleDelta)
         }
 
-        onPositionChanged: {
+        drag.onActiveChanged: {
             if (!drag.active) {
                 console.debug("Drag ended: "+boxId)
                 console.debug(mapNormalizedRect());
@@ -59,14 +63,15 @@ Rectangle {
 
         onClicked: {
             cropRect.focus=true
+            cropRect.clicked()
         }
 
         onPressAndHold: {
-
+            reset();
         }
 
         onDoubleClicked: {
-            reset();
+            cropRect.enabled=!cropRect.enabled
         }
 
         function reset() {
@@ -80,7 +85,7 @@ Rectangle {
     Text {
         text: '#'+boxId
         anchors.centerIn: parent
-        color: "black"
+        color: cropRect.enabled ? "green" : "black"
         font.pixelSize: 24
     }
 

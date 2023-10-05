@@ -11,42 +11,49 @@ Drawer {
     id: ssDrawer
     // enabled: atem.connected
     height: root.height
-    width: root.width/1.5
+    width: root.width/1.3
 
     property double ratio: 16/9
-
     property int boxDragMargin: 16
 
-    Rectangle {
+    property SuperSourceBox currentBox: ssb1;
+
+    ColumnLayout {
         anchors.fill: parent
-        color: "red"
         Rectangle {
-            id: pImage
-            width: parent.width
-            height: width/ratio
-            color: "grey"
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            color: "green"
+            Rectangle {
+                id: superSourceContainer
+                width: parent.width
+                height: width/ratio
+                color: "grey"
 
-            SuperSourceBox {
-                boxId: 1
+                SuperSourceBox {
+                    id: ssb1
+                    boxId: 1
+                }
+                SuperSourceBox {
+                    id: ssb2
+                    defaultX: 0.5
+                    defaultY: 0
+                    boxId: 2
+                }
+                SuperSourceBox {
+                    id: ssb3
+                    defaultX: 0
+                    defaultY: 0.5
+                    boxId: 3
+                }
+                SuperSourceBox {
+                    id: ssb4
+                    defaultX: 0.5
+                    defaultY: 0.5
+                    boxId: 4
+                }
             }
-            SuperSourceBox {
-                defaultX: 0.5
-                defaultY: 0
-                boxId: 2
-            }
-            SuperSourceBox {
-                defaultX: 0
-                defaultY: 0.5
-                boxId: 3
-            }
-            SuperSourceBox {
-                defaultX: 0.5
-                defaultY: 0.5
-                boxId: 4
-            }
-
         }
+
     }
-
-
 }

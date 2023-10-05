@@ -33,27 +33,69 @@ Drawer {
                 SuperSourceBox {
                     id: ssb1
                     boxId: 1
+                    visible: ss1Check.checked
                 }
                 SuperSourceBox {
                     id: ssb2
                     defaultX: 0.5
                     defaultY: 0
                     boxId: 2
+                    visible: ss2Check.checked
                 }
                 SuperSourceBox {
                     id: ssb3
                     defaultX: 0
                     defaultY: 0.5
                     boxId: 3
+                    visible: ss3Check.checked
                 }
                 SuperSourceBox {
                     id: ssb4
                     defaultX: 0.5
                     defaultY: 0.5
                     boxId: 4
+                    visible: ss4Check.checked
                 }
             }
         }
-
+        RowLayout {
+            CheckBox {
+                id: ssLiveCheck
+                text: "Live"
+                checked: true
+            }
+            Button {
+                text: "Commit"
+                enabled: !ssLiveCheck.checked
+            }
+            CheckBox {
+                id: ss1Check
+                text: "1"
+                checked: true
+            }
+            CheckBox {
+                id: ss2Check
+                text: "2"
+                checked: true
+            }
+            CheckBox {
+                id: ss3Check
+                text: "3"
+                checked: true
+            }
+            CheckBox {
+                id: ss4Check
+                text: "4"
+                checked: true
+            }
+        }
+        RowLayout {
+            Button {
+                text: "Set A"
+            }
+            Button {
+                text: "Set B"
+            }
+        }
     }
 }

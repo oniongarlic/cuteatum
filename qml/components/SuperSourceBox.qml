@@ -29,6 +29,12 @@ Rectangle {
                        cropRect.height/parent.height)
     }
 
+    Keys.onLeftPressed: cropRect.x--
+    Keys.onRightPressed: cropRect.x++
+    Keys.onUpPressed: cropRect.y--
+    Keys.onDownPressed: cropRect.y++
+    Keys.onSpacePressed: cropRect.enabled=!enabled
+
     Rectangle {
         id: cropCenterRectangle
         anchors.centerIn: parent

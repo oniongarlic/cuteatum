@@ -19,7 +19,8 @@ Page {
 
     property AtemMixEffect me;
     property AtemFairlight fl;
-    property AtemDownstreamKey dsk;    
+    property AtemDownstreamKey dsk;
+    property AtemSuperSource ss;
 
     background: Rectangle {
         gradient: Gradient {

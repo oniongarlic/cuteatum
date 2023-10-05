@@ -582,6 +582,11 @@ ApplicationWindow {
         }
     }
 
+    AtemSuperSource {
+        id: superSource
+        atemConnection: atem
+    }
+
     Timer {
         id: statusPoller
         interval: 1000

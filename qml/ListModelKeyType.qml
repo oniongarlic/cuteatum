@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick
 
 // 0 = luma, 1 = chroma, 2 = pattern, 3 = DVE
 

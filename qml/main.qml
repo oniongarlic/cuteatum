@@ -1,8 +1,8 @@
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Controls.Material 2.12
-import QtQuick.Layouts 1.12
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Controls.Material
+import QtQuick.Layouts
 
 import "drawers"
 
@@ -281,7 +281,7 @@ ApplicationWindow {
                 text: "Show interface"
                 action: actionMacros
             }
-        }
+        }        
     }
 
     Action {
@@ -378,6 +378,7 @@ ApplicationWindow {
             me: !atem.connected ? null : atem.mixEffect(0)
             fl: !atem.connected ? null : fairlight
             dsk: !atem.connected ? null : atem.downstreamKey(0)
+            ss: !atem.connected ? null : superSource
         }
     }
 
@@ -579,6 +580,15 @@ ApplicationWindow {
 
         onTallyChanged: {
             console.debug('audioTally: '+audioSource)
+        }
+    }
+
+    AtemSuperSource {
+        id: superSource
+        atemConnection: atem
+        // superSourceID: 0
+        onSuperSourceChanged: {
+            console.debug("SuperSource updated for box: "+boxid)
         }
     }
 

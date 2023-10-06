@@ -1,7 +1,7 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
-import QtQuick.Layouts 1.12
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.Material
+import QtQuick.Layouts
 import ".."
 
 import org.bm 1.0
@@ -23,7 +23,7 @@ Drawer {
     Keys.onDigit9Pressed: atem.runMacro(9)
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 8        
         CheckBox {
             text: "Repeat"
             onClicked: atem.setMacroRepeating(checked)

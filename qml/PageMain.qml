@@ -1,9 +1,9 @@
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Controls.Material 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Dialogs 1.2
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Controls.Material
+import QtQuick.Layouts
+import QtQuick.Dialogs
 
 import "drawers"
 
@@ -20,6 +20,7 @@ Page {
     property AtemMixEffect me;
     property AtemFairlight fl;
     property AtemDownstreamKey dsk;
+    property AtemSuperSource ss;
 
     background: Rectangle {
         gradient: Gradient {
@@ -118,6 +119,16 @@ Page {
         id: keySourceDrawer
         me: mainPage.me
         key: 0
+    }
+
+    SuperSourceDrawer {
+        id: ssDrawer
+    }
+
+    Action {
+        id: actionSuperSource
+        shortcut: "Ctrl+F"
+        onTriggered: ssDrawer.open();
     }
 
     GridLayout {

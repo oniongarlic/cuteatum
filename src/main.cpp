@@ -10,11 +10,12 @@
 
 #include <QSettings>
 
-#include <qatemconnection.h>
-#include <qatemcameracontrol.h>
-#include <qatemdownstreamkey.h>
-#include <qatemmixeffect.h>
-#include <qatemfairlight.h>
+#include <QAtemControl/qatemconnection.h>
+#include <QAtemControl/qatemcameracontrol.h>
+#include <QAtemControl/qatemdownstreamkey.h>
+#include <QAtemControl/qatemmixeffect.h>
+#include <QAtemControl/qatemfairlight.h>
+#include <QAtemControl/qatemsupersource.h>
 
 #include "servicediscovery.h"
 #include "cutemqttclient.h"
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<QAtemDownstreamKey>("org.bm", 1, 0, "AtemDownstreamKey", "AtemDownstreamKey can not be created");
     qmlRegisterUncreatableType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl", "AtemCameraControl can not be created");
     qmlRegisterType<QAtemFairlight>("org.bm", 1, 0, "AtemFairlight");
+    qmlRegisterType<QAtemSuperSource>("org.bm", 1, 0, "AtemSuperSource");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 

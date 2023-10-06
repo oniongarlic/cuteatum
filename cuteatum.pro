@@ -18,8 +18,8 @@ HEADERS += \
     src/servicediscovery.h
 
 unix {
-INCLUDEPATH += /usr/local/include
-LIBS += -L/usr/local/lib
+INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/QAtemControl
+LIBS += -L$$[QT_INSTALL_PREFIX]/lib
 LIBS += -lqatemcontrol
 }
 

@@ -18,11 +18,32 @@ Drawer {
 
     property SuperSourceBox currentBox: ssb1;
 
+    ListModel {
+        id: ssModel
+        ListElement { box: 1; dx: 0; dy: 0; w: 0.5; h: 0.5; ena: true; }
+        ListElement { box: 2; dx: 0.5; dy: 0; w: 0.5; h: 0.5; ena: true; }
+        ListElement { box: 3; dx: 0; dy: 0.5; w: 0.5; h: 0.5; ena: true; }
+        ListElement { box: 4; dx: 0.5; dy: 0.5; w: 0.5; h: 0.5; ena: true; }
+    }
+
+    Keys.onDigit1Pressed: selectBox(0)
+    Keys.onDigit2Pressed: selectBox(1)
+    Keys.onDigit3Pressed: selectBox(2)
+    Keys.onDigit4Pressed: selectBox(3)
+
+    function selectBox(i) {
+        ssBoxParent.currentIndex=i;
+        var item=itemAt(i)
+        item.focus=true
+    }
+
     ColumnLayout {
         anchors.fill: parent
+        anchors.margins: 8
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.margins: 2
             color: "green"
             Rectangle {
                 id: superSourceContainer
@@ -30,31 +51,32 @@ Drawer {
                 height: width/ratio
                 color: "grey"
 
-                SuperSourceBox {
-                    id: ssb1
-                    boxId: 1
-                    visible: ss1Check.checked
-                }
-                SuperSourceBox {
-                    id: ssb2
-                    defaultX: 0.5
-                    defaultY: 0
-                    boxId: 2
-                    visible: ss2Check.checked
-                }
-                SuperSourceBox {
-                    id: ssb3
-                    defaultX: 0
-                    defaultY: 0.5
-                    boxId: 3
-                    visible: ss3Check.checked
-                }
-                SuperSourceBox {
-                    id: ssb4
-                    defaultX: 0.5
-                    defaultY: 0.5
-                    boxId: 4
-                    visible: ss4Check.checked
+                Repeater {
+                    id: ssBoxParent
+                    property int currentIndex: -1
+                    onCurrentIndexChanged: {
+                        console.debug(currentIndex)
+                        for (var i=0;i<count;i++) {
+                            var item=itemAt(i)
+                            if (i==currentIndex) {
+                                item.z=1
+                                ssCheck.ssbox=item;
+                            } else {
+                                item.z=0;
+                            }
+                        }
+
+                    }
+                    model: ssModel
+                    delegate: SuperSourceBox {
+                        boxId: box
+                        defaultX: dx
+                        defaultY: dy
+                        visible: ena
+                        onClicked: {
+                            ssBoxParent.currentIndex=index
+                        }
+                    }
                 }
             }
         }
@@ -69,25 +91,13 @@ Drawer {
                 enabled: !ssLiveCheck.checked
             }
             CheckBox {
-                id: ss1Check
-                text: "1"
-                checked: true
-            }
-            CheckBox {
-                id: ss2Check
-                text: "2"
-                checked: true
-            }
-            CheckBox {
-                id: ss3Check
-                text: "3"
-                checked: true
-            }
-            CheckBox {
-                id: ss4Check
-                text: "4"
-                checked: true
-            }
+                id: ssCheck
+                property SuperSourceBox ssbox;
+                enabled: ssbox!=null
+                text: "Visible"
+                checked: ssbox.enabled
+                onCheckedChanged: ssbox.enabled=checked
+            }            
         }
         RowLayout {
             Button {

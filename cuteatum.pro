@@ -25,7 +25,7 @@ LIBS += -lqatemcontrol
 
 windows {
 INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/qatemcontrol
-LIBS += -L$$[QT_INSTALL_PREFIX]/lib/qatemcontrol
+LIBS += -L$$[QT_INSTALL_PREFIX]/lib
 LIBS += -lqatemcontrol
 }
 

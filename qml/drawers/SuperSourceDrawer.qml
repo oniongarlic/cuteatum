@@ -14,9 +14,7 @@ Drawer {
     width: root.width/1.3
 
     property double ratio: 16/9
-    property int boxDragMargin: 16
-
-    property SuperSourceBox currentBox: ssb1;
+    property int boxDragMargin: 16    
 
     ListModel {
         id: ssModel
@@ -36,6 +34,8 @@ Drawer {
         var item=itemAt(i)
         item.focus=true
     }
+
+    property SuperSourceBox selectedBox;
 
     ColumnLayout {
         anchors.fill: parent
@@ -60,7 +60,7 @@ Drawer {
                             var item=itemAt(i)
                             if (i==currentIndex) {
                                 item.z=1
-                                ssCheck.ssbox=item;
+                                selectedBox=item;
                             } else {
                                 item.z=0;
                             }
@@ -81,6 +81,7 @@ Drawer {
             }
         }
         RowLayout {
+            Layout.fillWidth: true
             CheckBox {
                 id: ssLiveCheck
                 text: "Live"
@@ -93,13 +94,69 @@ Drawer {
             CheckBox {
                 id: ssCheck
                 property SuperSourceBox ssbox;
-                enabled: ssbox!=null
+                enabled: selectedBox!=null
                 text: "Visible"
-                checked: ssbox.enabled
-                onCheckedChanged: ssbox.enabled=checked
-            }            
+                checked: selectedBox.enabled
+                onCheckedChanged: selectedBox.enabled=checked
+            }
+            CheckBox {
+                id: ssCropCheck
+                enabled: selectedBox!=null
+                text: "Crop"
+                checked: selectedBox.crop
+                onCheckedChanged: selectedBox.crop=checked
+            }
         }
+        GridLayout {
+            Layout.fillWidth: true
+            enabled: selectedBox && selectedBox.crop
+            rows: 1
+            columns: 4
+            SpinBox {
+                from: 0
+                to: 2048
+                stepSize: 1
+                wheelEnabled: true
+                editable: true
+                inputMethodHints: Qt.ImhDigitsOnly
+                value: selectedBox.cropTop
+                onValueChanged: selectedBox.cropTop=value
+            }
+            SpinBox {
+                from: 0
+                to: 2048
+                stepSize: 1                
+                wheelEnabled: true
+                editable: true
+                inputMethodHints: Qt.ImhDigitsOnly
+                value: selectedBox.cropBottom
+                onValueChanged: selectedBox.cropBottom=value
+            }
+            SpinBox {
+                from: 0
+                to: 2048
+                stepSize: 1
+                wheelEnabled: true
+                editable: true
+                inputMethodHints: Qt.ImhDigitsOnly
+                value: selectedBox.cropLeft
+                onValueChanged: selectedBox.cropLeft=value
+            }
+            SpinBox {
+                from: 0
+                to: 2048
+                stepSize: 1
+                wheelEnabled: true
+                editable: true
+                inputMethodHints: Qt.ImhDigitsOnly
+                value: selectedBox.cropRight
+                onValueChanged: selectedBox.cropRight=value
+            }
+
+        }
+
         RowLayout {
+            Layout.fillWidth: true
             Button {
                 text: "Set A"
             }

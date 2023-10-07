@@ -1,7 +1,7 @@
 import QtQuick
 
 Rectangle {
-    id: cropRect
+    id: sizeRect
     x: parent.width*defaultX
     y: parent.height*defaultY
     width: parent.width*defaulWidth
@@ -14,26 +14,36 @@ Rectangle {
 
     property bool enabled: true
 
+    property bool crop: false
+    property double cropTop: 0
+    property double cropBottom: 0
+    property double cropLeft: 0
+    property double cropRight: 0
+
     property int boxId: 1
     property double defaultX: 0
     property double defaultY: 0
     property double defaulWidth: 0.5
     property double defaulHeight: 0.5
 
+    readonly property double ratio: 16.0/9.0
+
+    readonly property double cropRatio: 2048
+
     signal clicked()
 
     function mapNormalizedRect() {
-        return Qt.rect(cropRect.x/parent.width,
-                       cropRect.y/parent.height,
-                       cropRect.width/parent.width,
-                       cropRect.height/parent.height)
+        return Qt.rect(sizeRect.x/parent.width,
+                       sizeRect.y/parent.height,
+                       sizeRect.width/parent.width,
+                       sizeRect.height/parent.height)
     }
 
-    Keys.onLeftPressed: cropRect.x--
-    Keys.onRightPressed: cropRect.x++
-    Keys.onUpPressed: cropRect.y--
-    Keys.onDownPressed: cropRect.y++
-    Keys.onSpacePressed: cropRect.enabled=!enabled
+    Keys.onLeftPressed: sizeRect.x--
+    Keys.onRightPressed: sizeRect.x++
+    Keys.onUpPressed: sizeRect.y--
+    Keys.onDownPressed: sizeRect.y++
+    Keys.onSpacePressed: sizeRect.enabled=!enabled
 
     Rectangle {
         id: cropCenterRectangle
@@ -42,19 +52,28 @@ Rectangle {
         width: parent.width
         height: parent.height
         color: "white"
-        opacity: (cropCenterArea.pressed || cropRect.focus) ? 0.2 : 0.0
+        opacity: (cropCenterArea.pressed || sizeRect.focus) ? 0.2 : 0.0
+    }
+    Rectangle {
+        x: 0+((parent.width/cropRatio)*cropLeft)
+        y: 0+((parent.height/cropRatio)*cropTop)
+        width: parent.width-((parent.width/cropRatio)*cropRight)-x
+        height: parent.height-((parent.height/cropRatio)*cropBottom)-y
+        color: "transparent"
+        border.color: "black"
+        border.width: crop ? 1 : 0
     }
 
     MouseArea {
         id: cropCenterArea
         anchors.fill: cropCenterRectangle
         anchors.margins: 8
-        drag.target: cropRect
+        drag.target: sizeRect
         drag.minimumX: 0
-        drag.maximumX: cropRect.parent.width-cropRect.width
+        drag.maximumX: sizeRect.parent.width-sizeRect.width
 
         drag.minimumY: 0
-        drag.maximumY: cropRect.parent.height-cropRect.height
+        drag.maximumY: sizeRect.parent.height-sizeRect.height
 
         onWheel: {
             console.debug(wheel.angleDelta)
@@ -68,8 +87,8 @@ Rectangle {
         }
 
         onClicked: {
-            cropRect.focus=true
-            cropRect.clicked()
+            sizeRect.focus=true
+            sizeRect.clicked()
         }
 
         onPressAndHold: {
@@ -77,28 +96,28 @@ Rectangle {
         }
 
         onDoubleClicked: {
-            cropRect.enabled=!cropRect.enabled
+            sizeRect.enabled=!sizeRect.enabled
         }
 
         function reset() {
-            cropRect.x=cropRect.parent.width*defaultX;
-            cropRect.y=cropRect.parent.height*defaultY;
-            cropRect.width=cropRect.parent.width*defaulWidth
-            cropRect.height=cropRect.parent.height*defaulHeight
+            sizeRect.x=sizeRect.parent.width*defaultX;
+            sizeRect.y=sizeRect.parent.height*defaultY;
+            sizeRect.width=sizeRect.parent.width*defaulWidth
+            sizeRect.height=sizeRect.parent.height*defaulHeight
         }
     }
 
     Text {
-        text: '#'+boxId
+        text: '#'+boxId+(crop ? "c" : "")
         anchors.centerIn: parent
-        color: cropRect.enabled ? "green" : "black"
+        color: sizeRect.enabled ? "green" : "black"
         font.pixelSize: 24
     }
 
     Rectangle {
         id: bottomRightDrag
-        anchors.horizontalCenter: cropRect.right
-        anchors.verticalCenter: cropRect.bottom
+        anchors.horizontalCenter: sizeRect.right
+        anchors.verticalCenter: sizeRect.bottom
         color: "#4c57d4e1"
         border.color: "#8c57d4e1"
         border.width: 2
@@ -114,18 +133,19 @@ Rectangle {
 
             onPositionChanged: {
                 if(drag.active){
-                    cropRect.width = cropRect.width + mouseX
-                    cropRect.height = cropRect.height + mouseY
+                    sizeRect.width = sizeRect.width + mouseX
+                    //sizeRect.height = sizeRect.height + mouseY
+                    sizeRect.height = sizeRect.width/ratio
 
-                    if (cropRect.width < dragMargin)
-                        cropRect.width = dragMargin
-                    else if (cropRect.width > cropRect.parent.width-cropRect.x)
-                        cropRect.width=cropRect.parent.width-cropRect.x
+                    if (sizeRect.width < dragMargin)
+                        sizeRect.width = dragMargin
+                    else if (sizeRect.width > sizeRect.parent.width-sizeRect.x)
+                        sizeRect.width=sizeRect.parent.width-sizeRect.x
 
-                    if (cropRect.height < dragMargin)
-                        cropRect.height = dragMargin
-                    else if (cropRect.height > cropRect.parent.height-cropRect.y)
-                        cropRect.height=cropRect.parent.height-cropRect.y
+                    if (sizeRect.height < dragMargin)
+                        sizeRect.height = dragMargin
+                    else if (sizeRect.height > sizeRect.parent.height-sizeRect.y)
+                        sizeRect.height=sizeRect.parent.height-sizeRect.y
                 }
             }
         }

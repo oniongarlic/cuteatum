@@ -68,6 +68,17 @@ Drawer {
                     color: "grey"
                     clip: true
 
+                    Rectangle {
+                        color: "transparent"
+                        border.color: "black"
+                        border.width: 1
+                        width: parent.width/2
+                        height: parent.height/2
+                        x: parent.width/4
+                        y: parent.height/4
+                        opacity: 0.4
+                    }
+
                     Repeater {
                         id: ssBoxParent
                         property int currentIndex: -1

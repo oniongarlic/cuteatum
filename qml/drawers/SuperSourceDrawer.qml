@@ -46,6 +46,7 @@ Drawer {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
+            Layout.minimumHeight: 1080/10
             Layout.margins: 2
             Rectangle {
                 Layout.alignment: Qt.AlignTop

@@ -131,7 +131,7 @@ Rectangle {
             if (boxSize<=0)
                 boxSize=0.01;
             if (boxSize>1)
-                boxSize=1
+                boxSize=1            
             console.debug(boxSize)
         }
 
@@ -139,6 +139,8 @@ Rectangle {
             if (!drag.active) {
                 console.debug("Drag ended: "+boxId)
                 console.debug(mapNormalizedRect());
+                boxX=sizeRect.x/sizeRect.parent.width
+                boxY=sizeRect.y/sizeRect.parent.height
             }
         }
 
@@ -196,7 +198,8 @@ Rectangle {
 
                     sizeRect.width = sizeRect.height*ratio
 
-                    boxSize=sizeRect.width/sizeRect.parent.width
+                    // Update normalized values
+                    boxSize=sizeRect.width/sizeRect.parent.width                   
 
                     if (sizeRect.width < dragMargin)
                         sizeRect.width = dragMargin

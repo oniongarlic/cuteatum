@@ -90,7 +90,8 @@ Drawer {
                             defaultX: dx
                             defaultY: dy
                             defaultSize: s
-                            visible: ena
+                            enabled: ena
+                            visible: enabled || !ssHideDisabled.checked
                             onClicked: {
                                 ssBoxParent.currentIndex=index
                             }
@@ -133,6 +134,10 @@ Drawer {
                 text: "Visible"
                 checked: selectedBox && selectedBox.enabled
                 onCheckedChanged: selectedBox.enabled=checked
+            }
+            CheckBox {
+                id: ssHideDisabled
+                text: "Hide disabled"
             }
             CheckBox {
                 id: ssCropCheck

@@ -7,8 +7,9 @@ Rectangle {
     width: parent.width*boxSize
     height: parent.height*boxSize
     color: "#4c57d4e1"
-    border.color: enabled ? "#40f440e0" : "#f44040e0"
-    border.width: 4
+    border.color: enabled ? "#20ff20" : "#ff2020"
+    border.width: 2
+    opacity: enabled ? 1 : 0.2
 
     property int dragMargin: 16
 

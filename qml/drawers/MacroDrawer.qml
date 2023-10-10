@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 import QtQuick.Layouts
 import ".."
 
@@ -9,21 +8,27 @@ import org.bm 1.0
 Drawer {
     id: macroDrawer
     height: root.height
-    width: root.width/1.4
-    Keys.enabled: atem.connected
-    Keys.onDigit1Pressed: atem.runMacro(1)
-    Keys.onDigit2Pressed: atem.runMacro(2)
-    Keys.onDigit3Pressed: atem.runMacro(3)
-    Keys.onDigit4Pressed: atem.runMacro(4)
-    Keys.onDigit5Pressed: atem.runMacro(5)
-    Keys.onDigit6Pressed: atem.runMacro(6)
-    Keys.onDigit7Pressed: atem.runMacro(7)
-    Keys.onDigit8Pressed: atem.runMacro(8)
-    Keys.onDigit9Pressed: atem.runMacro(9)
+    width: root.width/1.4    
+    Keys.onDigit1Pressed: runMacro(1)
+    Keys.onDigit2Pressed: runMacro(2)
+    Keys.onDigit3Pressed: runMacro(3)
+    Keys.onDigit4Pressed: runMacro(4)
+    Keys.onDigit5Pressed: runMacro(5)
+    Keys.onDigit6Pressed: runMacro(6)
+    Keys.onDigit7Pressed: runMacro(7)
+    Keys.onDigit8Pressed: runMacro(8)
+    Keys.onDigit9Pressed: runMacro(9)
+
+    function runMacro(m) {
+        if (atem.connected) {
+            atem.runMacro(m)
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 8        
-        enabled: atem.connected
+        //enabled: atem.connected
         CheckBox {
             text: "Repeat"
             onClicked: atem.setMacroRepeating(checked)

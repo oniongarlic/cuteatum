@@ -89,11 +89,7 @@ Rectangle {
 
     onDefaultSizeChanged: boxSize=defaultSize
     Component.onCompleted: {        
-        boxSize=defaultSize
-        boxX=defaultX
-        boxY=defaultY
-        x=parent.width*boxX
-        y=parent.height*boxY
+        reset()
     }
 
     function mapNormalizedRect() {
@@ -202,10 +198,10 @@ Rectangle {
 
     function reset() {
         boxSize=defaultSize
-        sizeRect.x=sizeRect.parent.width*defaultX;
-        sizeRect.y=sizeRect.parent.height*defaultY;
-        sizeRect.width=sizeRect.parent.width*boxSize
-        sizeRect.height=sizeRect.parent.height*boxSize
+        boxX=defaultX
+        boxY=defaultY
+        x=parent.width*boxX
+        y=parent.height*boxY
     }
 
     MouseArea {

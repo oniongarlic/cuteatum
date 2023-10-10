@@ -88,10 +88,7 @@ Rectangle {
     onBoxYChanged: y=parent.height*boxY
 
     onDefaultSizeChanged: boxSize=defaultSize
-    Component.onCompleted: {
-        console.debug("onCompleted: "+boxSize)
-        console.debug("onCompleted: "+defaultX)
-        console.debug("onCompleted: "+defaultY)
+    Component.onCompleted: {        
         boxSize=defaultSize
         boxX=defaultX
         boxY=defaultY
@@ -140,7 +137,6 @@ Rectangle {
     property vector3d anim;
 
     onAnimChanged: {
-        console.debug(anim)
         setPositionVector3d(anim)
     }
 
@@ -204,6 +200,14 @@ Rectangle {
         boxY=sizeRect.y/sizeRect.parent.height
     }
 
+    function reset() {
+        boxSize=defaultSize
+        sizeRect.x=sizeRect.parent.width*defaultX;
+        sizeRect.y=sizeRect.parent.height*defaultY;
+        sizeRect.width=sizeRect.parent.width*boxSize
+        sizeRect.height=sizeRect.parent.height*boxSize
+    }
+
     MouseArea {
         id: cropCenterArea
         anchors.fill: cropCenterRectangle
@@ -215,22 +219,18 @@ Rectangle {
         drag.minimumY: dragOutside ? -sizeRect.parent.height : 0
         drag.maximumY: dragOutside ? sizeRect.parent.height : sizeRect.parent.height-sizeRect.height
 
-        onWheel: {
-            console.debug(boxSize)
+        onWheel: {            
             if (boxSize<=0)
                 boxSize=0.01;
             boxSize=boxSize+(wheel.angleDelta.y/4800.0)
             if (boxSize<=0)
                 boxSize=0.01;
             if (boxSize>1)
-                boxSize=1            
-            console.debug(boxSize)
+                boxSize=1
         }
 
         drag.onActiveChanged: {
-            if (!drag.active) {
-                console.debug("Drag ended: "+boxId)
-                console.debug(mapNormalizedRect());
+            if (!drag.active) {                
                 boxX=sizeRect.x/sizeRect.parent.width
                 boxY=sizeRect.y/sizeRect.parent.height
             } else {
@@ -249,15 +249,7 @@ Rectangle {
 
         onDoubleClicked: {
             sizeRect.enabled=!sizeRect.enabled
-        }
-
-        function reset() {
-            boxSize=defaultSize
-            sizeRect.x=sizeRect.parent.width*defaultX;
-            sizeRect.y=sizeRect.parent.height*defaultY;
-            sizeRect.width=sizeRect.parent.width*boxSize
-            sizeRect.height=sizeRect.parent.height*boxSize
-        }
+        }        
     }
 
     Text {

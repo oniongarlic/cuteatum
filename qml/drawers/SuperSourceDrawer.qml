@@ -242,6 +242,10 @@ Drawer {
                         text: "Inside"
                         onClicked: selectedBox.snapInside()
                     }
+                    Button {
+                        text: "Reset"
+                        onClicked: selectedBox.reset()
+                    }
                 }
 
                 SpinBox {

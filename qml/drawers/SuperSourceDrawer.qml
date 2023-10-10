@@ -30,19 +30,25 @@ Drawer {
         }
     }
 
+    function preparePositions(bid) {
+        for (var i=0;i<4;i++) {
+            let v=savedPosition[bid][i];
+            let item=ssBoxParent.itemAt(i)
+            item.animateFrom=item.getPositionVector3d();
+            item.animateTo=v;
+        }
+    }
+
     function loadPositions(bid) {
         for (var i=0;i<4;i++) {
             let v=savedPosition[bid][i];
             let item=ssBoxParent.itemAt(i)
-            if (bid==0)
-                item.animateFrom=v;
-            else
-                item.animateTo=v;
-            console.debug(v)
+            item.setPositionVector3d(v);
         }
     }
 
-    function animateSuperSource() {
+    function animateSuperSource(bid) {
+        preparePositions(bid)
         for (var i=0;i<4;i++) {
             let item=ssBoxParent.itemAt(i)
             item.animate();
@@ -386,9 +392,15 @@ Drawer {
                 }
             }
             Button {
-                text: "Run"
+                text: "Run A"
                 onClicked: {
-                    animateSuperSource();
+                    animateSuperSource(0);
+                }
+            }
+            Button {
+                text: "Run B"
+                onClicked: {
+                    animateSuperSource(1);
                 }
             }
         }

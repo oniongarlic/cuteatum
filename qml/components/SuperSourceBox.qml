@@ -8,11 +8,15 @@ Rectangle {
     height: parent.height*boxSize
     color: "#4c57d4e1"
     border.color: enabled ? "#20ff20" : "#ff2020"
-    border.width: 2
+    border.width: activated ? 2 : 1
     opacity: enabled ? 1 : 0.2
     activeFocusOnTab: true
 
     property int dragMargin: 16
+
+    property bool selected: false
+
+    property bool activated: focus || selected
 
     property bool enabled: true
 
@@ -36,8 +40,6 @@ Rectangle {
     property double boxCenterY: (boxSize/2)+boxY-0.5
 
     property point boxCenter: Qt.point(boxCenterX, boxCenterY)
-
-    onBoxCenterChanged: console.debug(boxCenter)
 
     property int inputSource: 1000;
 
@@ -67,6 +69,19 @@ Rectangle {
         y=parent.height*boxY
         width=parent.width*boxSize
         height=parent.height*boxSize
+    }
+
+    function setCenter(x,y) {
+        setCenterX(x)
+        setCenterY(y)
+    }
+
+    function setCenterX(x) {
+        boxX=-(boxSize/2)+0.5+x
+    }
+
+    function setCenterY(y) {
+        boxY=-(boxSize/2)+0.5+y
     }
 
     onBoxXChanged: x=parent.width*boxX
@@ -101,10 +116,14 @@ Rectangle {
         boxSize=s;
     }
 
-    onBoxSizeChanged: {
-        console.debug("onBoxSizeChanged: "+boxSize)
+    onBoxSizeChanged: {        
         if (bRD.drag.active)
             return;
+        if (boxSize>1)
+            boxSize=1
+        else if (boxSize<0)
+            boxSize=0
+
         sizeRect.width=sizeRect.parent.width*boxSize
         sizeRect.height=sizeRect.parent.height*boxSize
     }
@@ -114,6 +133,7 @@ Rectangle {
     Keys.onUpPressed: boxY-=0.01
     Keys.onDownPressed: boxY+=0.01
     Keys.onSpacePressed: sizeRect.enabled=!enabled
+    Keys.onAsteriskPressed: sizeRect.crop=!crop
 
     Rectangle {
         id: cropCenterRectangle
@@ -122,7 +142,7 @@ Rectangle {
         width: parent.width
         height: parent.height
         color: "white"
-        opacity: (cropCenterArea.pressed || sizeRect.focus) ? 0.2 : 0.0
+        opacity: (cropCenterArea.pressed || sizeRect.focus || selected) ? 0.2 : 0.0
     }
     Rectangle {
         x: 0+((parent.width/cropRatio)*cropLeft)
@@ -163,6 +183,8 @@ Rectangle {
                 console.debug(mapNormalizedRect());
                 boxX=sizeRect.x/sizeRect.parent.width
                 boxY=sizeRect.y/sizeRect.parent.height
+            } else {
+                sizeRect.focus=true
             }
         }
 
@@ -192,6 +214,8 @@ Rectangle {
         text: '#'+boxId+(crop ? "c" : "")
         anchors.centerIn: parent
         color: sizeRect.enabled ? "green" : "black"
+        font.bold: activated
+        font.strikeout: !sizeRect.enabled
         font.pixelSize: 24
     }
 
@@ -221,8 +245,14 @@ Rectangle {
                     sizeRect.width = sizeRect.height*ratio
 
                     // Update normalized values
-                    boxSize=sizeRect.width/sizeRect.parent.width                   
+                    boxSize=sizeRect.width/sizeRect.parent.width
+                    if (boxSize>1) {
+                        boxSize=1
+                        sizeRect.width=sizeRect.parent.width
+                        sizeRect.height=sizeRect.parent.height
+                    }
 
+                    /*
                     if (sizeRect.width < dragMargin)
                         sizeRect.width = dragMargin
                     else if (sizeRect.width > sizeRect.parent.width-sizeRect.x)
@@ -232,6 +262,7 @@ Rectangle {
                         sizeRect.height = dragMargin
                     else if (sizeRect.height > sizeRect.parent.height-sizeRect.y)
                         sizeRect.height=sizeRect.parent.height-sizeRect.y
+                    */
                 } else {
 
                 }

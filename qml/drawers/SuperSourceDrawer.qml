@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 import QtQuick.Layouts
 import ".."
 import "../components"
@@ -38,6 +37,19 @@ Drawer {
     }
 
     property SuperSourceBox selectedBox;
+
+    function updateAtemLive() {
+        if (ssLiveCheck.checked) {
+            ss.setSuperSource(selectedBox.boxId-1,
+                              selectedBox.enabled,
+                              selectedBox.inputSource,
+                              selectedBox.atemPosition,
+                              selectedBox.atemSize,
+                              selectedBox.crop,
+                              selectedBox.atemCrop)
+        }
+    }
+
 
     ColumnLayout {
         id: c
@@ -105,6 +117,7 @@ Drawer {
                             defaultSize: s
                             enabled: ena
                             visible: enabled || !ssHideDisabled.checked
+                            selected: ssBoxParent.currentIndex==boxId-1
                             onClicked: {
                                 ssBoxParent.currentIndex=index
                             }
@@ -112,39 +125,76 @@ Drawer {
                                 if (focus)
                                     ssBoxParent.currentIndex=index
                             }
+                            onAtemCropChanged: {
+                                updateAtemLive()
+                            }
+                            onAtemSizeChanged: {
+                                updateAtemLive()
+                            }
+                            onAtemPositionChanged: {
+                                updateAtemLive()
+                            }
                         }
                     }
                 }
             }
             ColumnLayout {
-                Layout.maximumWidth: 200
+                Layout.maximumWidth: 240
                 Layout.minimumWidth: 160
                 Layout.fillHeight: true
                 Layout.fillWidth: false
                 Layout.alignment: Qt.AlignTop
                 enabled: selectedBox!=null
+
+                ComboBox {
+                    id: boxId
+                    model: ssModel
+                    displayText: "Box: " + currentText
+                    textRole: "box"
+                    currentIndex: ssBoxParent.currentIndex
+                    onCurrentIndexChanged: ssBoxParent.currentIndex=currentIndex
+                }
+
                 ComboBox {
                     id: inputSourceCombo
                     Layout.fillWidth: true
                     model: atem.camInputs
+                    onActivated: {
+
+                    }
                 }
 
-                RowLayout {
-                    SpinBox {
-                        id: boxX
-                        from: -4800
-                        to : 4800
-                        stepSize: 50
-                        wheelEnabled: true
-                        value: selectedBox.boxCenterX*4800
+                SpinBox {
+                    id: boxX
+                    Layout.fillWidth: true
+                    from: -4800
+                    to : 4800
+                    stepSize: 50
+                    wheelEnabled: true
+                    value: selectedBox.boxCenterX*4800
+                    onValueModified: {
+                        selectedBox.setCenterX(value/4800)
                     }
-                    SpinBox {
-                        id: boxY
-                        from: -4800
-                        to: 4800
-                        stepSize: 50
-                        wheelEnabled: true
-                        value: selectedBox.boxCenterY*4800
+                }
+                SpinBox {
+                    id: boxY
+                    Layout.fillWidth: true
+                    from: -4800
+                    to: 4800
+                    stepSize: 50
+                    wheelEnabled: true
+                    value: selectedBox.boxCenterY*4800
+                    onValueModified: {
+                        selectedBox.setCenterY(value/4800)
+                    }
+                }
+                RowLayout {
+                    Button {
+                        text: "Center"
+                        onClicked: {
+                            selectedBox.setCenterX(0)
+                            selectedBox.setCenterY(0)
+                        }
                     }
                 }
 
@@ -157,6 +207,23 @@ Drawer {
                     value: selectedBox.boxSize*100
                     onValueModified: {
                         selectedBox.setSize(value/100)
+                    }
+                }
+                RowLayout {
+                    Button {
+                        text: "20%"
+                        Layout.fillWidth: false
+                        onClicked: selectedBox.boxSize=0.25
+                    }
+                    Button {
+                        text: "50%"
+                        Layout.fillWidth: false
+                        onClicked: selectedBox.boxSize=0.50
+                    }
+                    Button {
+                        text: "100%"
+                        Layout.fillWidth: false
+                        onClicked: selectedBox.boxSize=1.00
                     }
                 }
             }

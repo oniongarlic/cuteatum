@@ -123,6 +123,7 @@ Page {
 
     SuperSourceDrawer {
         id: ssDrawer
+        ss: mainPage.ss
     }
 
     Action {

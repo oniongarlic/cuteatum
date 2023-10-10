@@ -42,9 +42,10 @@ int main(int argc, char *argv[])
 
     Settings settings;
 
-    QQmlApplicationEngine engine;   
-
     QQuickStyle::setStyle("Universal");
+    //QQuickStyle::setStyle("Material");
+
+    QQmlApplicationEngine engine;
 
     qmlRegisterType<QAtemConnection>("org.bm", 1, 0, "AtemConnection");
     qmlRegisterType<QAtemMixEffect>("org.bm", 1, 0, "AtemMixEffect");

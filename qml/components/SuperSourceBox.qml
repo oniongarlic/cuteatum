@@ -10,6 +10,7 @@ Rectangle {
     border.color: enabled ? "#20ff20" : "#ff2020"
     border.width: 2
     opacity: enabled ? 1 : 0.2
+    activeFocusOnTab: true
 
     property int dragMargin: 16
 
@@ -30,6 +31,26 @@ Rectangle {
     property double boxX;
     property double boxY;
     property double boxSize;
+
+    property double boxCenterX: (boxSize/2)+boxX-0.5
+    property double boxCenterY: (boxSize/2)+boxY-0.5
+
+    property point boxCenter: Qt.point(boxCenterX, boxCenterY)
+
+    onBoxCenterChanged: console.debug(boxCenter)
+
+    property int inputSource: 1000;
+
+    // Position & crop in mixer values
+    property point atemPosition: Qt.point(boxCenterX*4800, boxCenterY*4800)
+    property int atemSize: boxSize*1000
+    property rect atemCrop: Qt.rect(cropTop/cropRatio*18000,
+                                    cropBottom/cropRatio*18000,
+                                    cropLeft/cropRatio*18000,
+                                    cropRight/cropRatio*18000)
+
+    onAtemCropChanged: console.debug("atemCrop "+ atemCrop)
+    onAtemPositionChanged: console.debug("AtemPos "+ atemPosition)
 
     readonly property double ratio: 16.0/9.0
     readonly property double cropRatio: 2048
@@ -151,7 +172,7 @@ Rectangle {
         }
 
         onPressAndHold: {
-            reset();
+            //reset();
         }
 
         onDoubleClicked: {

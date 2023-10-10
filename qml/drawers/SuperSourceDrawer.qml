@@ -16,6 +16,8 @@ Drawer {
     property double ratio: 16/9
     property int boxDragMargin: 16
 
+    property AtemSuperSource ss;
+
     ListModel {
         id: ssModel
         ListElement { box: 1; dx: 0; dy: 0; s: 0.5; ena: true; }
@@ -55,10 +57,10 @@ Drawer {
                 color: "green"
                 border.color: "red"
                 border.width: 1
-                Layout.minimumWidth: 1920/8
-                Layout.minimumHeight: 1080/8
-                Layout.maximumWidth: 1920/2
-                Layout.maximumHeight: 1080/2
+                Layout.minimumWidth: 1920/6
+                Layout.minimumHeight: 1080/6
+                Layout.maximumWidth: 1920/1.6
+                Layout.maximumHeight: 1080/1.6
                 Layout.preferredWidth: ssc.width/1.1
                 clip: true
                 Rectangle {
@@ -106,19 +108,51 @@ Drawer {
                             onClicked: {
                                 ssBoxParent.currentIndex=index
                             }
+                            onFocusChanged: {
+                                if (focus)
+                                    ssBoxParent.currentIndex=index
+                            }
                         }
                     }
                 }
             }
             ColumnLayout {
+                Layout.maximumWidth: 200
+                Layout.minimumWidth: 160
                 Layout.fillHeight: true
                 Layout.fillWidth: false
                 Layout.alignment: Qt.AlignTop
+                enabled: selectedBox!=null
+                ComboBox {
+                    id: inputSourceCombo
+                    Layout.fillWidth: true
+                    model: atem.camInputs
+                }
+
+                RowLayout {
+                    SpinBox {
+                        id: boxX
+                        from: -4800
+                        to : 4800
+                        stepSize: 50
+                        wheelEnabled: true
+                        value: selectedBox.boxCenterX*4800
+                    }
+                    SpinBox {
+                        id: boxY
+                        from: -4800
+                        to: 4800
+                        stepSize: 50
+                        wheelEnabled: true
+                        value: selectedBox.boxCenterY*4800
+                    }
+                }
+
                 SpinBox {
                     id: boxSize
+                    Layout.fillWidth: true
                     from: 0
                     to: 100
-                    enabled: selectedBox!=null
                     wheelEnabled: true
                     value: selectedBox.boxSize*100
                     onValueModified: {
@@ -136,7 +170,16 @@ Drawer {
             }
             Button {
                 text: "Commit"
-                enabled: !ssLiveCheck.checked
+                enabled: selectedBox && !ssLiveCheck.checked
+                onClicked: {
+                    ss.setSuperSource(selectedBox.boxId-1,
+                                      selectedBox.enabled,
+                                      selectedBox.inputSource,
+                                      selectedBox.atemPosition,
+                                      selectedBox.atemSize,
+                                      selectedBox.crop,
+                                      selectedBox.atemCrop)
+                }
             }
             CheckBox {
                 id: ssCheck

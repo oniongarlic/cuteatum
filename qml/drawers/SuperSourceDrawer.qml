@@ -17,6 +17,38 @@ Drawer {
 
     property AtemSuperSource ss;
 
+    property var savedPosition: [];
+
+    onSavedPositionChanged: console.debug(savedPosition)
+
+    function savePositions(bid) {
+        savedPosition[bid]=[];
+        for (var i=0;i<4;i++) {
+            let item=ssBoxParent.itemAt(i)
+            let v=item.getPositionVector3d();
+            savedPosition[bid][i]=v;
+        }
+    }
+
+    function loadPositions(bid) {
+        for (var i=0;i<4;i++) {
+            let v=savedPosition[bid][i];
+            let item=ssBoxParent.itemAt(i)
+            if (bid==0)
+                item.animateFrom=v;
+            else
+                item.animateTo=v;
+            console.debug(v)
+        }
+    }
+
+    function animateSuperSource() {
+        for (var i=0;i<4;i++) {
+            let item=ssBoxParent.itemAt(i)
+            item.animate();
+        }
+    }
+
     ListModel {
         id: ssModel
         ListElement { box: 1; dx: 0; dy: 0; s: 0.5; ena: true; }
@@ -31,8 +63,9 @@ Drawer {
     Keys.onDigit4Pressed: selectBox(3)
 
     function selectBox(i) {
+        console.debug('KEYPRESS')
         ssBoxParent.currentIndex=i;
-        var item=itemAt(i)
+        var item=ssBoxParent.itemAt(i)
         item.focus=true
     }
 
@@ -326,9 +359,33 @@ Drawer {
             Layout.fillWidth: true
             Button {
                 text: "Set A"
+                onClicked: {
+                    savePositions(0);
+                }
+            }
+            Button {
+                text: "Get A"
+                onClicked: {
+                    loadPositions(0);
+                }
             }
             Button {
                 text: "Set B"
+                onClicked: {
+                    savePositions(1);
+                }
+            }
+            Button {
+                text: "Get B"
+                onClicked: {
+                    loadPositions(1);
+                }
+            }
+            Button {
+                text: "Run"
+                onClicked: {
+                    animateSuperSource();
+                }
             }
         }
     }

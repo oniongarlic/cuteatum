@@ -128,6 +128,39 @@ Rectangle {
         sizeRect.height=sizeRect.parent.height*boxSize
     }
 
+    function getPositionVector3d() {
+        return Qt.vector3d(boxCenterX, boxCenterY, boxSize)
+    }
+
+    function setPositionVector3d(v) {
+        setCenter(v.x,v.y)
+        setSize(v.z)
+    }
+
+    property vector3d anim;
+
+    onAnimChanged: {
+        console.debug(anim)
+        setPositionVector3d(anim)
+    }
+
+    property vector3d animateFrom;
+    property vector3d animateTo;
+
+    function animate() {
+        boxAnimation.start();
+    }
+
+    Vector3dAnimation {
+        id: boxAnimation
+        easing.type: Easing.InOutCubic
+        target: sizeRect
+        duration: 1000
+        property: "anim"
+        from: animateFrom
+        to: animateTo
+    }
+
     Keys.onLeftPressed: boxX-=0.01
     Keys.onRightPressed: boxX+=0.01
     Keys.onUpPressed: boxY-=0.01

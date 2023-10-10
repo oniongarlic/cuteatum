@@ -8,9 +8,8 @@ import org.bm 1.0
 
 Drawer {
     id: macroDrawer
-    enabled: atem.connected
     height: root.height
-    width: root.width/2
+    width: root.width/1.4
     Keys.enabled: atem.connected
     Keys.onDigit1Pressed: atem.runMacro(1)
     Keys.onDigit2Pressed: atem.runMacro(2)
@@ -24,6 +23,7 @@ Drawer {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 8        
+        enabled: atem.connected
         CheckBox {
             text: "Repeat"
             onClicked: atem.setMacroRepeating(checked)
@@ -32,7 +32,7 @@ Drawer {
             id: macroGrid
             Layout.fillHeight: true
             Layout.fillWidth: true
-            columns: 4
+            columns: 6
             columnSpacing: 8
             rowSpacing: 8
             Repeater {

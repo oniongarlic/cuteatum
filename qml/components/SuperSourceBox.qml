@@ -154,16 +154,33 @@ Rectangle {
         border.width: crop ? 1 : 0
     }
 
+    property bool dragOutside: true
+
+    function snapInside() {
+        if (sizeRect.x<0)
+            sizeRect.x=0
+        if (sizeRect.y<0)
+            sizeRect.y=0
+
+        if (x>sizeRect.parent.width-sizeRect.width)
+            x=sizeRect.parent.width-sizeRect.width
+        if (y>sizeRect.parent.height-sizeRect.height)
+            y=sizeRect.parent.height-sizeRect.height;
+
+        boxX=sizeRect.x/sizeRect.parent.width
+        boxY=sizeRect.y/sizeRect.parent.height
+    }
+
     MouseArea {
         id: cropCenterArea
         anchors.fill: cropCenterRectangle
         anchors.margins: 8
         drag.target: sizeRect
-        drag.minimumX: 0
-        drag.maximumX: sizeRect.parent.width-sizeRect.width
+        drag.minimumX: dragOutside ? -sizeRect.parent.width : 0
+        drag.maximumX: dragOutside ? sizeRect.parent.width : sizeRect.parent.width-sizeRect.width
 
-        drag.minimumY: 0
-        drag.maximumY: sizeRect.parent.height-sizeRect.height
+        drag.minimumY: dragOutside ? -sizeRect.parent.height : 0
+        drag.maximumY: dragOutside ? sizeRect.parent.height : sizeRect.parent.height-sizeRect.height
 
         onWheel: {
             console.debug(boxSize)

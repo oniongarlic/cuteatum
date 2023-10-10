@@ -155,6 +155,15 @@ Drawer {
                     onCurrentIndexChanged: ssBoxParent.currentIndex=currentIndex
                 }
 
+                CheckBox {
+                    id: ssCheck
+                    property SuperSourceBox ssbox;
+                    enabled: selectedBox!=null
+                    text: "Visible"
+                    checked: selectedBox && selectedBox.enabled
+                    onCheckedChanged: selectedBox.enabled=checked
+                }
+
                 ComboBox {
                     id: inputSourceCombo
                     Layout.fillWidth: true
@@ -195,6 +204,10 @@ Drawer {
                             selectedBox.setCenterX(0)
                             selectedBox.setCenterY(0)
                         }
+                    }
+                    Button {
+                        text: "Inside"
+                        onClicked: selectedBox.snapInside()
                     }
                 }
 
@@ -248,14 +261,7 @@ Drawer {
                                       selectedBox.atemCrop)
                 }
             }
-            CheckBox {
-                id: ssCheck
-                property SuperSourceBox ssbox;
-                enabled: selectedBox!=null
-                text: "Visible"
-                checked: selectedBox && selectedBox.enabled
-                onCheckedChanged: selectedBox.enabled=checked
-            }
+
             CheckBox {
                 id: ssHideDisabled
                 text: "Hide disabled"

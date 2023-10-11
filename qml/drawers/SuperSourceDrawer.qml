@@ -22,7 +22,14 @@ Drawer {
     onSavedPositionChanged: console.debug(savedPosition)
 
     onOpened: {
-
+        for (var i=0;i<4;i++) {
+            var b=ss.getSuperSourceBox(i);
+            console.debug(b.enabled)
+            console.debug(b.source)
+            console.debug(b.position)
+            console.debug(b.cropEnabled)
+            console.debug(b.crop)
+        }
     }
 
     Connections {
@@ -120,18 +127,22 @@ Drawer {
                 Layout.fillWidth: true
                 color: "green"
                 border.color: "red"
-                border.width: 1
+                border.width: 2
                 Layout.minimumWidth: 1920/6
                 Layout.minimumHeight: 1080/6
                 Layout.maximumWidth: 1920/1.6
                 Layout.maximumHeight: 1080/1.6
                 Layout.preferredWidth: ssc.width/1.1
+                Layout.preferredHeight: Layout.preferredWidth/ratio
+                Layout.margins: 1
                 clip: true
                 Rectangle {
                     id: superSourceContainer
                     width: parent.width
                     height: width/ratio
                     color: "grey"
+                    border.color: "red"
+                    border.width: 2
                     clip: true
 
                     Rectangle {
@@ -291,7 +302,7 @@ Drawer {
                 }
                 RowLayout {
                     Button {
-                        text: "20%"
+                        text: "25%"
                         Layout.fillWidth: false
                         onClicked: selectedBox.boxSize=0.25
                     }
@@ -299,6 +310,11 @@ Drawer {
                         text: "50%"
                         Layout.fillWidth: false
                         onClicked: selectedBox.boxSize=0.50
+                    }
+                    Button {
+                        text: "75%"
+                        Layout.fillWidth: false
+                        onClicked: selectedBox.boxSize=0.75
                     }
                     Button {
                         text: "100%"

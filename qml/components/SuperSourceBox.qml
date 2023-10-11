@@ -44,7 +44,7 @@ Rectangle {
     property int inputSource: 1000;
 
     // Position & crop in mixer values
-    property point atemPosition: Qt.point(boxCenterX*4800, boxCenterY*4800)
+    property point atemPosition: Qt.point(boxCenterX*3200, -boxCenterY*1800)
     property int atemSize: boxSize*1000
     property rect atemCrop: Qt.rect(cropTop/cropRatio*18000,
                                     cropBottom/cropRatio*18000,

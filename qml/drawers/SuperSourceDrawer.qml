@@ -21,6 +21,19 @@ Drawer {
 
     onSavedPositionChanged: console.debug(savedPosition)
 
+    onOpened: {
+
+    }
+
+    Connections {
+        target: ss
+        onSuperSourceChanged: {
+            console.debug('SSChanged: '+boxid)
+            var b=ss.getSuperSourceBox(boxid);
+            console.debug(b)
+        }
+    }
+
     function savePositions(bid) {
         savedPosition[bid]=[];
         for (var i=0;i<4;i++) {

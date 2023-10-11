@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
     qRegisterMetaType<QAtemDownstreamKey*>("AtemDownstreamKey");
 
+    qRegisterMetaType<QAtem::SuperSourceBoxSettings>();
     qRegisterMetaType<QAtem::InputInfo>();
     qRegisterMetaType<QAtem::Topology>();
     qRegisterMetaType<quint16>();

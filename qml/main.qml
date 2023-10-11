@@ -564,8 +564,8 @@ ApplicationWindow {
         onAudioMasterLevelsChanged: {
             console.debug(left)
             console.debug(right)
-            audioLevelMainLeft.value=left/65535
-            audioLevelMainRight.value=right/65535
+            audioLevelMainLeft.value=-left/65535
+            audioLevelMainRight.value=-right/65535
         }
     }
 
@@ -574,7 +574,12 @@ ApplicationWindow {
         atemConnection: atem
 
         onAudioLevelChanged: {
-            console.debug(audioSource+':= '+ levelLeft +':'+levelRight)
+            //console.debug(audioSource+':= '+ levelLeft +':'+levelRight)
+        }
+
+        onMasterAudioLevelChanged: {
+            audioLevelMainLeft.value=levelLeft/6553
+            audioLevelMainRight.value=levelRight/6553
         }
 
         onTallyChanged: {

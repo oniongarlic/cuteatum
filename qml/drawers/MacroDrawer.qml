@@ -64,9 +64,9 @@ Drawer {
                     highlighted: recordCheckbox.checked
                     onClicked: {
                         if (!recordCheckbox.checked)
-                            atem.runMacro(index+1)
+                            atem.runMacro(index)
                         else
-                            atem.startRecordingMacro(index+1, "Macro "+index, "");
+                            atem.startRecordingMacro(index, "Macro "+index+1, "");
                     }
                 }
             }

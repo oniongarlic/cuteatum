@@ -122,19 +122,12 @@ Drawer {
             Layout.minimumHeight: 1080/10
             Layout.margins: 2
             Rectangle {
-                Layout.alignment: Qt.AlignTop
-                Layout.fillHeight: true
-                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignTop                
                 color: "green"
                 border.color: "red"
                 border.width: 2
-                Layout.minimumWidth: 1920/6
-                Layout.minimumHeight: 1080/6
-                Layout.maximumWidth: 1920/1.6
-                Layout.maximumHeight: 1080/1.6
-                Layout.preferredWidth: ssc.width/1.1
-                Layout.preferredHeight: Layout.preferredWidth/ratio
-                Layout.margins: 1
+                Layout.preferredWidth: c.width/1.5
+                Layout.preferredHeight: Layout.preferredWidth/ssDrawer.ratio
                 clip: true
                 Rectangle {
                     id: superSourceContainer
@@ -211,15 +204,16 @@ Drawer {
                 }
             }
             ColumnLayout {
-                Layout.maximumWidth: 240
-                Layout.minimumWidth: 160
+                Layout.maximumWidth: 340
+                Layout.minimumWidth: 120
                 Layout.fillHeight: true
-                Layout.fillWidth: false
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignTop
                 enabled: selectedBox!=null
 
                 ComboBox {
                     id: boxId
+                    Layout.fillWidth: true
                     model: ssModel
                     displayText: "Box: " + currentText
                     textRole: "box"

@@ -170,6 +170,15 @@ Drawer {
                             onAtemSizeChanged: {
                                 updateAtemLive()
                             }
+                            onCropChanged: {
+                                updateAtemLive();
+                            }
+                            onEnabledChanged: {
+                                updateAtemLive();
+                            }
+                            onInputSourceChanged: {
+                                updateAtemLive();
+                            }
                             onAtemPositionChanged: {
                                 updateAtemLive()
                             }
@@ -208,7 +217,7 @@ Drawer {
                     Layout.fillWidth: true
                     model: atem.camInputs
                     onActivated: {
-
+                        selectedBox.inputSource=currentValue;
                     }
                 }
 
@@ -217,8 +226,9 @@ Drawer {
                     Layout.fillWidth: true
                     from: -4800
                     to : 4800
-                    stepSize: 50
+                    stepSize: 10
                     wheelEnabled: true
+                    editable: true
                     value: selectedBox.boxCenterX*4800
                     onValueModified: {
                         selectedBox.setCenterX(value/4800)
@@ -229,8 +239,9 @@ Drawer {
                     Layout.fillWidth: true
                     from: -4800
                     to: 4800
-                    stepSize: 50
+                    stepSize: 10
                     wheelEnabled: true
+                    editable: true
                     value: selectedBox.boxCenterY*4800
                     onValueModified: {
                         selectedBox.setCenterY(value/4800)

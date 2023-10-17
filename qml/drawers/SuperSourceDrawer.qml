@@ -97,15 +97,15 @@ Drawer {
 
     property SuperSourceBox selectedBox;
 
-    function updateAtemLive() {
-        if (ssLiveCheck.checked) {
-            ss.setSuperSource(selectedBox.boxId-1,
-                              selectedBox.enabled,
-                              selectedBox.inputSource,
-                              selectedBox.atemPosition,
-                              selectedBox.atemSize,
-                              selectedBox.crop,
-                              selectedBox.atemCrop)
+    function updateAtemLive(box, force) {
+        if (ssLiveCheck.checked || force) {
+            ss.setSuperSource(box.boxId-1,
+                              box.enabled,
+                              box.inputSource,
+                              box.atemPosition,
+                              box.atemSize,
+                              box.crop,
+                              box.atemCrop)
         }
     }
 
@@ -167,6 +167,7 @@ Drawer {
                         }
                         model: ssModel
                         delegate: SuperSourceBox {
+                            id: ssboxDelegate
                             boxId: box
                             defaultX: dx
                             defaultY: dy
@@ -182,22 +183,22 @@ Drawer {
                                     ssBoxParent.currentIndex=index
                             }
                             onAtemCropChanged: {
-                                updateAtemLive()
+                                updateAtemLive(ssboxDelegate, true)
                             }
                             onAtemSizeChanged: {
-                                updateAtemLive()
+                                updateAtemLive(ssboxDelegate, true)
                             }
                             onCropChanged: {
-                                updateAtemLive();
+                                updateAtemLive(ssboxDelegate, true);
                             }
                             onEnabledChanged: {
-                                updateAtemLive();
+                                updateAtemLive(ssboxDelegate, true);
                             }
                             onInputSourceChanged: {
-                                updateAtemLive();
+                                updateAtemLive(ssboxDelegate, true);
                             }
                             onAtemPositionChanged: {
-                                updateAtemLive()
+                                updateAtemLive(ssboxDelegate, true)
                             }
                         }
                     }
@@ -267,14 +268,32 @@ Drawer {
                 }
                 RowLayout {
                     Button {
-                        text: "Center"
+                        text: "L"
+                        onClicked: selectedBox.setCenterX(-0.25)
+                    }
+                    Button {
+                        text: "R"
+                        onClicked: selectedBox.setCenterX(0.25)
+                    }
+                    Button {
+                        text: "C"
                         onClicked: {
                             selectedBox.setCenterX(0)
                             selectedBox.setCenterY(0)
                         }
                     }
                     Button {
-                        text: "Inside"
+                        text: "U"
+                        onClicked: selectedBox.setCenterY(-0.25)
+                    }
+                    Button {
+                        text: "D"
+                        onClicked: selectedBox.setCenterY(0.25)
+                    }
+                }
+                RowLayout {
+                    Button {
+                        text: "In"
                         onClicked: selectedBox.snapInside()
                     }
                     Button {
@@ -436,6 +455,35 @@ Drawer {
                 onClicked: {
                     animateSuperSource(1);
                 }
+            }
+            ComboBox {
+                id: easingType
+                textRole: "text"
+                valueRole: "easingType"
+                enabled: selectedBox
+                model: ListModelEasing {
+
+                }
+                onActivated: {
+                    selectedBox.animateEasing=currentValue
+                }
+                Component.onCompleted: {
+                    currentIndex = indexOfValue(Easing.InCubic)
+                }
+            }
+
+            SpinBox {
+                Layout.fillWidth: true
+                id: easingDuration
+                enabled: selectedBox
+                editable: false
+                from: 1
+                to: 10
+                value: 1
+                onValueModified: {
+                    easingTransition.duration=value*1000;
+                }
+                //background.implicitWidth: 100
             }
         }
     }

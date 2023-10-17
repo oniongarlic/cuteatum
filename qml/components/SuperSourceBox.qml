@@ -138,6 +138,8 @@ Rectangle {
 
     property vector3d animateFrom;
     property vector3d animateTo;
+    property alias animateEasing: boxAnimation.easing.type
+    property alias animateDuration: boxAnimation.duration
 
     function animate() {
         boxAnimation.start();

@@ -136,6 +136,7 @@ Rectangle {
         setPositionVector3d(anim)
     }
 
+    // Position animation
     property vector3d animateFrom;
     property vector3d animateTo;
     property alias animateEasing: boxAnimation.easing.type

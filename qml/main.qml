@@ -377,7 +377,8 @@ ApplicationWindow {
             me: !atem.connected ? null : atem.mixEffect(0)
             fl: !atem.connected ? null : fairlight
             dsk: !atem.connected ? null : atem.downstreamKey(0)
-            ss: !atem.connected ? null : superSource
+            //ss: !atem.connected ? null : superSource
+            ss: superSource
         }
     }
 

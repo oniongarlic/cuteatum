@@ -109,6 +109,11 @@ Drawer {
         }
     }
 
+    onSelectedBoxChanged: {
+        inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(selectedBox.inputSource)
+        easingType.currentIndex=easingType.indexOfValue(selectedBox.animateEasing)
+        easingDuration.value=selectedBox.animateDuration/1000;
+    }
 
     ColumnLayout {
         id: c
@@ -163,7 +168,6 @@ Drawer {
                                     item.z=0;
                                 }
                             }
-
                         }
                         model: ssModel
                         delegate: SuperSourceBox {
@@ -292,6 +296,14 @@ Drawer {
                     }
                 }
                 RowLayout {
+                    Button {
+                        text: "F"
+                        onClicked: {
+                            selectedBox.setSize(1)
+                            selectedBox.setCenterX(0)
+                            selectedBox.setCenterY(0)
+                        }
+                    }
                     Button {
                         text: "In"
                         onClicked: selectedBox.snapInside()
@@ -472,16 +484,16 @@ Drawer {
                 }
             }
 
-            SpinBox {
-                Layout.fillWidth: true
+            SpinBox {                
                 id: easingDuration
+                Layout.fillWidth: true
                 enabled: selectedBox
                 editable: false
                 from: 1
                 to: 10
                 value: 1
                 onValueModified: {
-                    easingTransition.duration=value*1000;
+                    selectedBox.animateDuration=value*1000;
                 }
                 //background.implicitWidth: 100
             }

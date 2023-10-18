@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 
 Button {
     id: btn
@@ -31,14 +30,7 @@ Button {
             color: isPreview ? "#20e520" : "#e52020"
             border.width: 1
             border.color: btn.checked ? "#90e520" : "#101010"
-        }
-        Glow {
-            anchors.fill: parent
-            radius: btn.checked ? 8 : 0
-            samples: 12
-            color: isPreview ? "#20e520" : "#e52020"
-            source: btnbg
-        }
+        }        
     }
 
 }

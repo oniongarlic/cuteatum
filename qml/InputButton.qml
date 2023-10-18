@@ -27,10 +27,10 @@ Button {
         Rectangle {
             id: btnbg
             anchors.fill: parent
-            color: isPreview ? "#20e520" : "#e52020"
-            border.width: 1
+            radius: 2
+            color: isPreview ? "#20f520" : "#f53030"
+            border.width: btn.checked ? 2 : 1
             border.color: btn.checked ? "#90e520" : "#101010"
-        }        
+        }
     }
-
 }

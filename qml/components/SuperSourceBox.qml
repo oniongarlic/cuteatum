@@ -20,6 +20,9 @@ Rectangle {
 
     property bool enabled: true
 
+    property bool keepCenter: true
+    property bool keepInside: false
+
     property bool crop: false
     property double cropTop: 0
     property double cropBottom: 0
@@ -31,22 +34,29 @@ Rectangle {
     property double defaultY: 0
     property double defaultSize: 0.5
 
-    // Normalized
-    property double boxX;
-    property double boxY;
-    property double boxSize;
+    // Normalized position 0-1
+    readonly property double boxX: -(boxSize/2)+0.5+setX;
+    readonly property double boxY: -(boxSize/2)+0.5+setY;
+    property double boxSize: 0.5;
 
-    property double boxCenterX: (boxSize/2)+boxX-0.5
-    property double boxCenterY: (boxSize/2)+boxY-0.5
+    readonly property double boxCenterX: (boxSize/2)+boxX-0.5
+    readonly property double boxCenterY: (boxSize/2)+boxY-0.5
+
+    // The set position -1 - 0 - 1
+    property double setY;
+    property double setX;
 
     property point boxCenter: Qt.point(boxCenterX, boxCenterY)
 
     property int inputSource: 1000;
 
+    readonly property double ratio: 16.0/9.0
+    readonly property double cropRatio: 2048
+
     // Position & crop in mixer values
-    property point atemPosition: Qt.point(boxCenterX*3200, -boxCenterY*1800)
-    property int atemSize: boxSize*1000
-    property rect atemCrop: Qt.rect(cropLeft/cropRatio*18000,
+    readonly property point atemPosition: Qt.point(boxCenterX*3200, -boxCenterY*1800)
+    readonly property int atemSize: boxSize*1000
+    readonly property rect atemCrop: Qt.rect(cropLeft/cropRatio*18000,
                                     cropTop/cropRatio*18000,
                                     cropRight/cropRatio*18000,
                                     cropBottom/cropRatio*18000)
@@ -54,42 +64,45 @@ Rectangle {
     onAtemCropChanged: console.debug("atemCrop "+ atemCrop)
     onAtemPositionChanged: console.debug("AtemPos "+ atemPosition)
 
-    readonly property double ratio: 16.0/9.0
-    readonly property double cropRatio: 2048
+    onBoxXChanged: x=parent.width*boxX
+    onBoxYChanged: y=parent.height*boxY
 
-    signal clicked()
+    readonly property double _phw: parent.width+parent.height
 
-    readonly property int _pwh: parent.width+parent.height
+    on_PhwChanged: {
+        _updateXY();
+    }
 
-    on_PwhChanged: updateBox()
-    onParentChanged: updateBox();
+    onParentChanged: {
+        _updateXY();
+    }
 
-    function updateBox() {
+    function _updateXY() {
         x=parent.width*boxX
         y=parent.height*boxY
         width=parent.width*boxSize
         height=parent.height*boxSize
     }
 
-    function setCenter(x,y) {
-        setCenterX(x)
-        setCenterY(y)
-    }
-
-    function setCenterX(x) {
-        boxX=-(boxSize/2)+0.5+x
-    }
-
-    function setCenterY(y) {
-        boxY=-(boxSize/2)+0.5+y
-    }
-
-    onBoxXChanged: x=parent.width*boxX
-    onBoxYChanged: y=parent.height*boxY
+    signal clicked()
 
     onDefaultSizeChanged: boxSize=defaultSize
-    Component.onCompleted: {        
+    Component.onCompleted: {
         reset()
+        _updateXY();
+    }
+
+    function setCenter(cx,cy) {
+        setX=cx;
+        setY=cy;
+    }
+
+    function setCenterX(cx) {
+        setX=cx;
+    }
+
+    function setCenterY(cy) {
+        setY=cy;
     }
 
     function mapNormalizedRect() {
@@ -156,12 +169,34 @@ Rectangle {
         to: animateTo
     }
 
-    Keys.onLeftPressed: boxX-=0.01
-    Keys.onRightPressed: boxX+=0.01
-    Keys.onUpPressed: boxY-=0.01
-    Keys.onDownPressed: boxY+=0.01
+    Keys.onLeftPressed: setX-=0.01
+    Keys.onRightPressed: setX+=0.01
+    Keys.onUpPressed: setY-=0.01
+    Keys.onDownPressed: setY+=0.01
     Keys.onSpacePressed: sizeRect.enabled=!enabled
     Keys.onAsteriskPressed: sizeRect.crop=!crop
+    Keys.onPressed: {
+        switch (event.key) {
+        case Qt.Key_Plus:
+            boxSize+=0.01
+            break;
+        case Qt.Key_Minus:
+            boxSize-=0.01
+            break;
+        case Qt.Key_PageUp:
+            boxSize+=0.1
+            break;
+        case Qt.Key_PageDown:
+            boxSize-=0.1
+            break;
+        case Qt.Key_Home:
+            boxSize=1
+            break;
+        case Qt.Key_End:
+            boxSize=0.5
+            break;
+        }
+    }
 
     Rectangle {
         id: cropCenterRectangle
@@ -184,27 +219,22 @@ Rectangle {
 
     property bool dragOutside: true
 
-    function snapInside() {
-        if (sizeRect.x<0)
-            sizeRect.x=0
-        if (sizeRect.y<0)
-            sizeRect.y=0
-
-        if (x>sizeRect.parent.width-sizeRect.width)
-            x=sizeRect.parent.width-sizeRect.width
-        if (y>sizeRect.parent.height-sizeRect.height)
-            y=sizeRect.parent.height-sizeRect.height;
-
-        boxX=sizeRect.x/sizeRect.parent.width
-        boxY=sizeRect.y/sizeRect.parent.height
+    function snapInside() {        
+        var s=0.5-boxSize/2
+        if (setX<-s)
+            setX=-s
+        if (setY<-s)
+            setY=-s;
+        if (setX>s)
+            setX=s;
+        if (setY>s)
+            setY=s;
     }
 
     function reset() {
         boxSize=defaultSize
-        boxX=defaultX
-        boxY=defaultY
-        x=parent.width*boxX
-        y=parent.height*boxY
+        setX=defaultX
+        setY=defaultY
     }
 
     MouseArea {
@@ -230,8 +260,10 @@ Rectangle {
 
         drag.onActiveChanged: {
             if (!drag.active) {                
-                boxX=sizeRect.x/sizeRect.parent.width
-                boxY=sizeRect.y/sizeRect.parent.height
+                var bx=sizeRect.x/sizeRect.parent.width
+                var by=sizeRect.y/sizeRect.parent.height
+                setX=(boxSize/2)+bx-0.5
+                setY=(boxSize/2)+by-0.5
             } else {
                 sizeRect.focus=true
             }
@@ -277,12 +309,29 @@ Rectangle {
             drag.target: parent
             drag.threshold: 1
 
+            drag.onActiveChanged: {
+                sizeRect.forceActiveFocus();
+            }
+
             onPositionChanged: {
                 if (drag.active) {
+
                     sizeRect.width = sizeRect.width + mouseX
                     //sizeRect.height = sizeRect.height + mouseY
-                    sizeRect.height = sizeRect.width/ratio
 
+                    if (keepInside) {
+                        if (sizeRect.width < dragMargin)
+                            sizeRect.width = dragMargin
+                        else if (sizeRect.width > sizeRect.parent.width-sizeRect.x)
+                            sizeRect.width=sizeRect.parent.width-sizeRect.x
+
+                        if (sizeRect.height < dragMargin)
+                            sizeRect.height = dragMargin
+                        else if (sizeRect.height > sizeRect.parent.height-sizeRect.y)
+                            sizeRect.height=sizeRect.parent.height-sizeRect.y
+                    }
+
+                    sizeRect.height = sizeRect.width/ratio
                     sizeRect.width = sizeRect.height*ratio
 
                     // Update normalized values
@@ -292,20 +341,6 @@ Rectangle {
                         sizeRect.width=sizeRect.parent.width
                         sizeRect.height=sizeRect.parent.height
                     }
-
-                    /*
-                    if (sizeRect.width < dragMargin)
-                        sizeRect.width = dragMargin
-                    else if (sizeRect.width > sizeRect.parent.width-sizeRect.x)
-                        sizeRect.width=sizeRect.parent.width-sizeRect.x
-
-                    if (sizeRect.height < dragMargin)
-                        sizeRect.height = dragMargin
-                    else if (sizeRect.height > sizeRect.parent.height-sizeRect.y)
-                        sizeRect.height=sizeRect.parent.height-sizeRect.y
-                    */
-                } else {
-
                 }
             }
         }

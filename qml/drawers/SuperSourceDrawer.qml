@@ -17,13 +17,27 @@ Drawer {
 
     property AtemSuperSource ss;
 
+    property var boxes: [];
+
     property var savedPosition: [];
 
     onSavedPositionChanged: console.debug(savedPosition)
 
     onOpened: {
+        for (var i=0;i<4;i++) {            
+            boxes[i]=ss.getSuperSourceBox(i);
+        }
+        dumpBoxState();
+    }
+
+    Component.onCompleted: {
+        savePositions(0);
+        savePositions(1);
+    }
+
+    function dumpBoxState() {
         for (var i=0;i<4;i++) {
-            var b=ss.getSuperSourceBox(i);
+            var b=boxes[i];
             console.debug(b.enabled)
             console.debug(b.source)
             console.debug(b.position)
@@ -39,7 +53,7 @@ Drawer {
             var b=ss.getSuperSourceBox(boxid);
             console.debug(b)
         }
-    }
+    }    
 
     function savePositions(bid) {
         savedPosition[bid]=[];
@@ -77,12 +91,13 @@ Drawer {
 
     ListModel {
         id: ssModel
-        ListElement { box: 1; dx: 0; dy: 0; s: 0.5; ena: true; }
-        ListElement { box: 2; dx: 0.5; dy: 0; s: 0.5; ena: true; }
-        ListElement { box: 3; dx: 0; dy: 0.5; s: 0.5; ena: true; }
-        ListElement { box: 4; dx: 0.5; dy: 0.5; s: 0.5; ena: true; }
+        ListElement { box: 1; dx: -0.25; dy: -0.25; s: 0.5; ena: true; }
+        ListElement { box: 2; dx: 0.25; dy: -0.25; s: 0.5; ena: true; }
+        ListElement { box: 3; dx: -0.25; dy: 0.25; s: 0.5; ena: true; }
+        ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; }
     }
 
+    Keys.enabled: true
     Keys.onDigit1Pressed: selectBox(0)
     Keys.onDigit2Pressed: selectBox(1)
     Keys.onDigit3Pressed: selectBox(2)
@@ -281,10 +296,7 @@ Drawer {
                     }
                     Button {
                         text: "C"
-                        onClicked: {
-                            selectedBox.setCenterX(0)
-                            selectedBox.setCenterY(0)
-                        }
+                        onClicked: selectedBox.setCenter(0,0)
                     }
                     Button {
                         text: "U"
@@ -347,7 +359,16 @@ Drawer {
                         onClicked: selectedBox.boxSize=1.00
                     }
                 }
+                RowLayout {
+                    Button {
+                        text: "Debug"
+                        enabled: true
+                        onClicked: dumpBoxState();
+                    }
+                }
+
             }
+
         }
         RowLayout {
             Layout.fillWidth: true
@@ -427,7 +448,6 @@ Drawer {
                 value: selectedBox.cropRight
                 onValueChanged: selectedBox.cropRight=value
             }
-
         }
 
         RowLayout {

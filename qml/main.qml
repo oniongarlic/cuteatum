@@ -237,8 +237,7 @@ ApplicationWindow {
     }
 
     MacroDrawer {
-        id: macroDrawer
-        enabled: atem.connected        
+        id: macroDrawer        
     }
 
     InputButtonGroup {
@@ -375,7 +374,15 @@ ApplicationWindow {
         property string deviceID: ""
 
         property int camInputs: 0
+        property int mixers: 0
         property int supersources: 0
+        property int dves: 0
+        property int sources: 0
+        property int outputs: 0
+        property int stingers: 0
+        property int downstreamKeyers: 0
+        property int upstreamKeyers: 0
+        property int colorGenerators: 0
 
         onConnected: {
             console.debug("Connected!")
@@ -402,7 +409,14 @@ ApplicationWindow {
             console.debug("DVE:"+topo.DVEs)
             console.debug("SS:"+topo.supersources)
 
+            mixers=topo.MEs
             supersources=topo.supersources
+            stingers=topo.stingers
+            outputs=topo.auxBusses
+            downstreamKeyers=topo.downstreamKeyers
+            upstreamKeyers=topo.upstreamKeyers
+            colorGenerators=topo.colorGenerators
+            dves=topo.DVEs
 
             requestRecordingStatus();
             requestStreamingStatus();
@@ -437,6 +451,8 @@ ApplicationWindow {
                 console.debug(" INT:"+input.internalType)
                 console.debug(" LTX:"+input.longText)
                 console.debug(" STX:"+input.shortText)
+
+                atemSources.append(input)
             }
         }
 
@@ -642,3 +658,4 @@ ApplicationWindow {
         }
     }
 }
+

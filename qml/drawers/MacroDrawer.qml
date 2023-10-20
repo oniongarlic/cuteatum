@@ -32,10 +32,12 @@ Drawer {
         RowLayout {
             CheckBox {
                 text: "Repeat"
+                enabled: !atem.macroRunning
                 onClicked: atem.setMacroRepeating(checked)
             }
             CheckBox {
                 id: recordCheckbox
+                enabled: !atem.macroRunning
                 text: "Recording"
             }
             Button {
@@ -45,6 +47,7 @@ Drawer {
             }
             Button {
                 text: "Pause"
+                enabled: atem.macroRecording
                 onClicked: atem.addMacroPause(30)
             }
         }
@@ -62,6 +65,7 @@ Drawer {
                     Layout.fillHeight: true
                     text: "M "+(index+1)
                     highlighted: recordCheckbox.checked
+                    enabled: !atem.macroRecording && !atem.macroRunning
                     onClicked: {
                         if (!recordCheckbox.checked)
                             atem.runMacro(index)

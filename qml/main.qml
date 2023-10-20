@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import "drawers"
+import "dialogs"
 
 import org.bm 1.0
 import org.tal.servicediscovery 1.0
@@ -71,72 +72,18 @@ ApplicationWindow {
         id: atemSources
     }
 
-    Dialog {
+    ConnectDialog {
         id: nyaDialog
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        width: parent.width/2
-        title: "Connect to switcher"
-
-        x: Math.round((parent.width - width) / 2)
-        y: Math.round((parent.height - height) / 2)
-
-        ColumnLayout {
-            anchors.fill: parent
-            TextField {
-                id: ipText
-                Layout.fillWidth: true
-                inputMethodHints: Qt.ImhPreferNumbers | Qt.ImhNoPredictiveText
-                placeholderText: "Switcher IP"
-            }
-            Frame {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumHeight: ipText.height*4
-                Layout.maximumHeight: ipText.height*5
-                ColumnLayout {
-                    anchors.fill: parent
-                    ListView {
-                        id: deviceListView
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        model: deviceModel
-                        clip: true
-                        delegate: Component {
-                            Label {
-                                text: name+"("+deviceIP+")"
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onDoubleClicked: {
-                                        console.debug("DBCL")
-                                        var dev=deviceModel.get(index)
-                                        ipText.text=dev.deviceIP
-                                        nyaDialog.close();
-                                        atem.connectToSwitcher(dev.deviceIP, 2000)
-                                    }
-                                    onClicked: {
-                                        console.debug("CL")
-                                        var dev=deviceModel.get(index)
-                                        ipText.text=dev.deviceIP
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                }
-            }
-            Button {
-                text: "Refresh"
-                onClicked: {
-                    sd.startDiscovery();
-                }
-            }
-        }
+        model: deviceModel
 
         onAccepted: {
             console.debug(result)
             nyaDialog.close();            
-            atem.connectToSwitcher(ipText.text, 2000)
+            atem.connectToSwitcher(ip, 2000)
+        }
+
+        onRefresh: {
+            sd.startDiscovery();
         }
     }
 

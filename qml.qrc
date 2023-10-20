@@ -13,5 +13,6 @@
         <file>qml/drawers/MacroDrawer.qml</file>
         <file>qml/drawers/SuperSourceDrawer.qml</file>
         <file>qml/components/SuperSourceBox.qml</file>
+        <file>qml/dialogs/ConnectDialog.qml</file>
     </qresource>
 </RCC>

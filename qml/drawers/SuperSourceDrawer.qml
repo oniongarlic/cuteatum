@@ -9,8 +9,8 @@ import org.bm 1.0
 Drawer {
     id: ssDrawer
     // enabled: atem.connected
-    height: root.height
-    width: root.width/1.2
+    height: parent.height
+    width: parent.width/1.2
 
     property double ratio: 16/9
     property int boxDragMargin: 16
@@ -24,10 +24,12 @@ Drawer {
     onSavedPositionChanged: console.debug(savedPosition)
 
     onOpened: {
-        for (var i=0;i<4;i++) {            
+        for (var i=0;i<4;i++) {
             boxes[i]=ss.getSuperSourceBox(i);
+            dumpBoxState(boxes[i])
+            var sb=ssBoxParent.itemAt(i);
+            syncBoxState(boxes[i],sb)
         }
-        dumpBoxState();
     }
 
     Component.onCompleted: {
@@ -35,15 +37,21 @@ Drawer {
         savePositions(1);
     }
 
-    function dumpBoxState() {
-        for (var i=0;i<4;i++) {
-            var b=boxes[i];
-            console.debug(b.enabled)
-            console.debug(b.source)
-            console.debug(b.position)
-            console.debug(b.cropEnabled)
-            console.debug(b.crop)
-        }
+    function dumpBoxState(b) {
+        console.debug(b.enabled)
+        console.debug(b.source)
+        console.debug(b.position)
+        console.debug(b.size)
+        console.debug(b.cropEnabled)
+        console.debug(b.crop)
+    }
+
+    function syncBoxState(b, sb) {
+        sb.enabled=b.enabled
+        sb.inputSource=b.source
+        sb.crop=b.cropEnabled
+        sb.setAtemPosition(b.position)
+        sb.setSize(b.size/1000)
     }
 
     Connections {
@@ -51,9 +59,10 @@ Drawer {
         onSuperSourceChanged: {
             console.debug('SSChanged: '+boxid)
             var b=ss.getSuperSourceBox(boxid);
-            console.debug(b)
+            var sb=ssBoxParent.itemAt(boxid);
+            syncBoxState(b, sb)
         }
-    }    
+    }
 
     function savePositions(bid) {
         savedPosition[bid]=[];
@@ -142,7 +151,7 @@ Drawer {
             Layout.minimumHeight: 1080/10
             Layout.margins: 2
             Rectangle {
-                Layout.alignment: Qt.AlignTop                
+                Layout.alignment: Qt.AlignTop
                 color: "green"
                 border.color: "red"
                 border.width: 2
@@ -504,7 +513,7 @@ Drawer {
                 }
             }
 
-            SpinBox {                
+            SpinBox {
                 id: easingDuration
                 Layout.fillWidth: true
                 enabled: selectedBox

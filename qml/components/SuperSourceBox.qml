@@ -105,6 +105,10 @@ Rectangle {
         setY=cy;
     }
 
+    function setAtemPosition(p) {
+        setCenter(p.x/3200, -p.y/1800)
+    }
+
     function mapNormalizedRect() {
         return Qt.rect(sizeRect.x/parent.width,
                        sizeRect.y/parent.height,

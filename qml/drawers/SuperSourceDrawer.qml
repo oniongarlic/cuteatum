@@ -23,14 +23,7 @@ Drawer {
 
     onSavedPositionChanged: console.debug(savedPosition)
 
-    onOpened: {
-        for (var i=0;i<4;i++) {
-            boxes[i]=ss.getSuperSourceBox(i);
-            dumpBoxState(boxes[i])
-            var sb=ssBoxParent.itemAt(i);
-            syncBoxState(boxes[i],sb)
-        }
-    }
+    onAboutToShow: syncBoxStates();
 
     Component.onCompleted: {
         savePositions(0);
@@ -44,6 +37,19 @@ Drawer {
         console.debug(b.size)
         console.debug(b.cropEnabled)
         console.debug(b.crop)
+    }
+
+    property bool animating: false
+
+    function syncBoxStates() {
+        if (!atem.connected)
+            return;
+        for (var i=0;i<4;i++) {
+            boxes[i]=ss.getSuperSourceBox(i);
+            dumpBoxState(boxes[i])
+            var sb=ssBoxParent.itemAt(i);
+            syncBoxState(boxes[i],sb)
+        }
     }
 
     function syncBoxState(b, sb) {
@@ -294,26 +300,54 @@ Drawer {
                         selectedBox.setCenterY(value/4800)
                     }
                 }
-                RowLayout {
+                GridLayout {
+                    rows: 3
+                    columns: 3
+                    Layout.fillWidth: true
+                    Button {
+                        text: "LU"
+                        onClicked: selectedBox.setCenter(-0.25, -0.25)
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        text: "CU"
+                        onClicked: selectedBox.setCenter(0, -0.25)
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        text: "RU"
+                        onClicked: selectedBox.setCenter(0.25, -0.25)
+                        Layout.fillWidth: true
+                    }
                     Button {
                         text: "L"
                         onClicked: selectedBox.setCenterX(-0.25)
-                    }
-                    Button {
-                        text: "R"
-                        onClicked: selectedBox.setCenterX(0.25)
+                        Layout.fillWidth: true
                     }
                     Button {
                         text: "C"
                         onClicked: selectedBox.setCenter(0,0)
+                        Layout.fillWidth: true
                     }
                     Button {
-                        text: "U"
-                        onClicked: selectedBox.setCenterY(-0.25)
+                        text: "R"
+                        onClicked: selectedBox.setCenterX(0.25)
+                        Layout.fillWidth: true
                     }
                     Button {
-                        text: "D"
-                        onClicked: selectedBox.setCenterY(0.25)
+                        text: "LD"
+                        onClicked: selectedBox.setCenter(-0.25, 0.25)
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        text: "CD"
+                        onClicked: selectedBox.setCenter(0, 0.25)
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        text: "RD"
+                        onClicked: selectedBox.setCenter(0.25, 0.25)
+                        Layout.fillWidth: true
                     }
                 }
                 RowLayout {
@@ -326,11 +360,11 @@ Drawer {
                         }
                     }
                     Button {
-                        text: "In"
+                        text: "I"
                         onClicked: selectedBox.snapInside()
                     }
                     Button {
-                        text: "Reset"
+                        text: "R"
                         onClicked: selectedBox.reset()
                     }
                 }

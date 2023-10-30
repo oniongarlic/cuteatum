@@ -159,8 +159,14 @@ Rectangle {
     property alias animateEasing: boxAnimation.easing.type
     property alias animateDuration: boxAnimation.duration
 
+    readonly property alias animateRunning: boxAnimation.running
+
     function animate() {
         boxAnimation.start();
+    }
+
+    function animateStop() {
+        boxAnimation.stop();
     }
 
     Vector3dAnimation {

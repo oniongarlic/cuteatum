@@ -112,12 +112,6 @@ Drawer {
         ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; }
     }
 
-    Keys.enabled: true
-    Keys.onDigit1Pressed: selectBox(0)
-    Keys.onDigit2Pressed: selectBox(1)
-    Keys.onDigit3Pressed: selectBox(2)
-    Keys.onDigit4Pressed: selectBox(3)
-
     function selectBox(i) {
         console.debug('KEYPRESS')
         ssBoxParent.currentIndex=i;
@@ -149,6 +143,30 @@ Drawer {
         id: c
         anchors.fill: parent
         anchors.margins: 8
+
+        focus: true
+        Keys.enabled: true
+        Keys.onPressed: {
+            switch (event.key) {
+            case Qt.Key_F1:
+                selectBox(0)
+                event.accepted=true;
+                break;
+            case Qt.Key_F2:
+                selectBox(1)
+                event.accepted=true;
+                break;
+            case Qt.Key_F3:
+                selectBox(2)
+                event.accepted=true;
+                break;
+            case Qt.Key_F4:
+                selectBox(3)
+                event.accepted=true;
+                break;
+            }
+        }
+
         RowLayout {
             id: ssc
             Layout.fillHeight: true

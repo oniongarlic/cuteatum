@@ -1,6 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Timeline
+import Qt.labs.qmlmodels
+
 import ".."
 import "../components"
 
@@ -110,6 +113,88 @@ Drawer {
         ListElement { box: 2; dx: 0.25; dy: -0.25; s: 0.5; ena: true; }
         ListElement { box: 3; dx: -0.25; dy: 0.25; s: 0.5; ena: true; }
         ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; }
+    }
+
+    QtObject {
+        id: sproxy
+        property double x;
+        property double y;
+        property double s;
+        property int frame: 0;
+
+        function append(f) {
+            //let v={ "f": Math.round(f), "x": x.toFixed(2), "y": y.toFixed(2), "s": s.toFixed(2) }
+            let v={ "f": frame++, "x": x.toFixed(3), "y": y.toFixed(3), "s": s.toFixed(3) }
+            timelineModel.appendRow(v)
+        }
+
+        function clear() {
+            timelineModel.clear()
+            frame=0
+        }
+    }
+
+    TableModel {
+        id: timelineModel
+        TableModelColumn { display: "f" }
+        TableModelColumn { display: "x" }
+        TableModelColumn { display: "y" }
+        TableModelColumn { display: "s" }
+    }
+
+    Component {
+        id: kfg
+        KeyframeGroup {
+            keyframes: [
+                Keyframe { frame: 0; value: 0 },
+                Keyframe { frame: 60; value: 0 }
+            ]
+            function setStartValue(v) {
+                keyframes[0].value=v;
+            }
+            function setEndValue(v) {
+                keyframes[1].value=v;
+            }
+            function setFromTo(f, t) {
+                setStartValue(f)
+                setEndValue(t)
+            }
+        }
+    }
+
+    Timeline {
+        id: ssTimeLine
+        startFrame: 0
+        endFrame: 60
+        enabled: true
+
+        onCurrentFrameChanged: {
+            sproxy.append(currentFrame)
+        }
+
+        Component.onCompleted: {
+            let tx=kfg.createObject(ssTimeLine, { target: sproxy, property: "x" });
+            let ty=kfg.createObject(ssTimeLine, { target: sproxy, property: "y" });
+            let ts=kfg.createObject(ssTimeLine, { target: sproxy, property: "s" });
+
+            tx.setFromTo(-0.5, 0.5)
+            ty.setFromTo(-0.5, 0.5)
+            ts.setFromTo(0.2, 1)
+
+            keyframeGroups.push(tx)
+            keyframeGroups.push(ty)
+            keyframeGroups.push(ts)
+        }
+
+        animations: [
+            TimelineAnimation {
+                id: ssAnimation
+                duration: 1000
+                easing.type: Easing.InOutExpo
+                from: ssTimeLine.startFrame
+                to: ssTimeLine.endFrame
+            }
+        ]
     }
 
     function selectBox(i) {
@@ -385,6 +470,10 @@ Drawer {
                         text: "R"
                         onClicked: selectedBox.reset()
                     }
+                    Button {
+                        text: "TL"
+                        onClicked: ssAnimation.start()
+                    }
                 }
 
                 SpinBox {
@@ -427,7 +516,62 @@ Drawer {
                         onClicked: dumpBoxState();
                     }
                 }
-
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    HorizontalHeaderView {
+                        id: horizontalHeader
+                        Layout.fillWidth: true
+                        syncView: timelineList
+                        clip: true
+                        model: [ "Frame", "X", "Y", "Size" ]
+                    }
+                    TableView {
+                        id: timelineList
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        boundsBehavior: Flickable.StopAtBounds
+                        boundsMovement: Flickable.StopAtBounds
+                        clip: true
+                        columnSpacing: 2
+                        rowSpacing: 2
+                        alternatingRows: true
+                        model: timelineModel
+                        animate: false
+                        selectionModel: ItemSelectionModel { }
+                        selectionBehavior: TableView.SelectRows
+                        ScrollBar.vertical: ScrollBar { }
+                        delegate: Rectangle {
+                            id: cellDelegate
+                            required property bool selected
+                            required property bool current
+                            implicitHeight: l.contentHeight
+                            implicitWidth: Math.max(l.contentWidth, 56)
+                            color: row === timelineList.currentRow
+                                        ? palette.highlight
+                                        : (timelineList.alternatingRows && row % 2 !== 0
+                                        ? palette.alternateBase
+                                        : palette.base)
+                            Label {
+                                id: l
+                                anchors.fill: parent
+                                anchors.leftMargin: 2
+                                anchors.rightMargin: 2
+                                horizontalAlignment: Text.AlignRight
+                                leftInset: 2
+                                rightInset: 2
+                                text: model.display
+                                font.bold: cellDelegate.current
+                            }
+                        }
+                        onCurrentRowChanged: {
+                            if (currentRow==-1)
+                                return;
+                            let v=model.getRow(currentRow)
+                            selectedBox.setSize(v.s)
+                            selectedBox.setCenter(v.x, v.y)
+                        }
+                    }
+                }
             }
 
         }

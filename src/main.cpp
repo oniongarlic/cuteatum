@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("CuteAtum");
     QCoreApplication::setApplicationVersion("0.1");
 
+    QLoggingCategory::setFilterRules(QStringLiteral("qt.qml.binding.removal.info=true"));
+
     if (!QDBusConnection::sessionBus().isConnected()) {
         qWarning("Cannot connect to the D-Bus session bus.\n"
                  "Please check your system settings and try again.\n"

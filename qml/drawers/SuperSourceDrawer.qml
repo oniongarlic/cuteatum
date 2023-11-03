@@ -9,11 +9,10 @@ import "../components"
 
 import org.bm 1.0
 
-Drawer {
+Page {
     id: ssDrawer
+    title: "SuperSource editor"
     // enabled: atem.connected
-    height: parent.height
-    width: parent.width/1.2
 
     property double ratio: 16/9
     property int boxDragMargin: 16
@@ -26,7 +25,16 @@ Drawer {
 
     onSavedPositionChanged: console.debug(savedPosition)
 
-    onAboutToShow: syncBoxStates();
+    StackView.onActivating: syncBoxStates();
+
+    objectName: "supersource"
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Escape) {
+            event.accepted = true;
+            rootStack.pop()
+        }
+    }
 
     Component.onCompleted: {
         savePositions(0);
@@ -227,7 +235,7 @@ Drawer {
     ColumnLayout {
         id: c
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 4
 
         focus: true
         Keys.enabled: true

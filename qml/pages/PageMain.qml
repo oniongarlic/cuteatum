@@ -122,17 +122,6 @@ Page {
         key: 0
     }
 
-    SuperSourceDrawer {
-        id: ssDrawer
-        ss: mainPage.ss
-    }
-
-    Action {
-        id: actionSuperSource
-        shortcut: "Ctrl+F"
-        onTriggered: ssDrawer.open();
-    }
-
     GridLayout {
         id: container
         rowSpacing: 1

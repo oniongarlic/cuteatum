@@ -125,6 +125,13 @@ ApplicationWindow {
             }
 
             MenuItem {
+                text: "SuperSource..."
+                onClicked: {
+                    return rootStack.push(superSourceView)
+                }
+            }
+
+            MenuItem {
                 text: "Settings..."
                 onClicked: {
                     return rootStack.push(settingsView)
@@ -334,6 +341,19 @@ ApplicationWindow {
         id: settingsView
         PageSettings {
 
+        }
+    }
+
+    Action {
+        id: actionSuperSource
+        shortcut: "Ctrl+F"
+        onTriggered: rootStack.push(superSourceView)
+    }
+
+    Component {
+        id: superSourceView
+        SuperSourceDrawer {
+            ss: superSource
         }
     }
 

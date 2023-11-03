@@ -5,6 +5,8 @@ import QtQuick.Layouts
 
 import "drawers"
 import "dialogs"
+import "pages"
+import "components"
 
 import org.bm 1.0
 import org.tal.servicediscovery 1.0

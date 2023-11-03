@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Timeline
 import Qt.labs.qmlmodels
 
-import ".."
+import "../models"
 import "../components"
 
 import org.bm 1.0
@@ -124,7 +124,7 @@ Drawer {
 
         function append(f) {
             //let v={ "f": Math.round(f), "x": x.toFixed(2), "y": y.toFixed(2), "s": s.toFixed(2) }
-            let v={ "f": frame++, "x": x.toFixed(3), "y": y.toFixed(3), "s": s.toFixed(3) }
+            let v={ "f": frame++, "x": x.toFixed(4), "y": y.toFixed(4), "s": s.toFixed(4) }
             timelineModel.appendRow(v)
         }
 
@@ -177,9 +177,9 @@ Drawer {
             let ty=kfg.createObject(ssTimeLine, { target: sproxy, property: "y" });
             let ts=kfg.createObject(ssTimeLine, { target: sproxy, property: "s" });
 
-            tx.setFromTo(-0.5, 0.5)
-            ty.setFromTo(-0.5, 0.5)
-            ts.setFromTo(0.2, 1)
+            tx.setFromTo(-0.25, 0)
+            ty.setFromTo(-0.25, 0)
+            ts.setFromTo(0.42, 1)
 
             keyframeGroups.push(tx)
             keyframeGroups.push(ty)

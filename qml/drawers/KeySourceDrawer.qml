@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import ".."
+
+import "../components"
+import "../models"
 
 import org.bm 1.0
 

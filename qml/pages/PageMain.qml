@@ -4,7 +4,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-import "drawers"
+import "../drawers"
+import "../models"
+import "../components"
 
 import org.bm 1.0
 

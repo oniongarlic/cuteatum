@@ -352,7 +352,7 @@ ApplicationWindow {
 
     Component {
         id: superSourceView
-        SuperSourceDrawer {
+        PageSuperSource {
             ss: superSource
         }
     }

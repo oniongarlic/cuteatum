@@ -3,6 +3,7 @@
         <file>qml/main.qml</file>
         <file>qml/pages/PageMain.qml</file>
         <file>qml/pages/PageSettings.qml</file>
+        <file>qml/pages/PageSuperSource.qml</file>
         <file>qml/models/ListModelEasing.qml</file>
         <file>qml/models/ListModelKeyType.qml</file>
         <file>qml/components/BlinkButton.qml</file>
@@ -12,7 +13,6 @@
         <file>qml/components/SuperSourceBox.qml</file>
         <file>qml/drawers/KeySourceDrawer.qml</file>
         <file>qml/drawers/MacroDrawer.qml</file>
-        <file>qml/drawers/SuperSourceDrawer.qml</file>
         <file>qml/dialogs/ConnectDialog.qml</file>
     </qresource>
 </RCC>

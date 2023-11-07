@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-// import "../components"
+import "../components"
 
 Page {
     id: settingsPage
@@ -10,7 +10,7 @@ Page {
     objectName: "settings"
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (event.key === Qt.Key_Escape) {
             console.log("*** Back button")
             event.accepted = true;
             rootStack.pop()

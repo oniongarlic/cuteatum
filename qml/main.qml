@@ -5,6 +5,8 @@ import QtQuick.Layouts
 
 import "drawers"
 import "dialogs"
+import "pages"
+import "components"
 
 import org.bm 1.0
 import org.tal.servicediscovery 1.0
@@ -120,6 +122,13 @@ ApplicationWindow {
 
             MenuSeparator {
 
+            }
+
+            MenuItem {
+                text: "SuperSource..."
+                onClicked: {
+                    return rootStack.push(superSourceView)
+                }
             }
 
             MenuItem {
@@ -332,6 +341,19 @@ ApplicationWindow {
         id: settingsView
         PageSettings {
 
+        }
+    }
+
+    Action {
+        id: actionSuperSource
+        shortcut: "Ctrl+F"
+        onTriggered: rootStack.push(superSourceView)
+    }
+
+    Component {
+        id: superSourceView
+        PageSuperSource {
+            ss: superSource
         }
     }
 

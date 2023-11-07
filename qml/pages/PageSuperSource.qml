@@ -4,16 +4,15 @@ import QtQuick.Layouts
 import QtQuick.Timeline
 import Qt.labs.qmlmodels
 
-import ".."
+import "../models"
 import "../components"
 
 import org.bm 1.0
 
-Drawer {
+Page {
     id: ssDrawer
+    title: "SuperSource editor"
     // enabled: atem.connected
-    height: parent.height
-    width: parent.width/1.2
 
     property double ratio: 16/9
     property int boxDragMargin: 16
@@ -26,7 +25,16 @@ Drawer {
 
     onSavedPositionChanged: console.debug(savedPosition)
 
-    onAboutToShow: syncBoxStates();
+    StackView.onActivating: syncBoxStates();
+
+    objectName: "supersource"
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Escape) {
+            event.accepted = true;
+            rootStack.pop()
+        }
+    }
 
     Component.onCompleted: {
         savePositions(0);
@@ -124,7 +132,7 @@ Drawer {
 
         function append(f) {
             //let v={ "f": Math.round(f), "x": x.toFixed(2), "y": y.toFixed(2), "s": s.toFixed(2) }
-            let v={ "f": frame++, "x": x.toFixed(3), "y": y.toFixed(3), "s": s.toFixed(3) }
+            let v={ "f": frame++, "x": x.toFixed(4), "y": y.toFixed(4), "s": s.toFixed(4) }
             timelineModel.appendRow(v)
         }
 
@@ -177,9 +185,9 @@ Drawer {
             let ty=kfg.createObject(ssTimeLine, { target: sproxy, property: "y" });
             let ts=kfg.createObject(ssTimeLine, { target: sproxy, property: "s" });
 
-            tx.setFromTo(-0.5, 0.5)
-            ty.setFromTo(-0.5, 0.5)
-            ts.setFromTo(0.2, 1)
+            tx.setFromTo(-0.25, 0)
+            ty.setFromTo(-0.25, 0)
+            ts.setFromTo(0.42, 1)
 
             keyframeGroups.push(tx)
             keyframeGroups.push(ty)
@@ -227,7 +235,7 @@ Drawer {
     ColumnLayout {
         id: c
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 4
 
         focus: true
         Keys.enabled: true
@@ -342,7 +350,7 @@ Drawer {
                 }
             }
             ColumnLayout {
-                Layout.maximumWidth: 340
+                //Layout.maximumWidth: 340
                 Layout.minimumWidth: 120
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -377,30 +385,33 @@ Drawer {
                     }
                 }
 
-                SpinBox {
-                    id: boxX
+                RowLayout {
                     Layout.fillWidth: true
-                    from: -4800
-                    to : 4800
-                    stepSize: 10
-                    wheelEnabled: true
-                    editable: true
-                    value: selectedBox.boxCenterX*4800
-                    onValueModified: {
-                        selectedBox.setCenterX(value/4800)
+                    SpinBox {
+                        id: boxX
+                        Layout.fillWidth: true
+                        from: -4800
+                        to : 4800
+                        stepSize: 10
+                        wheelEnabled: true
+                        editable: true
+                        value: selectedBox.boxCenterX*4800
+                        onValueModified: {
+                            selectedBox.setCenterX(value/4800)
+                        }
                     }
-                }
-                SpinBox {
-                    id: boxY
-                    Layout.fillWidth: true
-                    from: -4800
-                    to: 4800
-                    stepSize: 10
-                    wheelEnabled: true
-                    editable: true
-                    value: selectedBox.boxCenterY*4800
-                    onValueModified: {
-                        selectedBox.setCenterY(value/4800)
+                    SpinBox {
+                        id: boxY
+                        Layout.fillWidth: true
+                        from: -4800
+                        to: 4800
+                        stepSize: 10
+                        wheelEnabled: true
+                        editable: true
+                        value: selectedBox.boxCenterY*4800
+                        onValueModified: {
+                            selectedBox.setCenterY(value/4800)
+                        }
                     }
                 }
                 GridLayout {
@@ -470,10 +481,6 @@ Drawer {
                         text: "R"
                         onClicked: selectedBox.reset()
                     }
-                    Button {
-                        text: "TL"
-                        onClicked: ssAnimation.start()
-                    }
                 }
 
                 SpinBox {
@@ -516,8 +523,94 @@ Drawer {
                         onClicked: dumpBoxState();
                     }
                 }
-                ColumnLayout {
+                RowLayout {
                     Layout.fillWidth: true
+                    Button {
+                        text: "Set A"
+                        onClicked: {
+                            savePositions(0);
+                        }
+                    }
+                    Button {
+                        text: "Get A"
+                        onClicked: {
+                            loadPositions(0);
+                        }
+                    }
+                    Button {
+                        text: "Set B"
+                        onClicked: {
+                            savePositions(1);
+                        }
+                    }
+                    Button {
+                        text: "Get B"
+                        onClicked: {
+                            loadPositions(1);
+                        }
+                    }
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Button {
+                        text: "Run A"
+                        onClicked: {
+                            animateSuperSource(0);
+                        }
+                    }
+                    Button {
+                        text: "Run B"
+                        onClicked: {
+                            animateSuperSource(1);
+                        }
+                    }
+                    Button {
+                        text: "TL"
+                        onClicked: ssAnimation.start()
+                    }
+                    ComboBox {
+                        id: easingType
+                        textRole: "text"
+                        valueRole: "easingType"
+                        enabled: selectedBox
+                        model: ListModelEasing {
+
+                        }
+                        onActivated: {
+                            selectedBox.animateEasing=currentValue
+                        }
+                        Component.onCompleted: {
+                            currentIndex = indexOfValue(Easing.InCubic)
+                        }
+                    }
+
+                    SpinBox {
+                        id: easingDuration
+                        Layout.fillWidth: true
+                        enabled: selectedBox
+                        editable: false
+                        from: 1
+                        to: 10
+                        value: 1
+                        onValueModified: {
+                            selectedBox.animateDuration=value*1000;
+                        }
+                        //background.implicitWidth: 100
+                    }
+                }
+                ColumnLayout {
+                    id: tlc
+                    Layout.fillWidth: true
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0
+                        to: timelineList.rows
+                        enabled: timelineList.rows>0
+                        wheelEnabled: true
+                        stepSize: 1
+                        onMoved: tlc.setFromRow(value)
+                    }
+
                     HorizontalHeaderView {
                         id: horizontalHeader
                         Layout.fillWidth: true
@@ -525,6 +618,13 @@ Drawer {
                         clip: true
                         model: [ "Frame", "X", "Y", "Size" ]
                     }
+
+                    function setFromRow(r) {
+                        let v=timelineList.model.getRow(r)
+                        selectedBox.setSize(v.s)
+                        selectedBox.setCenter(v.x, v.y)
+                    }
+
                     TableView {
                         id: timelineList
                         Layout.fillWidth: true
@@ -547,10 +647,10 @@ Drawer {
                             implicitHeight: l.contentHeight
                             implicitWidth: Math.max(l.contentWidth, 56)
                             color: row === timelineList.currentRow
-                                        ? palette.highlight
-                                        : (timelineList.alternatingRows && row % 2 !== 0
-                                        ? palette.alternateBase
-                                        : palette.base)
+                                   ? palette.highlight
+                                   : (timelineList.alternatingRows && row % 2 !== 0
+                                      ? palette.alternateBase
+                                      : palette.base)
                             Label {
                                 id: l
                                 anchors.fill: parent
@@ -566,9 +666,7 @@ Drawer {
                         onCurrentRowChanged: {
                             if (currentRow==-1)
                                 return;
-                            let v=model.getRow(currentRow)
-                            selectedBox.setSize(v.s)
-                            selectedBox.setCenter(v.x, v.y)
+                            tlc.setFromRow(currentRow)
                         }
                     }
                 }
@@ -611,8 +709,8 @@ Drawer {
         GridLayout {
             Layout.fillWidth: true
             enabled: selectedBox && selectedBox.crop
-            rows: 1
-            columns: 4
+            rows: 2
+            columns: 2
             SpinBox {
                 from: 0
                 to: 2048
@@ -652,75 +750,6 @@ Drawer {
                 inputMethodHints: Qt.ImhDigitsOnly
                 value: selectedBox.cropRight
                 onValueChanged: selectedBox.cropRight=value
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Button {
-                text: "Set A"
-                onClicked: {
-                    savePositions(0);
-                }
-            }
-            Button {
-                text: "Get A"
-                onClicked: {
-                    loadPositions(0);
-                }
-            }
-            Button {
-                text: "Set B"
-                onClicked: {
-                    savePositions(1);
-                }
-            }
-            Button {
-                text: "Get B"
-                onClicked: {
-                    loadPositions(1);
-                }
-            }
-            Button {
-                text: "Run A"
-                onClicked: {
-                    animateSuperSource(0);
-                }
-            }
-            Button {
-                text: "Run B"
-                onClicked: {
-                    animateSuperSource(1);
-                }
-            }
-            ComboBox {
-                id: easingType
-                textRole: "text"
-                valueRole: "easingType"
-                enabled: selectedBox
-                model: ListModelEasing {
-
-                }
-                onActivated: {
-                    selectedBox.animateEasing=currentValue
-                }
-                Component.onCompleted: {
-                    currentIndex = indexOfValue(Easing.InCubic)
-                }
-            }
-
-            SpinBox {
-                id: easingDuration
-                Layout.fillWidth: true
-                enabled: selectedBox
-                editable: false
-                from: 1
-                to: 10
-                value: 1
-                onValueModified: {
-                    selectedBox.animateDuration=value*1000;
-                }
-                //background.implicitWidth: 100
             }
         }
     }

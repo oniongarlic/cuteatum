@@ -4,7 +4,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-import "drawers"
+import "../drawers"
+import "../models"
+import "../components"
 
 import org.bm 1.0
 
@@ -118,17 +120,6 @@ Page {
         id: keySourceDrawer
         me: mainPage.me
         key: 0
-    }
-
-    SuperSourceDrawer {
-        id: ssDrawer
-        ss: mainPage.ss
-    }
-
-    Action {
-        id: actionSuperSource
-        shortcut: "Ctrl+F"
-        onTriggered: ssDrawer.open();
     }
 
     GridLayout {

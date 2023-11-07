@@ -467,6 +467,32 @@ ApplicationWindow {
             console.debug("Preview is: "+me.previewInput())
         }
 
+        onMacroRecordingStateChanged: {
+            console.debug("MacroRecording state is")
+            console.debug(macroIndex)
+            console.debug(recording)
+        }
+
+        onMacroRunningStateChanged: {
+            console.debug("MacroRunning state is")
+            console.debug(macroIndex)
+            console.debug(running)
+            console.debug(repeating)
+        }
+
+        onMacroRunningChanged: {
+            console.debug("MacroRunning: "+macroRunning)
+        }
+
+        onMacroRecordingChanged: {
+            console.debug("MacroRecording: "+macroRecording)
+        }
+
+        onMacroInfoChanged: {
+            console.debug("MacroInfo: "+index)
+            console.debug(info)
+        }
+
         onAudioInputChanged: {
             console.debug("AudioInput changed "+index + " "+input)
         }

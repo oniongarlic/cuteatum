@@ -18,6 +18,8 @@ Page {
     property int program;
     property int preview;
 
+    property bool forcePreview: false
+
     property AtemMixEffect me;
     property AtemFairlight fl;
     property AtemDownstreamKey dsk;
@@ -133,6 +135,7 @@ Page {
         enabled: atem.connected
 
         RowLayout {
+            id: inputProgramButtonRow
             Layout.fillWidth: true
             Layout.fillHeight: true
             //Layout.alignment: Qt.AlignHCenter
@@ -140,6 +143,7 @@ Page {
             Layout.column: 0
             Layout.row: 0
             spacing: 2
+            visible: !forcePreview
             GridLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -227,6 +231,7 @@ Page {
         }
 
         RowLayout {
+            id: inputPreviewButtonRow
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
             Layout.margins: 0

@@ -25,6 +25,9 @@ ApplicationWindow {
     property string mqttHostname: "localhost"
     property int mqttPort: 1883
 
+    // Debug
+    property bool debugEnabled: false
+
     property date atemTime;
     property string sTime;
 
@@ -44,8 +47,13 @@ ApplicationWindow {
     }
 
     Settings {
-        id: config
+        id: deviceConfig
+        category: "device"
         property string previousDevice;
+    }
+
+    Settings {
+        id: config
         property alias x: root.x
         property alias y: root.y
         property alias width: root.width
@@ -67,9 +75,11 @@ ApplicationWindow {
             }
 
             // XXX: Static default test devices
-            deviceModel.append({"name": "ATEM Mini Pro", "deviceIP": "192.168.1.99", "port": 9910})
-            deviceModel.append({"name": "ATEM Mini Pro ISO", "deviceIP": "192.168.0.49", "port": 9910})
-            deviceModel.append({"name": "Emulator", "deviceIP": "192.168.1.89", "port": 9910})
+            if (debugEnabled) {
+                deviceModel.append({"name": "ATEM Mini Pro", "deviceIP": "192.168.1.99", "port": 9910})
+                deviceModel.append({"name": "ATEM Mini Pro ISO", "deviceIP": "192.168.0.49", "port": 9910})
+                deviceModel.append({"name": "Emulator", "deviceIP": "192.168.1.89", "port": 9910})
+            }
         }
 
         Component.onCompleted: {
@@ -106,6 +116,7 @@ ApplicationWindow {
 
     menuBar: MenuBar {
         enabled: rootStack.depth<2
+        visible: rootStack.depth<2
         Menu {
             title: "&File"
 
@@ -137,6 +148,12 @@ ApplicationWindow {
 
             MenuSeparator {
 
+            }
+
+            MenuItem {
+                id: forcePreviewMenu
+                text: "Force preview"
+                checkable: true
             }
 
             MenuItem {
@@ -349,6 +366,7 @@ ApplicationWindow {
             dsk: !atem.connected ? null : atem.downstreamKey(0)
             //ss: !atem.connected ? null : superSource
             ss: superSource
+            forcePreview: forcePreviewMenu.checked
         }
     }
 
@@ -388,8 +406,8 @@ ApplicationWindow {
         if (mqttEnabled) {
             mqttClient.connectToHost();
         }
-        if (config.previousDevice!='')
-            atem.connectToSwitcher(config.previousDevice, 2000)
+        if (deviceConfig.previousDevice!='')
+            atem.connectToSwitcher(deviceConfig.previousDevice, 2000)
     }
 
     function cutTransition() {

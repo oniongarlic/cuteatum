@@ -123,23 +123,28 @@ Page {
         ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; }
     }
 
-    QtObject {
-        id: sproxy
-        property double x;
-        property double y;
-        property double s;
-        property int frame: 0;
+    TimelineBoxProxy {
+        id: sproxy1
+        box: 0
+        onNewFrame: timelineModel.appendRow(v)
+    }
 
-        function append(f) {
-            //let v={ "f": Math.round(f), "x": x.toFixed(2), "y": y.toFixed(2), "s": s.toFixed(2) }
-            let v={ "f": frame++, "x": x.toFixed(4), "y": y.toFixed(4), "s": s.toFixed(4) }
-            timelineModel.appendRow(v)
-        }
+    TimelineBoxProxy {
+        id: sproxy2
+        box: 1
+        onNewFrame: timelineModel.appendRow(v)
+    }
 
-        function clear() {
-            timelineModel.clear()
-            frame=0
-        }
+    TimelineBoxProxy {
+        id: sproxy3
+        box: 2
+        onNewFrame: timelineModel.appendRow(v)
+    }
+
+    TimelineBoxProxy {
+        id: sproxy4
+        box: 3
+        onNewFrame: timelineModel.appendRow(v)
     }
 
     TableModel {
@@ -151,53 +156,98 @@ Page {
     }
 
     Component {
+        id: kf
+        Keyframe {}
+    }
+
+    Component {
         id: kfg
-        KeyframeGroup {
-            keyframes: [
-                Keyframe { frame: 0; value: 0 },
-                Keyframe { frame: 60; value: 0 }
-            ]
-            function setStartValue(v) {
-                keyframes[0].value=v;
-            }
-            function setEndValue(v) {
-                keyframes[1].value=v;
-            }
-            function setFromTo(f, t) {
-                setStartValue(f)
-                setEndValue(t)
-            }
+        KeyframeGroup {            
+            keyframes: []
         }
     }
 
     Timeline {
         id: ssTimeLine
         startFrame: 0
-        endFrame: 60
-        enabled: true
+        endFrame: 120
+        enabled: ssAnimation.running
+
+        property var boxes: [];
 
         onCurrentFrameChanged: {
-            sproxy.append(currentFrame)
+            sproxy1.append(currentFrame)
         }
 
         Component.onCompleted: {
-            let tx=kfg.createObject(ssTimeLine, { target: sproxy, property: "x" });
-            let ty=kfg.createObject(ssTimeLine, { target: sproxy, property: "y" });
-            let ts=kfg.createObject(ssTimeLine, { target: sproxy, property: "s" });
+            initBoxes();
+        }
 
-            tx.setFromTo(-0.25, 0)
-            ty.setFromTo(-0.25, 0)
-            ts.setFromTo(0.42, 1)
+        function initBoxes() {
+            boxes=[]
+            for (let i=0;i<4;i++) {
+                let k=initBox();
+                boxes.push(k)
+            }
+        }
 
-            keyframeGroups.push(tx)
-            keyframeGroups.push(ty)
-            keyframeGroups.push(ts)
+        function initBox() {
+            let k=createBoxGroup();
+            console.debug(k)
+            addBoxGroup(k)
+            return k;
+        }
+
+        function addBoxKeyframe(ki,f,x,y,s) {
+            let k=boxes[ki]
+            addKeyframeToGroup(k[0], f, x)
+            addKeyframeToGroup(k[1], f, y)
+            addKeyframeToGroup(k[2], f, s)
+
+            dumpKeyframes(k[2]);
+        }
+
+        function dumpKeyframes(k) {
+            for (let i=0;i<k.keyframes.length;i++) {
+                console.debug("***KEYFRAME")
+                console.debug(k.keyframes[i].frame)
+                console.debug(k.keyframes[i].value)
+            }
+        }
+
+        function addKeyframeToGroup(kg, f, v) {
+            console.debug("Frame: "+f+" == "+v)
+            kg.keyframes.push(kf.createObject(ssTimeLine, { frame: f, value: v }))
+        }
+
+        /* Per SuperSource box keyframe group */
+        function createBoxGroup(b) {
+            let tx=kfg.createObject(ssTimeLine, { target: sproxy1, property: "x" });
+            let ty=kfg.createObject(ssTimeLine, { target: sproxy1, property: "y" });
+            let ts=kfg.createObject(ssTimeLine, { target: sproxy1, property: "s" });
+            return [tx, ty, ts];
+        }
+
+        function addBoxGroup(kg) {
+            keyframeGroups.push(kg[0])
+            keyframeGroups.push(kg[1])
+            keyframeGroups.push(kg[2])
+        }
+
+        function clearKeyframes() {
+            sproxy1.clear()
+            timelineModel.clear()
+        }
+
+        function addKeyframe(frame) {
+            console.debug(frame)
+            addBoxKeyframe(ssBoxParent.currentIndex, frame, selectedBox.setX, selectedBox.setY, selectedBox.boxSize)
         }
 
         animations: [
             TimelineAnimation {
                 id: ssAnimation
-                duration: 1000
+                duration: 4000
                 easing.type: Easing.InOutExpo
                 from: ssTimeLine.startFrame
                 to: ssTimeLine.endFrame
@@ -577,9 +627,6 @@ Page {
                             loadPositions(1);
                         }
                     }
-                }
-                RowLayout {
-                    Layout.fillWidth: true
                     Button {
                         text: "Run A"
                         onClicked: {
@@ -592,10 +639,9 @@ Page {
                             animateSuperSource(1);
                         }
                     }
-                    Button {
-                        text: "TL"
-                        onClicked: ssAnimation.start()
-                    }
+                }
+                RowLayout {
+                    Layout.fillWidth: true
                     ComboBox {
                         id: easingType
                         textRole: "text"
@@ -626,17 +672,49 @@ Page {
                         //background.implicitWidth: 100
                     }
                 }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Button {
+                        text: "Set KF"
+                        onClicked: {
+                            ssTimeLine.addKeyframe(ssFrame.value)
+                            ssFrame.value+=30
+                        }
+                    }
+                    Button {
+                        text: "Clear"
+                        onClicked: ssTimeLine.clearKeyframes()
+                    }
+                    Button {
+                        text: "TL"
+                        onClicked: ssAnimation.start()
+                    }
+                    SpinBox {
+                        id: ssFrame
+                        Layout.fillWidth: true
+                        from: 0
+                        to: 120
+                        wheelEnabled: true
+                        stepSize: 1
+                    }
+                }
                 ColumnLayout {
                     id: tlc
                     Layout.fillWidth: true
-                    Slider {
-                        Layout.fillWidth: true
-                        from: 0
-                        to: timelineList.rows
-                        enabled: timelineList.rows>0
-                        wheelEnabled: true
-                        stepSize: 1
-                        onMoved: tlc.setFromRow(value)
+                    RowLayout {
+                        Slider {
+                            id: tlFrame
+                            Layout.fillWidth: true
+                            from: 0
+                            to: timelineList.rows
+                            enabled: timelineList.rows>0
+                            wheelEnabled: true
+                            stepSize: 1
+                            onMoved: tlc.setFromRow(value)
+                        }
+                        Label {
+                            text: tlFrame.value
+                        }
                     }
 
                     HorizontalHeaderView {
@@ -695,6 +773,7 @@ Page {
                             if (currentRow==-1)
                                 return;
                             tlc.setFromRow(currentRow)
+                            tlFrame.value=currentRow
                         }
                     }
                 }

@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
@@ -42,6 +43,16 @@ ApplicationWindow {
         }
     }
 
+    Settings {
+        id: config
+        property string previousDevice;
+        property alias x: root.x
+        property alias y: root.y
+        property alias width: root.width
+        property alias height: root.height
+        property alias visibility: root.visibility
+    }
+
     ServiceDiscovery {
         id: sd
 
@@ -74,13 +85,17 @@ ApplicationWindow {
         id: atemSources
     }
 
+    ListModel {
+        id: macrosModel
+    }
+
     ConnectDialog {
         id: nyaDialog
         model: deviceModel
 
         onAccepted: {
             console.debug(result)
-            nyaDialog.close();            
+            nyaDialog.close();
             atem.connectToSwitcher(ip, 2000)
         }
 
@@ -189,42 +204,42 @@ ApplicationWindow {
         Menu {
             title: "&Output"
             enabled: atem.connected
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Multiview"
                 inputID: 9001
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Program"
                 inputID: 10010
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Preview"
                 inputID: 10011
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Input 1"
                 inputID: 1
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Input 2"
                 inputID: 2
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Input 3"
                 inputID: 3
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Input 4"
                 inputID: 4
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {                
+            InputMenuItem {
                 text: "Direct input 1"
                 inputID: 11001
                 ButtonGroup.group: outputGroup
@@ -236,7 +251,7 @@ ApplicationWindow {
                 text: "Show interface"
                 action: actionMacros
             }
-        }        
+        }
     }
 
     Action {
@@ -246,7 +261,7 @@ ApplicationWindow {
     }
 
     MacroDrawer {
-        id: macroDrawer        
+        id: macroDrawer
     }
 
     InputButtonGroup {
@@ -373,6 +388,8 @@ ApplicationWindow {
         if (mqttEnabled) {
             mqttClient.connectToHost();
         }
+        if (config.previousDevice!='')
+            atem.connectToSwitcher(config.previousDevice, 2000)
     }
 
     function cutTransition() {
@@ -388,7 +405,7 @@ ApplicationWindow {
     function setPreview(i) {
         var me=atem.mixEffect(0);
         me.changePreviewInput(i)
-    }    
+    }
 
     AtemConnection {
         id: atem
@@ -408,6 +425,9 @@ ApplicationWindow {
 
         onConnected: {
             console.debug("Connected!")
+
+            config.previousDevice=hostname()
+
             console.debug(productInformation())
 
             console.debug(colorGeneratorColor(0))
@@ -450,7 +470,7 @@ ApplicationWindow {
 
                 meCon.target=me;
                 meCon.program=me.programInput();
-                meCon.preview=me.previewInput();                
+                meCon.preview=me.previewInput();
 
                 dumpMixerState()
 
@@ -512,7 +532,12 @@ ApplicationWindow {
 
         onMacroInfoChanged: {
             console.debug("MacroInfo: "+index)
-            console.debug(info)
+            let m={ "macroIndex": index, "used": info.used, "name": info.name, "description": info.description }
+            console.debug(m)
+            if (macrosModel.count<index)
+                macrosModel.insert(index, m)
+            else
+                macrosModel.set(index, m)
         }
 
         onAudioInputChanged: {
@@ -529,7 +554,7 @@ ApplicationWindow {
             var tc=getTime();
             atemTime=tc;
             sTime=atemTime.toTimeString();
-            mqttClient.publishTimeCode(tc)            
+            mqttClient.publishTimeCode(tc)
         }
 
         onAudioLevelsChanged: {

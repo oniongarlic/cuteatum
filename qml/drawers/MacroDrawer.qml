@@ -39,10 +39,12 @@ Drawer {
                 id: recordCheckbox
                 enabled: !atem.macroRunning
                 text: "Recording"
+                icon.name: "media-record"
             }
             Button {
                 text: "Stop"
                 enabled: recordCheckbox.checked
+                icon.name: "media-playback-stop"
                 onClicked: atem.stopRecordingMacro();
             }
             Button {
@@ -55,15 +57,17 @@ Drawer {
             id: macroGrid
             Layout.fillHeight: true
             Layout.fillWidth: true
-            columns: 6
+            columns: 5
             columnSpacing: 8
             rowSpacing: 8
             Repeater {
-                model: 24
+                model: macrosModel
                 delegate: Button {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    text: "M "+(index+1)
+                    // text: "M "+(index+1)
+                    text: (index+1) +":" + name
+                    icon.name: used ? "media-playback-start" : ""
                     highlighted: recordCheckbox.checked
                     enabled: !atem.macroRecording && !atem.macroRunning
                     onClicked: {

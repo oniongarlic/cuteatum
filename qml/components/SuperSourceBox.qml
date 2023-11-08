@@ -127,7 +127,7 @@ Rectangle {
     }
 
     onBoxSizeChanged: {        
-        if (bRD.drag.active)
+        if (bottomRightDrag.dragAactive)
             return;
         if (boxSize>1)
             boxSize=1
@@ -162,7 +162,7 @@ Rectangle {
     readonly property alias animateRunning: boxAnimation.running
 
     function animate() {
-        boxAnimation.start();
+        boxAnimation.restart();
     }
 
     function animateStop() {
@@ -302,57 +302,11 @@ Rectangle {
         font.pixelSize: 24
     }
 
-    Rectangle {
+    DragBox {
         id: bottomRightDrag
+        dragItem: sizeRect
         anchors.horizontalCenter: sizeRect.right
         anchors.verticalCenter: sizeRect.bottom
-        color: "#4c57d4e1"
-        border.color: "#8c57d4e1"
-        border.width: 2
-        width: dragMargin
-        height: dragMargin
-        radius: dragMargin/2
-
-        MouseArea {
-            id: bRD
-            anchors.fill: bottomRightDrag
-            drag.target: parent
-            drag.threshold: 1
-
-            drag.onActiveChanged: {
-                sizeRect.forceActiveFocus();
-            }
-
-            onPositionChanged: {
-                if (drag.active) {
-
-                    sizeRect.width = sizeRect.width + mouseX
-                    //sizeRect.height = sizeRect.height + mouseY
-
-                    if (keepInside) {
-                        if (sizeRect.width < dragMargin)
-                            sizeRect.width = dragMargin
-                        else if (sizeRect.width > sizeRect.parent.width-sizeRect.x)
-                            sizeRect.width=sizeRect.parent.width-sizeRect.x
-
-                        if (sizeRect.height < dragMargin)
-                            sizeRect.height = dragMargin
-                        else if (sizeRect.height > sizeRect.parent.height-sizeRect.y)
-                            sizeRect.height=sizeRect.parent.height-sizeRect.y
-                    }
-
-                    sizeRect.height = sizeRect.width/ratio
-                    sizeRect.width = sizeRect.height*ratio
-
-                    // Update normalized values
-                    boxSize=sizeRect.width/sizeRect.parent.width
-                    if (boxSize>1) {
-                        boxSize=1
-                        sizeRect.width=sizeRect.parent.width
-                        sizeRect.height=sizeRect.parent.height
-                    }
-                }
-            }
-        }
     }
+
 }

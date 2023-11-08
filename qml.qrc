@@ -14,5 +14,6 @@
         <file>qml/drawers/KeySourceDrawer.qml</file>
         <file>qml/drawers/MacroDrawer.qml</file>
         <file>qml/dialogs/ConnectDialog.qml</file>
+        <file>qml/components/DragBox.qml</file>
     </qresource>
 </RCC>

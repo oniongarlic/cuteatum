@@ -257,6 +257,34 @@ Page {
                 selectBox(3)
                 event.accepted=true;
                 break;
+
+            case Qt.Key_F5:
+                event.accepted=true;
+                break;
+            case Qt.Key_F6:
+                event.accepted=true;
+                break;
+            case Qt.Key_F7:
+                event.accepted=true;
+                break;
+            case Qt.Key_F8:
+                event.accepted=true;
+                break;
+
+            case Qt.Key_F9:
+                animateSuperSource(0)
+                event.accepted=true;
+                break;
+            case Qt.Key_F10:
+                animateSuperSource(1)
+                event.accepted=true;
+                break;
+            case Qt.Key_F11:
+                event.accepted=true;
+                break;
+            case Qt.Key_F12:
+                event.accepted=true;
+                break;
             }
         }
 

@@ -153,8 +153,8 @@ Page {
 
         function syncFromProxy(p) {
             timelineModel.clear()
-            console.debug(p)
             for (let i=0;i<p.keyFrames.length;i++) {
+                console.debug(p.keyFrames[i])
                 appendRow(p.keyFrames[i])
             }
         }
@@ -182,7 +182,12 @@ Page {
 
         onCurrentFrameChanged: {
             if (!tlEnabled.checked) {
-                proxies[selectedBox.boxId-1].append(currentFrame)
+                proxies[0].append(currentFrame)
+                proxies[1].append(currentFrame)
+                proxies[2].append(currentFrame)
+                proxies[3].append(currentFrame)
+            } else {
+                console.debug("CF: "+currentFrame)
             }
         }
 
@@ -258,13 +263,17 @@ Page {
         animations: [
             TimelineAnimation {
                 id: ssAnimation
-                duration: 2000
+                duration: 1000
                 easing.type: Easing.InOutExpo
                 from: ssTimeLine.startFrame
                 to: ssTimeLine.endFrame
                 onFinished: {
-                    console.debug("Animated!")
+                    console.debug("Animation done")
                     timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
+                }
+                onStarted: {
+                    console.debug("Animation starts...")
+                    ssTimeLine.clearKeyframes();
                 }
             }
         ]

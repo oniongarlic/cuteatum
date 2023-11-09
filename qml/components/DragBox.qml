@@ -23,6 +23,8 @@ Rectangle {
         drag.target: parent
         drag.threshold: 1
 
+        cursorShape: Qt.SizeFDiagCursor
+
         drag.onActiveChanged: {
             dragItem.forceActiveFocus();
         }

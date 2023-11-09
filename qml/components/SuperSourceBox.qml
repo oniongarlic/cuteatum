@@ -258,6 +258,8 @@ Rectangle {
         drag.minimumY: dragOutside ? -sizeRect.parent.height : 0
         drag.maximumY: dragOutside ? sizeRect.parent.height : sizeRect.parent.height-sizeRect.height
 
+        cursorShape: Qt.DragMoveCursor
+
         onWheel: {            
             if (boxSize<=0)
                 boxSize=0.01;

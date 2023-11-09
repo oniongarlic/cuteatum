@@ -185,7 +185,7 @@ Rectangle {
     Keys.onDownPressed: setY+=0.01
     Keys.onSpacePressed: sizeRect.enabled=!enabled
     Keys.onAsteriskPressed: sizeRect.crop=!crop
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         switch (event.key) {
         case Qt.Key_Plus:
             boxSize+=0.01

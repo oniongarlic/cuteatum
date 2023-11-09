@@ -20,6 +20,7 @@ Page {
     property AtemSuperSource ss;
 
     property var boxes: [];
+    property var proxies: [];
 
     property var savedPosition: [];
 
@@ -29,7 +30,7 @@ Page {
 
     objectName: "supersource"
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Escape) {
             event.accepted = true;
             rootStack.pop()
@@ -73,7 +74,7 @@ Page {
 
     Connections {
         target: ss
-        onSuperSourceChanged: {
+        function onSuperSourceChanged(boxid) {
             console.debug('SSChanged: '+boxid)
             var b=ss.getSuperSourceBox(boxid);
             var sb=ssBoxParent.itemAt(boxid);
@@ -126,25 +127,21 @@ Page {
     TimelineBoxProxy {
         id: sproxy1
         box: 0
-        onNewFrame: timelineModel.appendRow(v)
     }
 
     TimelineBoxProxy {
         id: sproxy2
         box: 1
-        onNewFrame: timelineModel.appendRow(v)
     }
 
     TimelineBoxProxy {
         id: sproxy3
         box: 2
-        onNewFrame: timelineModel.appendRow(v)
     }
 
     TimelineBoxProxy {
         id: sproxy4
         box: 3
-        onNewFrame: timelineModel.appendRow(v)
     }
 
     TableModel {
@@ -153,6 +150,14 @@ Page {
         TableModelColumn { display: "x" }
         TableModelColumn { display: "y" }
         TableModelColumn { display: "s" }
+
+        function syncFromProxy(p) {
+            timelineModel.clear()
+            console.debug(p)
+            for (let i=0;i<p.keyFrames.length;i++) {
+                appendRow(p.keyFrames[i])
+            }
+        }
     }
 
     Component {
@@ -162,7 +167,7 @@ Page {
 
     Component {
         id: kfg
-        KeyframeGroup {            
+        KeyframeGroup {
             keyframes: []
         }
     }
@@ -170,13 +175,15 @@ Page {
     Timeline {
         id: ssTimeLine
         startFrame: 0
-        endFrame: 120
-        enabled: ssAnimation.running
+        endFrame: 60
+        enabled: tlEnabled.checked || ssAnimation.running
 
         property var boxes: [];
 
         onCurrentFrameChanged: {
-            sproxy1.append(currentFrame)
+            if (!tlEnabled.checked) {
+                proxies[selectedBox.boxId-1].append(currentFrame)
+            }
         }
 
         Component.onCompleted: {
@@ -184,18 +191,20 @@ Page {
         }
 
         function initBoxes() {
+            proxies=[]
+            proxies[0]=sproxy1;
+            proxies[1]=sproxy2;
+            proxies[2]=sproxy3;
+            proxies[3]=sproxy4;
             boxes=[]
             for (let i=0;i<4;i++) {
-                let k=initBox();
+                let k=initBox(proxies[i]);
                 boxes.push(k)
             }
         }
 
-        function initBox() {
-            let k=createBoxGroup();
-            console.debug(k)
-            addBoxGroup(k)
-            return k;
+        function initBox(proxy) {
+            return addBoxGroup(createBoxGroup(proxy))
         }
 
         function addBoxKeyframe(ki,f,x,y,s) {
@@ -209,9 +218,7 @@ Page {
 
         function dumpKeyframes(k) {
             for (let i=0;i<k.keyframes.length;i++) {
-                console.debug("***KEYFRAME")
-                console.debug(k.keyframes[i].frame)
-                console.debug(k.keyframes[i].value)
+                console.debug("***KEYFRAME: "+k.keyframes[i].frame+" : "+k.keyframes[i].value)
             }
         }
 
@@ -221,10 +228,10 @@ Page {
         }
 
         /* Per SuperSource box keyframe group */
-        function createBoxGroup(b) {
-            let tx=kfg.createObject(ssTimeLine, { target: sproxy1, property: "x" });
-            let ty=kfg.createObject(ssTimeLine, { target: sproxy1, property: "y" });
-            let ts=kfg.createObject(ssTimeLine, { target: sproxy1, property: "s" });
+        function createBoxGroup(proxy) {
+            let tx=kfg.createObject(ssTimeLine, { target: proxy, property: "x" });
+            let ty=kfg.createObject(ssTimeLine, { target: proxy, property: "y" });
+            let ts=kfg.createObject(ssTimeLine, { target: proxy, property: "s" });
             return [tx, ty, ts];
         }
 
@@ -232,25 +239,33 @@ Page {
             keyframeGroups.push(kg[0])
             keyframeGroups.push(kg[1])
             keyframeGroups.push(kg[2])
+
+            return kg;
         }
 
         function clearKeyframes() {
             sproxy1.clear()
+            sproxy2.clear()
+            sproxy3.clear()
+            sproxy4.clear()
             timelineModel.clear()
         }
 
         function addKeyframe(frame) {
-            console.debug(frame)
             addBoxKeyframe(ssBoxParent.currentIndex, frame, selectedBox.setX, selectedBox.setY, selectedBox.boxSize)
         }
 
         animations: [
             TimelineAnimation {
                 id: ssAnimation
-                duration: 4000
+                duration: 2000
                 easing.type: Easing.InOutExpo
                 from: ssTimeLine.startFrame
                 to: ssTimeLine.endFrame
+                onFinished: {
+                    console.debug("Animated!")
+                    timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
+                }
             }
         ]
     }
@@ -280,6 +295,8 @@ Page {
         inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(selectedBox.inputSource)
         easingType.currentIndex=easingType.indexOfValue(selectedBox.animateEasing)
         easingDuration.value=selectedBox.animateDuration/1000;
+
+        timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
     }
 
     ColumnLayout {
@@ -289,54 +306,54 @@ Page {
 
         focus: true
         Keys.enabled: true
-        Keys.onPressed: {
-            switch (event.key) {
-            case Qt.Key_F1:
-                selectBox(0)
-                event.accepted=true;
-                break;
-            case Qt.Key_F2:
-                selectBox(1)
-                event.accepted=true;
-                break;
-            case Qt.Key_F3:
-                selectBox(2)
-                event.accepted=true;
-                break;
-            case Qt.Key_F4:
-                selectBox(3)
-                event.accepted=true;
-                break;
+        Keys.onPressed: (event) => {
+                            switch (event.key) {
+                                case Qt.Key_F1:
+                                selectBox(0)
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F2:
+                                selectBox(1)
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F3:
+                                selectBox(2)
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F4:
+                                selectBox(3)
+                                event.accepted=true;
+                                break;
 
-            case Qt.Key_F5:
-                event.accepted=true;
-                break;
-            case Qt.Key_F6:
-                event.accepted=true;
-                break;
-            case Qt.Key_F7:
-                event.accepted=true;
-                break;
-            case Qt.Key_F8:
-                event.accepted=true;
-                break;
+                                case Qt.Key_F5:
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F6:
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F7:
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F8:
+                                event.accepted=true;
+                                break;
 
-            case Qt.Key_F9:
-                animateSuperSource(0)
-                event.accepted=true;
-                break;
-            case Qt.Key_F10:
-                animateSuperSource(1)
-                event.accepted=true;
-                break;
-            case Qt.Key_F11:
-                event.accepted=true;
-                break;
-            case Qt.Key_F12:
-                event.accepted=true;
-                break;
-            }
-        }
+                                case Qt.Key_F9:
+                                animateSuperSource(0)
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F10:
+                                animateSuperSource(1)
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F11:
+                                event.accepted=true;
+                                break;
+                                case Qt.Key_F12:
+                                event.accepted=true;
+                                break;
+                            }
+                        }
 
         RowLayout {
             id: ssc
@@ -435,23 +452,27 @@ Page {
                 Layout.alignment: Qt.AlignTop
                 enabled: selectedBox!=null
 
-                ComboBox {
-                    id: boxId
-                    Layout.fillWidth: true
-                    model: ssModel
-                    displayText: "Box: " + currentText
-                    textRole: "box"
-                    currentIndex: ssBoxParent.currentIndex
-                    onCurrentIndexChanged: ssBoxParent.currentIndex=currentIndex
-                }
+                RowLayout {
 
-                CheckBox {
-                    id: ssCheck
-                    property SuperSourceBox ssbox;
-                    enabled: selectedBox!=null
-                    text: "Visible"
-                    checked: selectedBox && selectedBox.enabled
-                    onCheckedChanged: selectedBox.enabled=checked
+                    ComboBox {
+                        id: boxId
+                        Layout.fillWidth: true
+                        model: ssModel
+                        displayText: "Box: " + currentText
+                        textRole: "box"
+                        currentIndex: ssBoxParent.currentIndex
+                        onCurrentIndexChanged: ssBoxParent.currentIndex=currentIndex
+                    }
+
+                    CheckBox {
+                        id: ssCheck
+                        property SuperSourceBox ssbox;
+                        enabled: selectedBox!=null
+                        text: "Visible"
+                        checked: selectedBox && selectedBox.enabled
+                        onCheckedChanged: selectedBox.enabled=checked
+                    }
+
                 }
 
                 ComboBox {
@@ -675,10 +696,9 @@ Page {
                 RowLayout {
                     Layout.fillWidth: true
                     Button {
-                        text: "Set KF"
+                        text: "Add KF"
                         onClicked: {
                             ssTimeLine.addKeyframe(ssFrame.value)
-                            ssFrame.value+=30
                         }
                     }
                     Button {
@@ -686,7 +706,8 @@ Page {
                         onClicked: ssTimeLine.clearKeyframes()
                     }
                     Button {
-                        text: "TL"
+                        text: "Play"
+                        enabled: !ssAnimation.running
                         onClicked: ssAnimation.start()
                     }
                     SpinBox {
@@ -698,22 +719,49 @@ Page {
                         stepSize: 1
                     }
                 }
+
+                ListView {
+                    id: tlKeyframes
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    delegate: ItemDelegate {
+                        text: modelData
+                    }
+
+                    onCountChanged: console.debug("ListView keyframes: "+count)
+                }
+
                 ColumnLayout {
                     id: tlc
                     Layout.fillWidth: true
                     RowLayout {
+                        CheckBox {
+                            id: tlEnabled
+                        }
                         Slider {
                             id: tlFrame
                             Layout.fillWidth: true
                             from: 0
                             to: timelineList.rows
-                            enabled: timelineList.rows>0
+                            enabled: !tlEnabled.checked && timelineList.rows>0
+                            visible: !tlEnabled.checked
                             wheelEnabled: true
                             stepSize: 1
                             onMoved: tlc.setFromRow(value)
                         }
+                        Slider {
+                            id: tlKeyFrame
+                            Layout.fillWidth: true
+                            from: 0
+                            to: ssTimeLine.endFrame
+                            enabled: tlEnabled.checked
+                            visible: tlEnabled.checked
+                            wheelEnabled: true
+                            stepSize: 1
+                            onMoved: ssTimeLine.currentFrame=value
+                        }
                         Label {
-                            text: tlFrame.value
+                            text: tlEnabled.checked ? tlKeyFrame.value : tlFrame.value
                         }
                     }
 

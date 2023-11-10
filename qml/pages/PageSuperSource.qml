@@ -256,8 +256,9 @@ Page {
             timelineModel.clear()
         }
 
-        function addKeyframe(frame) {
-            addBoxKeyframe(ssBoxParent.currentIndex, frame, selectedBox.setX, selectedBox.setY, selectedBox.boxSize)
+        function addKeyframe(box, frame) {
+            let b=ssBoxParent.itemAt(box)
+            addBoxKeyframe(box, frame, b.setX, b.setY, b.boxSize)
         }
 
         animations: [
@@ -705,9 +706,18 @@ Page {
                 RowLayout {
                     Layout.fillWidth: true
                     Button {
-                        text: "Add KF"
+                        text: "1 KF"
                         onClicked: {
-                            ssTimeLine.addKeyframe(ssFrame.value)
+                            ssTimeLine.addKeyframe(ssBoxParent.currentIndex, ssFrame.value)
+                        }
+                    }
+                    Button {
+                        text: "A KF"
+                        onClicked: {
+                            ssTimeLine.addKeyframe(0, ssFrame.value)
+                            ssTimeLine.addKeyframe(1, ssFrame.value)
+                            ssTimeLine.addKeyframe(2, ssFrame.value)
+                            ssTimeLine.addKeyframe(3, ssFrame.value)
                         }
                     }
                     Button {

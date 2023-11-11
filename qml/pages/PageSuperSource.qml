@@ -116,6 +116,12 @@ Page {
         }
     }
 
+    function syncBoxFromProxy(boxid, proxy) {
+        var sb=ssBoxParent.itemAt(boxid);
+        sb.setCenter(proxy.x, proxy.y)
+        sb.setSize(proxy.s)
+    }
+
     ListModel {
         id: ssModel
         ListElement { box: 1; dx: -0.25; dy: -0.25; s: 0.5; ena: true; }
@@ -127,21 +133,25 @@ Page {
     TimelineBoxProxy {
         id: sproxy1
         box: 0
+        onUpdated: syncBoxFromProxy(box, sproxy1)
     }
 
     TimelineBoxProxy {
         id: sproxy2
         box: 1
+        onUpdated: syncBoxFromProxy(box, sproxy2)
     }
 
     TimelineBoxProxy {
         id: sproxy3
         box: 2
+        onUpdated: syncBoxFromProxy(box, sproxy3)
     }
 
     TimelineBoxProxy {
         id: sproxy4
         box: 3
+        onUpdated: syncBoxFromProxy(box, sproxy4)
     }
 
     TableModel {
@@ -182,12 +192,17 @@ Page {
 
         onCurrentFrameChanged: {
             if (!tlEnabled.checked) {
+                console.debug("CF-animate: "+currentFrame)
                 proxies[0].append(currentFrame)
                 proxies[1].append(currentFrame)
                 proxies[2].append(currentFrame)
                 proxies[3].append(currentFrame)
             } else {
-                console.debug("CF: "+currentFrame)
+                console.debug("CF-interactive: "+currentFrame)
+                proxies[0].setFrame(currentFrame)
+                proxies[1].setFrame(currentFrame)
+                proxies[2].setFrame(currentFrame)
+                proxies[3].setFrame(currentFrame)
             }
         }
 

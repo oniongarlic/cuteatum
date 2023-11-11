@@ -9,6 +9,11 @@ QtObject {
     property var keyFrames: []    
 
     signal newFrame(var v)
+    signal updated()
+
+    function setFrame(f) {
+        updated()
+    }
 
     function append(f) {
         //let v={ "f": Math.round(f), "x": x.toFixed(2), "y": y.toFixed(2), "s": s.toFixed(2) }

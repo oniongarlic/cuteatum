@@ -185,7 +185,7 @@ Page {
     Timeline {
         id: ssTimeLine
         startFrame: 0
-        endFrame: 60
+        endFrame: 0
         enabled: tlEnabled.checked || ssAnimation.running
 
         property var boxes: [];
@@ -273,6 +273,7 @@ Page {
 
         function addKeyframe(box, frame) {
             let b=ssBoxParent.itemAt(box)
+            ssTimeLine.endFrame=Math.max(frame, ssTimeLine.endFrame)
             addBoxKeyframe(box, frame, b.setX, b.setY, b.boxSize)
         }
 

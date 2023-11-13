@@ -161,6 +161,12 @@ Rectangle {
 
     readonly property alias animateRunning: boxAnimation.running
 
+    property bool slowDown: false
+    property bool snapToGrid: false
+    property bool dragOutside: true
+
+    readonly property double wheelZoomScale: slowDown ? 9600.0 : 4800.0
+
     function animate() {
         boxAnimation.restart();
     }
@@ -186,29 +192,48 @@ Rectangle {
     Keys.onSpacePressed: sizeRect.enabled=!enabled
     Keys.onAsteriskPressed: sizeRect.crop=!crop
     Keys.onPressed: (event) => {
+        if (event.modifiers & Qt.ShiftModifier)
+            slowDown=true;
+        if (event.modifiers & Qt.ControlModifier)
+            snapToGrid=true;
+        if (event.modifiers & Qt.AltModifier)
+            dragOutside=false;
         switch (event.key) {
         case Qt.Key_Plus:
             boxSize+=0.01
+            event.accepted = true;
             break;
         case Qt.Key_Minus:
             boxSize-=0.01
+            event.accepted = true;
             break;
         case Qt.Key_PageUp:
             boxSize+=0.1
+            event.accepted = true;
             break;
         case Qt.Key_PageDown:
             boxSize-=0.1
+            event.accepted = true;
             break;
         case Qt.Key_Home:
             boxSize=1
+            event.accepted = true;
             break;
         case Qt.Key_End:
             boxSize=0.5
+            event.accepted = true;
             break;
         case Qt.Key_Delete:
             boxSize=0.0
+            event.accepted = true;
             break;
         }
+    }
+
+    Keys.onReleased: {
+        slowDown=false;
+        snapToGrid=false
+        dragOutside=true;
     }
 
     Rectangle {
@@ -228,9 +253,7 @@ Rectangle {
         color: "transparent"
         border.color: "black"
         border.width: crop ? 1 : 0
-    }
-
-    property bool dragOutside: true
+    }    
 
     function snapInside() {        
         var s=0.5-boxSize/2
@@ -263,10 +286,12 @@ Rectangle {
 
         cursorShape: Qt.DragMoveCursor
 
+        focus: true
+
         onWheel: {            
             if (boxSize<=0)
                 boxSize=0.01;
-            boxSize=boxSize+(wheel.angleDelta.y/4800.0)
+            boxSize=boxSize+(wheel.angleDelta.y/wheelZoomScale)
             if (boxSize<=0)
                 boxSize=0.01;
             if (boxSize>1)

@@ -231,6 +231,10 @@ Rectangle {
     }
 
     Keys.onReleased: {
+        setKeyboardDefaults()
+    }
+
+    function setKeyboardDefaults() {
         slowDown=false;
         snapToGrid=false
         dragOutside=true;

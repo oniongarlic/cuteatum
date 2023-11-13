@@ -179,10 +179,10 @@ Rectangle {
         to: animateTo
     }
 
-    Keys.onLeftPressed: setX-=0.01
-    Keys.onRightPressed: setX+=0.01
-    Keys.onUpPressed: setY-=0.01
-    Keys.onDownPressed: setY+=0.01
+    Keys.onLeftPressed: setX-=0.001
+    Keys.onRightPressed: setX+=0.001
+    Keys.onUpPressed: setY-=0.001
+    Keys.onDownPressed: setY+=0.001
     Keys.onSpacePressed: sizeRect.enabled=!enabled
     Keys.onAsteriskPressed: sizeRect.crop=!crop
     Keys.onPressed: (event) => {
@@ -204,6 +204,9 @@ Rectangle {
             break;
         case Qt.Key_End:
             boxSize=0.5
+            break;
+        case Qt.Key_Delete:
+            boxSize=0.0
             break;
         }
     }

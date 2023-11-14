@@ -126,6 +126,16 @@ Rectangle {
         boxSize=s;
     }
 
+    //onXChanged: updatePositionData()
+    //onYChanged: updatePositionData()
+
+    function updatePositionData() {
+        var bx=x/parent.width
+        var by=y/parent.height
+        setX=(boxSize/2)+bx-0.5
+        setY=(boxSize/2)+by-0.5
+    }
+
     onBoxSizeChanged: {        
         if (bottomRightDrag.dragAactive)
             return;
@@ -165,8 +175,6 @@ Rectangle {
     property bool snapToGrid: false
     property bool dragOutside: true
 
-    readonly property double wheelZoomScale: slowDown ? 9600.0 : 4800.0
-
     function animate() {
         boxAnimation.restart();
     }
@@ -192,10 +200,6 @@ Rectangle {
     Keys.onSpacePressed: sizeRect.enabled=!enabled
     Keys.onAsteriskPressed: sizeRect.crop=!crop
     Keys.onPressed: (event) => {
-        if (event.modifiers & Qt.ShiftModifier)
-            slowDown=true;
-        if (event.modifiers & Qt.ControlModifier)
-            snapToGrid=true;
         if (event.modifiers & Qt.AltModifier)
             dragOutside=false;
         switch (event.key) {
@@ -240,26 +244,7 @@ Rectangle {
         dragOutside=true;
     }
 
-    Rectangle {
-        id: cropCenterRectangle
-        anchors.centerIn: parent
-        anchors.margins: dragMargin
-        width: parent.width
-        height: parent.height
-        color: "white"
-        opacity: (cropCenterArea.pressed || sizeRect.focus || selected) ? 0.2 : 0.0
-    }
-    Rectangle {
-        x: 0+((parent.width/cropRatio)*cropLeft)
-        y: 0+((parent.height/cropRatio)*cropTop)
-        width: parent.width-((parent.width/cropRatio)*cropRight)-x
-        height: parent.height-((parent.height/cropRatio)*cropBottom)-y
-        color: "transparent"
-        border.color: "black"
-        border.width: crop ? 1 : 0
-    }    
-
-    function snapInside() {        
+    function snapInside() {
         var s=0.5-boxSize/2
         if (setX<-s)
             setX=-s
@@ -277,8 +262,27 @@ Rectangle {
         setY=defaultY
     }
 
+    Rectangle {
+        id: cropCenterRectangle
+        anchors.centerIn: parent
+        anchors.margins: dragMargin
+        width: parent.width
+        height: parent.height
+        color: "white"
+        opacity: (dragArea.pressed || sizeRect.focus || selected) ? 0.2 : 0.0
+    }
+    Rectangle {
+        x: 0+((parent.width/cropRatio)*cropLeft)
+        y: 0+((parent.height/cropRatio)*cropTop)
+        width: parent.width-((parent.width/cropRatio)*cropRight)-x
+        height: parent.height-((parent.height/cropRatio)*cropBottom)-y
+        color: "transparent"
+        border.color: "black"
+        border.width: crop ? 1 : 0
+    }
+
     MouseArea {
-        id: cropCenterArea
+        id: dragArea
         anchors.fill: cropCenterRectangle
         anchors.margins: 8
         drag.target: sizeRect
@@ -292,24 +296,59 @@ Rectangle {
 
         focus: true
 
-        onWheel: {            
+        function wheelSizeAdjust(delta) {
             if (boxSize<=0)
                 boxSize=0.01;
-            boxSize=boxSize+(wheel.angleDelta.y/wheelZoomScale)
+            boxSize=boxSize+(delta)
             if (boxSize<=0)
                 boxSize=0.01;
             if (boxSize>1)
                 boxSize=1
         }
 
+        function adjustXCrop(delta) {
+            sizeRect.cropLeft=sizeRect.cropLeft+delta
+            sizeRect.cropRight=sizeRect.cropRight+delta
+            if (sizeRect.cropLeft<0)
+                sizeRect.cropLeft=0
+            if (sizeRect.cropRight<0)
+                sizeRect.cropRight=0
+        }
+
+        function adjustYCrop(delta) {
+            sizeRect.cropTop=sizeRect.cropTop+delta
+            sizeRect.cropBottom=sizeRect.cropBottom+delta
+            if (sizeRect.cropTop<0)
+                sizeRect.cropTop=0
+            if (sizeRect.cropBottom<0)
+                sizeRect.cropBottom=0
+        }
+
+        onWheel: {
+            if (wheel.modifiers==Qt.NoModifier) {
+                wheelSizeAdjust(wheel.angleDelta.y/4800.0)
+            } else if ((wheel.modifiers & Qt.ShiftModifier) && (wheel.modifiers & Qt.ControlModifier)) {
+                wheelSizeAdjust(wheel.angleDelta.y/9600.0)
+            } else if (wheel.modifiers & Qt.ControlModifier) {
+                adjustYCrop(wheel.angleDelta.y/180)
+            } else if (wheel.modifiers & Qt.ShiftModifier) {
+                adjustXCrop(wheel.angleDelta.y/180)
+            }
+            wheel.accepted=true
+        }
+
         drag.onActiveChanged: {
-            if (!drag.active) {                
-                var bx=sizeRect.x/sizeRect.parent.width
-                var by=sizeRect.y/sizeRect.parent.height
+            var bx=sizeRect.x/sizeRect.parent.width
+            var by=sizeRect.y/sizeRect.parent.height
+
+            if (!drag.active) {
                 setX=(boxSize/2)+bx-0.5
                 setY=(boxSize/2)+by-0.5
             } else {
                 sizeRect.focus=true
+                if (snapToGrid) {
+
+                }
             }
         }
 
@@ -333,7 +372,7 @@ Rectangle {
         color: sizeRect.enabled ? "green" : "black"
         font.bold: activated
         font.strikeout: !sizeRect.enabled
-        font.pixelSize: 24
+        font.pixelSize: boxSize < 0.3 ? 18 : 24
     }
 
     DragBox {

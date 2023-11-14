@@ -244,7 +244,8 @@ Page {
 
         function addKeyframeToGroup(kg, f, v) {
             console.debug("Frame: "+f+" == "+v)
-            kg.keyframes.push(kf.createObject(ssTimeLine, { frame: f, value: v }))
+            let e=easingType.currentValue
+            kg.keyframes.push(kf.createObject(ssTimeLine, { frame: f, value: v, easing: e }))
         }
 
         /* Per SuperSource box keyframe group */
@@ -389,20 +390,21 @@ Page {
             Layout.minimumHeight: 1080/10
             Layout.margins: 2
             Rectangle {
+                color: "grey"
+                border.color: "black"
+                border.width: 1
                 Layout.alignment: Qt.AlignTop
-                color: "green"
-                border.color: "red"
-                border.width: 2
                 Layout.preferredWidth: c.width/1.5
                 Layout.preferredHeight: Layout.preferredWidth/ssDrawer.ratio
                 clip: true
                 Rectangle {
                     id: superSourceContainer
-                    width: parent.width
+                    width: parent.width-4
                     height: width/ratio
+                    anchors.centerIn: parent
                     color: "grey"
-                    border.color: "red"
-                    border.width: 2
+                    border.color: ssLiveCheck.checked ? "red" : "green"
+                    border.width: 4
                     clip: true
 
                     Rectangle {
@@ -449,10 +451,13 @@ Page {
                                     ssBoxParent.currentIndex=index
                             }
                             onAtemCropChanged: {
-                                updateAtemLive(ssboxDelegate, true)
+                                updateAtemLive(ssboxDelegate, true);
                             }
                             onAtemSizeChanged: {
-                                updateAtemLive(ssboxDelegate, true)
+                                updateAtemLive(ssboxDelegate, true);
+                            }
+                            onAtemPositionChanged: {
+                                updateAtemLive(ssboxDelegate, true);
                             }
                             onCropChanged: {
                                 updateAtemLive(ssboxDelegate, true);
@@ -462,9 +467,6 @@ Page {
                             }
                             onInputSourceChanged: {
                                 updateAtemLive(ssboxDelegate, true);
-                            }
-                            onAtemPositionChanged: {
-                                updateAtemLive(ssboxDelegate, true)
                             }
                         }
                     }
@@ -701,7 +703,7 @@ Page {
                             selectedBox.animateEasing=currentValue
                         }
                         Component.onCompleted: {
-                            currentIndex = indexOfValue(Easing.InCubic)
+                            currentIndex=indexOfValue(Easing.InCubic)
                         }
                     }
 
@@ -900,7 +902,7 @@ Page {
             Layout.fillWidth: true
             enabled: selectedBox && selectedBox.crop
             rows: 2
-            columns: 2
+            columns: 3
             SpinBox {
                 from: 0
                 to: 2048
@@ -909,7 +911,7 @@ Page {
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 value: selectedBox.cropTop
-                onValueChanged: selectedBox.cropTop=value
+                onValueModified: selectedBox.cropTop=value
             }
             SpinBox {
                 from: 0
@@ -919,7 +921,14 @@ Page {
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 value: selectedBox.cropBottom
-                onValueChanged: selectedBox.cropBottom=value
+                onValueModified: selectedBox.cropBottom=value
+            }
+            Button {
+                text: "25%"
+                onClicked: {
+                    selectedBox.cropLeft=512
+                    selectedBox.cropRight=512
+                }
             }
             SpinBox {
                 from: 0
@@ -929,7 +938,7 @@ Page {
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 value: selectedBox.cropLeft
-                onValueChanged: selectedBox.cropLeft=value
+                onValueModified: selectedBox.cropLeft=value
             }
             SpinBox {
                 from: 0
@@ -939,7 +948,14 @@ Page {
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
                 value: selectedBox.cropRight
-                onValueChanged: selectedBox.cropRight=value
+                onValueModified: selectedBox.cropRight=value
+            }
+            Button {
+                text: "50%"
+                onClicked: {
+                    selectedBox.cropLeft=768
+                    selectedBox.cropRight=768
+                }
             }
         }
     }

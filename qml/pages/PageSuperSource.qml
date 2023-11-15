@@ -786,6 +786,31 @@ Page {
                             stepSize: 1
                             onMoved: tlc.setFromRow(value)
                         }
+                        Button {
+                            text: "Play"
+                            enabled: tlKeyFrame.enabled && ssTimeLine.endFrame>0 && !playbackTicker.running
+                            visible: tlKeyFrame.enabled
+                            icon.name: "media-playback-play"
+                            onClicked: {
+                                ssTimeLine.currentFrame=0
+                                playbackTicker.start()
+                            }
+                            Timer {
+                                id: playbackTicker
+                                repeat: true
+                                interval: 100
+                                onTriggered: {
+                                    ssTimeLine.currentFrame++
+                                    console.debug("tick")
+                                    if (atem.connected && atem.macroRecording) {
+                                        console.debug("macroPause")
+                                        atem.addMacroPause(1)
+                                    }
+                                    if (ssTimeLine.endFrame==ssTimeLine.currentFrame)
+                                        stop();
+                                }
+                            }
+                        }
                         Slider {
                             id: tlKeyFrame
                             Layout.fillWidth: true

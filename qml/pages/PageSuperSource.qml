@@ -930,7 +930,7 @@ Page {
             columns: 3
             SpinBox {
                 from: 0
-                to: 2048
+                to: 1800
                 stepSize: 1
                 wheelEnabled: true
                 editable: true
@@ -940,7 +940,7 @@ Page {
             }
             SpinBox {
                 from: 0
-                to: 2048
+                to: 1800
                 stepSize: 1
                 wheelEnabled: true
                 editable: true
@@ -951,13 +951,13 @@ Page {
             Button {
                 text: "25%"
                 onClicked: {
-                    selectedBox.cropLeft=512
-                    selectedBox.cropRight=512
+                    selectedBox.cropLeft=450
+                    selectedBox.cropRight=450
                 }
             }
             SpinBox {
                 from: 0
-                to: 2048
+                to: 3200
                 stepSize: 1
                 wheelEnabled: true
                 editable: true
@@ -967,7 +967,7 @@ Page {
             }
             SpinBox {
                 from: 0
-                to: 2048
+                to: 3200
                 stepSize: 1
                 wheelEnabled: true
                 editable: true
@@ -978,8 +978,8 @@ Page {
             Button {
                 text: "50%"
                 onClicked: {
-                    selectedBox.cropLeft=768
-                    selectedBox.cropRight=768
+                    selectedBox.cropLeft=900
+                    selectedBox.cropRight=900
                 }
             }
         }

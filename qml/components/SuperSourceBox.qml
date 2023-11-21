@@ -51,15 +51,16 @@ Rectangle {
     property int inputSource: 1000;
 
     readonly property double ratio: 16.0/9.0
-    readonly property double cropRatio: 2048
+    readonly property double cropRatioTB: 1800
+    readonly property double cropRatioLR: 3200
 
     // Position & crop in mixer values
     readonly property point atemPosition: Qt.point(boxCenterX*3200, -boxCenterY*1800)
     readonly property int atemSize: boxSize*1000
-    readonly property rect atemCrop: Qt.rect(cropLeft/cropRatio*18000,
-                                    cropTop/cropRatio*18000,
-                                    cropRight/cropRatio*18000,
-                                    cropBottom/cropRatio*18000)
+    readonly property rect atemCrop: Qt.rect(cropLeft*10,
+                                    cropTop*10,
+                                    cropRight*10,
+                                    cropBottom*10)
 
     onAtemCropChanged: console.debug("atemCrop "+ atemCrop)
     onAtemPositionChanged: console.debug("AtemPos "+ atemPosition)
@@ -116,10 +117,10 @@ Rectangle {
                        sizeRect.height/parent.height)
     }
     function cropNormalizedRect() {
-        return Qt.rect(cropLeft/cropRatio,
-                       cropTop/cropRatio,
-                       cropRight/cropRatio,
-                       cropBottom/cropRatio)
+        return Qt.rect(cropLeft/cropRatioLR,
+                       cropTop/cropRatioTB,
+                       cropRight/cropRatioLR,
+                       cropBottom/cropRatioTB)
     }
 
     function setSize(s) {
@@ -271,11 +272,13 @@ Rectangle {
         color: "white"
         opacity: (dragArea.pressed || sizeRect.focus || selected) ? 0.2 : 0.0
     }
+
+    // XXX
     Rectangle {
-        x: 0+((parent.width/cropRatio)*cropLeft)
-        y: 0+((parent.height/cropRatio)*cropTop)
-        width: parent.width-((parent.width/cropRatio)*cropRight)-x
-        height: parent.height-((parent.height/cropRatio)*cropBottom)-y
+        x: 0+((parent.width/cropRatioLR)*cropLeft)
+        y: 0+((parent.height/cropRatioTB)*cropTop)
+        width: parent.width-((parent.width/cropRatioLR)*cropRight)-x
+        height: parent.height-((parent.height/cropRatioTB)*cropBottom)-y
         color: "transparent"
         border.color: "black"
         border.width: crop ? 1 : 0

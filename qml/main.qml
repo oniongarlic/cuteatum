@@ -444,7 +444,7 @@ ApplicationWindow {
         onConnected: {
             console.debug("Connected!")
 
-            config.previousDevice=hostname()
+            deviceConfig.previousDevice=hostname()
 
             console.debug(productInformation())
 

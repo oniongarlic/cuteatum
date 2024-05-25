@@ -284,6 +284,10 @@ Rectangle {
         border.width: crop ? 1 : 0
     }
 
+    function externalWheelEventHandler(wheel) {
+        dragArea.wheelEventHandler(wheel)
+    }
+
     MouseArea {
         id: dragArea
         anchors.fill: cropCenterRectangle
@@ -327,7 +331,7 @@ Rectangle {
                 sizeRect.cropBottom=0
         }
 
-        onWheel: {
+        function wheelEventHandler(wheel) {
             if (wheel.modifiers==Qt.NoModifier) {
                 wheelSizeAdjust(wheel.angleDelta.y/4800.0)
             } else if ((wheel.modifiers & Qt.ShiftModifier) && (wheel.modifiers & Qt.ControlModifier)) {
@@ -337,6 +341,10 @@ Rectangle {
             } else if (wheel.modifiers & Qt.ShiftModifier) {
                 adjustXCrop(wheel.angleDelta.y/180)
             }
+        }
+
+        onWheel: {
+            wheelEventHandler(wheel)
             wheel.accepted=true
         }
 

@@ -14,7 +14,7 @@ Page {
     title: "SuperSource editor"
     // enabled: atem.connected
 
-    property double ratio: 16/9
+    readonly property double ratio: 16/9
     property int boxDragMargin: 16
 
     property AtemSuperSource ss;
@@ -31,15 +31,24 @@ Page {
     objectName: "supersource"
 
     Keys.onReleased: (event) => {
-        if (event.key === Qt.Key_Escape) {
-            event.accepted = true;
-            rootStack.pop()
-        }
-    }
+                         if (event.key === Qt.Key_Escape) {
+                             event.accepted = true;
+                             rootStack.pop()
+                         }
+                     }
 
     Component.onCompleted: {
         savePositions(0);
         savePositions(1);
+    }
+
+    header: ToolBar {
+        RowLayout {
+            ToolButton {
+                text: "Close"
+                onClicked: rootStack.pop();
+            }
+        }
     }
 
     function dumpBoxState(b) {
@@ -407,6 +416,15 @@ Page {
                     border.width: 4
                     clip: true
 
+                    MouseArea {
+                        anchors.fill: parent
+                        onWheel: {
+                            if (!selectedBox)
+                                return;
+                            selectedBox.externalWheelEventHandler(wheel)
+                        }
+                    }
+
                     Rectangle {
                         color: "transparent"
                         border.color: "black"
@@ -522,7 +540,7 @@ Page {
                         stepSize: 10
                         wheelEnabled: true
                         editable: true
-                        value: selectedBox.boxCenterX*4800
+                        value: selectedBox ? selectedBox.boxCenterX*4800 : 0
                         onValueModified: {
                             selectedBox.setCenterX(value/4800)
                         }
@@ -535,7 +553,7 @@ Page {
                         stepSize: 10
                         wheelEnabled: true
                         editable: true
-                        value: selectedBox.boxCenterY*4800
+                        value: selectedBox ? selectedBox.boxCenterY*4800 : 0
                         onValueModified: {
                             selectedBox.setCenterY(value/4800)
                         }
@@ -616,7 +634,7 @@ Page {
                     from: 0
                     to: 100
                     wheelEnabled: true
-                    value: selectedBox.boxSize*100
+                    value: selectedBox ? selectedBox.boxSize*100 : 0
                     onValueModified: {
                         selectedBox.setSize(value/100)
                     }
@@ -695,7 +713,7 @@ Page {
                         id: easingType
                         textRole: "text"
                         valueRole: "easingType"
-                        enabled: selectedBox
+                        enabled: selectedBox!=null
                         model: ListModelEasing {
 
                         }
@@ -710,7 +728,7 @@ Page {
                     SpinBox {
                         id: easingDuration
                         Layout.fillWidth: true
-                        enabled: selectedBox
+                        enabled: selectedBox!=null
                         editable: false
                         from: 1
                         to: 10
@@ -821,6 +839,11 @@ Page {
                             wheelEnabled: true
                             stepSize: 1
                             onMoved: ssTimeLine.currentFrame=value
+                            ToolTip {
+                                parent: tlKeyFrame.handle
+                                visible: tlKeyFrame.pressed
+                                text: tlKeyFrame.value.toFixed(1)
+                            }
                         }
                         Label {
                             text: tlEnabled.checked ? tlKeyFrame.value : tlFrame.value
@@ -935,7 +958,7 @@ Page {
                 wheelEnabled: true
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox.cropTop
+                value: selectedBox ? selectedBox.cropTop : 0
                 onValueModified: selectedBox.cropTop=value
             }
             SpinBox {
@@ -945,7 +968,7 @@ Page {
                 wheelEnabled: true
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox.cropBottom
+                value: selectedBox ? selectedBox.cropBottom : 0
                 onValueModified: selectedBox.cropBottom=value
             }
             Button {
@@ -962,7 +985,7 @@ Page {
                 wheelEnabled: true
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox.cropLeft
+                value: selectedBox ? selectedBox.cropLeft : 0
                 onValueModified: selectedBox.cropLeft=value
             }
             SpinBox {
@@ -972,7 +995,7 @@ Page {
                 wheelEnabled: true
                 editable: true
                 inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox.cropRight
+                value: selectedBox ? selectedBox.cropRight : 0
                 onValueModified: selectedBox.cropRight=value
             }
             Button {

@@ -18,6 +18,8 @@ ApplicationWindow {
     width: 800
     height: 480
     visible: true
+    minimumWidth: 800
+    minimumHeight: 480
     title: qsTr("CuteAtum")
 
     // MQTT

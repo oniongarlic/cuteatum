@@ -6,8 +6,10 @@ import QtQuick.Layouts
 Dialog {
     id: nyaDialog
     standardButtons: Dialog.Ok | Dialog.Cancel
-    width: parent.width/2
+    width: Math.min(parent.width/2, 600)
+    height: Math.min(parent.height/1.5, 400)
     title: "Connect to switcher"
+    modal: true
 
     x: Math.round((parent.width - width) / 2)
     y: Math.round((parent.height - height) / 2)

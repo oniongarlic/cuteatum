@@ -6,7 +6,7 @@ Rectangle {
     y: parent.height*boxY
     width: parent.width*boxSize
     height: parent.height*boxSize
-    color: "#4c57d4e1"
+    color: crop ? "#214ddf4d" : "#914ddf4d"
     border.color: enabled ? "#20ff20" : "#ff2020"
     border.width: activated ? 2 : 1
     opacity: enabled ? 1 : 0.2

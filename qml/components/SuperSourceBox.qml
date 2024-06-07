@@ -389,6 +389,7 @@ Rectangle {
     DragBox {
         id: bottomRightDrag
         dragItem: sizeRect
+        border.width: activated ? 2 : 1
         anchors.horizontalCenter: sizeRect.right
         anchors.verticalCenter: sizeRect.bottom
     }

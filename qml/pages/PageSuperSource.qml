@@ -133,10 +133,10 @@ Page {
 
     ListModel {
         id: ssModel
-        ListElement { box: 1; dx: -0.25; dy: -0.25; s: 0.5; ena: true; }
-        ListElement { box: 2; dx: 0.25; dy: -0.25; s: 0.5; ena: true; }
-        ListElement { box: 3; dx: -0.25; dy: 0.25; s: 0.5; ena: true; }
-        ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; }
+        ListElement { box: 1; dx: -0.25; dy: -0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
+        ListElement { box: 2; dx: 0.25; dy: -0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
+        ListElement { box: 3; dx: -0.25; dy: 0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
+        ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
     }
 
     TimelineBoxProxy {

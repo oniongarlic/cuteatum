@@ -110,6 +110,17 @@ Rectangle {
         setCenter(p.x/3200, -p.y/1800)
     }
 
+    function setCrop(ct, cb, cl, cr) {
+        cropLeft=cl;
+        cropBottom=cb;
+        cropTop=ct;
+        cropRight=cr;
+    }
+
+    function setAtemCrop(c) {
+        setCrop(c.y/10, c.height/10, c.x/10, c.width/10)
+    }
+
     function mapNormalizedRect() {
         return Qt.rect(sizeRect.x/parent.width,
                        sizeRect.y/parent.height,

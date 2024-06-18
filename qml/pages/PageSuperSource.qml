@@ -79,6 +79,7 @@ Page {
         sb.crop=b.cropEnabled
         sb.setAtemPosition(b.position)
         sb.setSize(b.size/1000)
+        sb.setAtemCrop(b.crop)
     }
 
     Connections {

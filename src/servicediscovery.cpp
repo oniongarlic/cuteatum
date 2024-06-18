@@ -4,14 +4,21 @@
 
 ServiceDiscovery::ServiceDiscovery(QObject *parent) : QObject(parent)
 {
-    m_interface=new QDBusInterface("org.freedesktop.Avahi", "/", "org.freedesktop.Avahi.Server", QDBusConnection::systemBus(), this);
+    m_interface=new QDBusInterface("org.freedesktop.Avahi", "/", "org.freedesktop.Avahi.Server", QDBusConnection::systemBus(), this);    
 }
 
 void ServiceDiscovery::startDiscovery()
 {
     m_devices.clear();
 
-    auto reply=m_interface->call("ServiceBrowserNew", -1, -1, "_blackmagic._tcp", "", (uint)0);
+    // startDiscoveryForType("_blackmagic._tcp");
+    startDiscoveryForType("_switcher_ctrl._udp");
+}
+
+void ServiceDiscovery::startDiscoveryForType(const QString type)
+{
+
+    auto reply=m_interface->call("ServiceBrowserNew", -1, -1, type, "", (uint)0);
     auto args=reply.arguments();
     QString path=args[0].toString();
 
@@ -29,13 +36,16 @@ void ServiceDiscovery::onItemNew(const QDBusMessage &reply)
 {
     qDebug() << "onItemNew" << reply.arguments();
 
+    auto args=reply.arguments();
+    auto type=args[2];
+
     auto rsreply=m_interface->call(
                 "ResolveService",
-                reply.arguments()[0],
-                reply.arguments()[1],
-                reply.arguments()[2],
-                reply.arguments()[3],
-                reply.arguments()[4],
+                args[0],
+                args[1],
+                args[2],
+                args[3],
+                args[4],
                 -1,
                 (uint)0);
 

@@ -24,6 +24,7 @@ public slots:
 protected:
     QDBusInterface *m_interface;    
     QVariantList m_devices;
+    void startDiscoveryForType(const QString type);
 };
 
 #endif // SERVICEDISCOVERY_H

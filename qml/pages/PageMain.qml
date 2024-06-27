@@ -24,6 +24,7 @@ Page {
     property AtemFairlight fl;
     property AtemDownstreamKey dsk;
     property AtemSuperSource ss;
+    property AtemStreaming atemStream;
 
     background: Rectangle {
         gradient: Gradient {
@@ -528,7 +529,7 @@ Page {
                         text: "Stream"
                         Layout.fillWidth: true
                         onClicked: {
-                            atem.startStreaming();
+                            atemStream.startStreaming();
                         }
                     }
                     Button {
@@ -536,7 +537,7 @@ Page {
                         text: "Stop"
                         Layout.fillWidth: true
                         onClicked: {
-                            atem.stopStreaming();
+                            atemStream.stopStreaming();
                         }
                     }
                     Label {

@@ -16,6 +16,7 @@
 #include <QAtemControl/qatemmixeffect.h>
 #include <QAtemControl/qatemfairlight.h>
 #include <QAtemControl/qatemsupersource.h>
+#include <QAtemControl/qatemstreaming.h>
 
 #include "servicediscovery.h"
 #include "cutemqttclient.h"
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl", "AtemCameraControl can not be created");
     qmlRegisterType<QAtemFairlight>("org.bm", 1, 0, "AtemFairlight");
     qmlRegisterType<QAtemSuperSource>("org.bm", 1, 0, "AtemSuperSource");
+    qmlRegisterType<QAtemStreaming>("org.bm", 1, 0, "AtemStreaming");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 
@@ -77,6 +79,7 @@ int main(int argc, char *argv[])
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
+
     engine.load(url);
 
     return app.exec();

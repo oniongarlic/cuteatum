@@ -590,22 +590,9 @@ ApplicationWindow {
 
         onMediaInfoChanged: console.debug(info)
 
-        onStreamingDatarateChanged: {
-            if (atem.streamingDatarate>0)
-                mqttClient.publishOnAir(atem.streamingDatarate);
-            else
-                mqttClient.publishOnAir(0);
-        }
-        onStreamingCacheChanged: {
-            console.debug("Cache status: "+cache)
-        }
 
         onRecordingTimeChanged: {
             console.debug("Recording: "+time)
-        }
-
-        onStreamingTimeChanged: {
-            console.debug("Streaming: "+time)
         }
 
         onTimecodeLockedChanged: {
@@ -644,6 +631,26 @@ ApplicationWindow {
         }
     }
 
+    AtemStreaming {
+        id: streaming
+        atemConnection: atem
+
+        onStreamingDatarateChanged: {
+            if (atem.streamingDatarate>0)
+                mqttClient.publishOnAir(atem.streamingDatarate);
+            else
+                mqttClient.publishOnAir(0);
+        }
+        onStreamingCacheChanged: {
+            console.debug("Cache status: "+cache)
+        }
+
+        onStreamingTimeChanged: {
+            console.debug("Streaming: "+time)
+        }
+
+    }
+
     AtemSuperSource {
         id: superSource
         atemConnection: atem
@@ -660,7 +667,7 @@ ApplicationWindow {
         running: atem.connected && atem.timecodeLocked
         onTriggered: {
             atem.requestRecordingStatus();
-            atem.requestStreamingStatus();
+            streaming.requestStreamingStatus();
         }
     }
 

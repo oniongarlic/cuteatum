@@ -220,6 +220,7 @@ ApplicationWindow {
                 }
             }
         }
+
         Menu {
             title: "&Output"
             enabled: atem.connected
@@ -368,6 +369,7 @@ ApplicationWindow {
             dsk: !atem.connected ? null : atem.downstreamKey(0)
             //ss: !atem.connected ? null : superSource
             ss: superSource
+            atemStream: streaming
             forcePreview: forcePreviewMenu.checked
         }
     }
@@ -481,7 +483,7 @@ ApplicationWindow {
             dves=topo.DVEs
 
             requestRecordingStatus();
-            requestStreamingStatus();
+            streaming.requestStreamingStatus();
 
             var me=atem.mixEffect(0);
 
@@ -647,6 +649,17 @@ ApplicationWindow {
 
         onStreamingTimeChanged: {
             console.debug("Streaming: "+time)
+        }
+
+        onStreamingServiceUpdated: {
+            console.debug(name)
+            console.debug(url)
+            console.debug(key)
+        }
+
+        onStreamingAuthenticatonUpdated: {
+            console.debug(username)
+            console.debug(password)
         }
 
     }

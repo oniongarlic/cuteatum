@@ -315,20 +315,20 @@ ApplicationWindow {
             }
             Label {
                 Layout.fillWidth: false
-                visible: atem.streamingDatarate>0 && atem.connected
-                text: atem.streamingTime
+                visible: streaming.streamingDatarate>0 && atem.connected
+                text: streaming.streamingTime
                 Layout.alignment: Qt.AlignRight
             }
             Label {
                 Layout.fillWidth: false
-                visible: atem.streamingDatarate>0 && atem.connected
-                text: atem.streamingDatarate/1000/1000 + " Mbps"
+                visible: streaming.streamingDatarate>0 && atem.connected
+                text: streaming.streamingDatarate/1000/1000 + " Mbps"
                 Layout.alignment: Qt.AlignRight
             }
             Label {
                 Layout.fillWidth: false
-                visible: atem.streamingDatarate>0 && atem.connected
-                text: atem.streamingCache
+                visible: streaming.streamingDatarate>0 && atem.connected
+                text: streaming.streamingCache
                 Layout.alignment: Qt.AlignRight
             }
             ColumnLayout {
@@ -506,9 +506,14 @@ ApplicationWindow {
 
             var inputs=inputInfoCount();
             console.debug("INPUTS: "+inputs)
+
+            var inputIndexes=inputInfoIndexes();
+
             for (var i=0; i<inputs; i++) {
-                var input=inputInfo(i);
-                console.debug("INPUT: "+i)
+                var idx=inputIndexes[i];
+                var input=inputInfo(idx);
+                console.debug("INPUT:",i,idx);
+                console.debug(input)
                 console.debug(" IDX:"+input.index)
                 console.debug(" TAL:"+input.tally)
                 console.debug(" EXT:"+input.externalType)

@@ -4,6 +4,8 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import QtQml.Models
+
 import "drawers"
 import "dialogs"
 import "pages"
@@ -222,44 +224,82 @@ ApplicationWindow {
         }
 
         Menu {
-            title: "&Output"
+            id: outputsMenu
+            title: "&Outputs"
             enabled: atem.connected
-            InputMenuItem {
+            Instantiator {
+                model: atem.outputs
+                active: outputGroups.active && outputGroups.count>0
+                delegate: Menu {
+                    id: om
+                    title: "Output "+index;
+                    required property int index;
+                    OutputMenuItem {
+                        text: "Multiview"
+                        ButtonGroup.group: outputGroups.objectAt(om.index)
+                        inputID: 9001
+                    }
+                    OutputMenuItem {
+                        text: "Program"
+                        inputID: 10010
+                        ButtonGroup.group: outputGroups.objectAt(om.index)
+                    }
+                    OutputMenuItem {
+                        text: "Preview"
+                        inputID: 10011
+                        ButtonGroup.group: outputGroups.objectAt(om.index)
+                    }
+                    Repeater {
+                        model: 4
+                        OutputMenuItem {
+                            required property int index;
+                            text: "Input "+index+1
+                            inputID: index+1
+                            ButtonGroup.group: outputGroups.objectAt(om.index)
+                        }
+                    }
+                    Component.onCompleted: console.debug("OutputMenu created", index)
+                }
+                onObjectAdded: (index, object) => outputsMenu.insertMenu(index, object)
+                onObjectRemoved: (index, object) => outputsMenu.removeMenu(object)
+            }
+
+            OutputMenuItem {
                 text: "Multiview"
                 inputID: 9001
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Program"
                 inputID: 10010
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Preview"
                 inputID: 10011
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Input 1"
                 inputID: 1
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Input 2"
                 inputID: 2
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Input 3"
                 inputID: 3
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Input 4"
                 inputID: 4
                 ButtonGroup.group: outputGroup
             }
-            InputMenuItem {
+            OutputMenuItem {
                 text: "Direct input 1"
                 inputID: 11001
                 ButtonGroup.group: outputGroup
@@ -284,9 +324,28 @@ ApplicationWindow {
         id: macroDrawer
     }
 
-    InputButtonGroup {
+    Instantiator {
+        id: outputGroups
+        model: atem.outputs
+        active: atem.connected && atem.outputs>0
+        delegate: OutputButtonGroup {
+            required property int index;
+            // activeSource: atem.auxSource(index)
+            outputIndex: index
+            onClicked: {
+                atem.setAuxSource(outputIndex, button.inputID);
+            }
+            Component.onCompleted: {
+                activeSource=atem.auxSource(index)
+                console.debug("OutputGroup created", index)
+            }
+        }
+    }
+
+    OutputButtonGroup {
         id: outputGroup
-        activeInput: 0
+        activeSource: atem.connected ? atem.auxSource(0) : 0
+        outputIndex: 0
         onClicked: {
             atem.setAuxSource(0, button.inputID);
         }
@@ -513,6 +572,7 @@ ApplicationWindow {
                 var idx=inputIndexes[i];
                 var input=inputInfo(idx);
                 console.debug("INPUT:",i,idx);
+
                 console.debug(input)
                 console.debug(" IDX:"+input.index)
                 console.debug(" TAL:"+input.tally)
@@ -560,7 +620,7 @@ ApplicationWindow {
         onMacroInfoChanged: {
             console.debug("MacroInfo: "+index)
             let m={ "macroIndex": index, "used": info.used, "name": info.name, "description": info.description }
-            console.debug(m)
+            console.debug(info)
             if (macrosModel.count<index)
                 macrosModel.insert(index, m)
             else
@@ -597,7 +657,6 @@ ApplicationWindow {
 
         onMediaInfoChanged: console.debug(info)
 
-
         onRecordingTimeChanged: {
             console.debug("Recording: "+time)
         }
@@ -608,8 +667,9 @@ ApplicationWindow {
 
         onAuxSourceChanged: {
             console.debug("AUX:"+aux+" = "+source)
-            outputGroup.activeInput=source
+            outputGroup.activeSource=source
             mqttClient.publishOutput(source)
+            outputGroups.objectAt(aux).activeSource=source;
         }
 
         onAudioMasterLevelsChanged: {

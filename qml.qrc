@@ -16,5 +16,7 @@
         <file>qml/dialogs/ConnectDialog.qml</file>
         <file>qml/components/DragBox.qml</file>
         <file>qml/components/TimelineBoxProxy.qml</file>
+        <file>qml/components/OutputMenuItem.qml</file>
+        <file>qml/components/OutputButtonGroup.qml</file>
     </qresource>
 </RCC>

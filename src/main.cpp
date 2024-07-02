@@ -66,7 +66,10 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QAtem::SuperSourceBoxSettings>();
     qRegisterMetaType<QAtem::InputInfo>();
     qRegisterMetaType<QAtem::Topology>();
+    qRegisterMetaType<quint8>();
     qRegisterMetaType<quint16>();
+    qRegisterMetaType<QAtem::MediaInfo>();
+    qRegisterMetaType<QAtem::MacroInfo>();
     qRegisterMetaType<QMap<quint16,QAtem::InputInfo>>();
 
     qmlRegisterType<CuteMqttClient>("org.tal.mqtt", 1, 0, "MqttClient");

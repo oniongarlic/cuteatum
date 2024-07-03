@@ -25,6 +25,7 @@ Page {
     property AtemDownstreamKey dsk;
     property AtemSuperSource ss;
     property AtemStreaming atemStream;
+    property AtemRecording atemRecording;
 
     background: Rectangle {
         gradient: Gradient {
@@ -517,6 +518,7 @@ Page {
                 Layout.column: 0
                 Layout.row: 4
                 Layout.margins: 4
+                visible: atemStream.isSupported || atemRecording.isSupported
 
                 ColumnLayout {
                     Layout.fillWidth: true

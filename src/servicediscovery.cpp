@@ -11,7 +11,7 @@ void ServiceDiscovery::startDiscovery()
 {
     m_devices.clear();
 
-    // startDiscoveryForType("_blackmagic._tcp");
+    startDiscoveryForType("_blackmagic._tcp");
     startDiscoveryForType("_switcher_ctrl._udp");
 }
 

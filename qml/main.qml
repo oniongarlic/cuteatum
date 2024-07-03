@@ -429,6 +429,7 @@ ApplicationWindow {
             //ss: !atem.connected ? null : superSource
             ss: superSource
             atemStream: streaming
+            atemRecording: recording
             forcePreview: forcePreviewMenu.checked
         }
     }
@@ -541,7 +542,7 @@ ApplicationWindow {
             colorGenerators=topo.colorGenerators
             dves=topo.DVEs
 
-            requestRecordingStatus();
+            recording.requestRecordingStatus();
             streaming.requestStreamingStatus();
 
             var me=atem.mixEffect(0);
@@ -657,9 +658,7 @@ ApplicationWindow {
 
         onMediaInfoChanged: console.debug(info)
 
-        onRecordingTimeChanged: {
-            console.debug("Recording: "+time)
-        }
+
 
         onTimecodeLockedChanged: {
             console.debug("TimecodeLock"+locked)
@@ -726,7 +725,15 @@ ApplicationWindow {
             console.debug(username)
             console.debug(password)
         }
+    }
 
+    AtemRecording {
+        id: recording
+        atemConnection: atem
+
+        onRecordingTimeChanged: {
+            console.debug("Recording: "+time)
+        }
     }
 
     AtemSuperSource {
@@ -744,7 +751,7 @@ ApplicationWindow {
         repeat: true
         running: atem.connected && atem.timecodeLocked
         onTriggered: {
-            atem.requestRecordingStatus();
+            recording.requestRecordingStatus();
             streaming.requestStreamingStatus();
         }
     }

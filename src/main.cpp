@@ -17,6 +17,7 @@
 #include <QAtemControl/qatemfairlight.h>
 #include <QAtemControl/qatemsupersource.h>
 #include <QAtemControl/qatemstreaming.h>
+#include <QAtemControl/qatemrecording.h>
 
 #include "servicediscovery.h"
 #include "cutemqttclient.h"
@@ -57,6 +58,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<QAtemFairlight>("org.bm", 1, 0, "AtemFairlight");
     qmlRegisterType<QAtemSuperSource>("org.bm", 1, 0, "AtemSuperSource");
     qmlRegisterType<QAtemStreaming>("org.bm", 1, 0, "AtemStreaming");
+    qmlRegisterType<QAtemRecording>("org.bm", 1, 0, "AtemRecording");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
 

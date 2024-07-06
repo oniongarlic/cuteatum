@@ -19,6 +19,8 @@ Button {
     property bool compact: false
     property bool isPreview: false
 
+    property string  textShort;
+
     onCheckedChanged: console.debug("ABC"+checked)
 
     background: Item {

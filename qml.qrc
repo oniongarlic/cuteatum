@@ -18,5 +18,6 @@
         <file>qml/components/TimelineBoxProxy.qml</file>
         <file>qml/components/OutputMenuItem.qml</file>
         <file>qml/components/OutputButtonGroup.qml</file>
+        <file>qml/components/InputButtonRepeater.qml</file>
     </qresource>
 </RCC>

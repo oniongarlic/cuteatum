@@ -27,6 +27,12 @@ Page {
     property AtemStreaming atemStream;
     property AtemRecording atemRecording;
 
+    required property ListModel meSourcesModel;
+    required property ListModel mediaPlayersModel;
+    required property ListModel mediaModel;
+    //required property ListModel utputsModel;
+    //required property ListModel outputSourcesModel;
+
     background: Rectangle {
         gradient: Gradient {
             GradientStop { position: 0; color: "#bfa0a0" }
@@ -149,20 +155,12 @@ Page {
             GridLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                columns: atem.camInputs<10 ? 8 : 10
+                columns: meSourcesModel.count<10 ? 8 : 10
                 columnSpacing: 2
                 rowSpacing: 2
-                Repeater {
-                    model: atem.camInputs
-                    delegate: inputButtonComponent
-                }
-                Component {
-                    id: inputButtonComponent
-                    InputButton {
-                        text: "C"+(index+1)
-                        inputID: index+1
-                        ButtonGroup.group: programGroup
-                    }
+                InputButtonRepeater {
+                    model: meSourcesModel
+                    bg: programGroup
                 }
             }
             InputButton {
@@ -177,10 +175,9 @@ Page {
                 visible: atem.supersources>1
                 ButtonGroup.group: programGroup
             }
-            InputButton {
-                text: "Still"
-                inputID: AtemMixEffect.MediaPlayer1
-                ButtonGroup.group: programGroup
+            InputButtonRepeater {
+                model: mediaPlayersModel
+                bg: programGroup
             }
             ColumnLayout {
                 spacing: 0
@@ -246,18 +243,10 @@ Page {
                 columns: atem.camInputs<10 ? 8 : 10
                 columnSpacing: 2
                 rowSpacing: 2
-                Repeater {
-                    model: atem.camInputs
-                    delegate: previewinputButtonComponent
-                }
-                Component {
-                    id: previewinputButtonComponent
-                    InputButton {
-                        text: "C"+(index+1)
-                        inputID: index+1
-                        isPreview: true
-                        ButtonGroup.group: previewGroup
-                    }
+                InputButtonRepeater {
+                    model: meSourcesModel
+                    isPreview: true
+                    bg: previewGroup
                 }
             }
             InputButton {

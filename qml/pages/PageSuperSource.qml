@@ -525,7 +525,7 @@ Page {
                 ComboBox {
                     id: inputSourceCombo
                     Layout.fillWidth: true
-                    model: atem.camInputs
+                    model: atem.superSourceBoxInputModel
                     onActivated: {
                         selectedBox.inputSource=currentValue;
                     }

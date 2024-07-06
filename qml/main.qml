@@ -103,6 +103,40 @@ ApplicationWindow {
         id: macrosModel
     }
 
+    ListModel {
+        id: inputSourcesModel
+    }
+
+    ListModel {
+        id: superSourcesModel
+    }
+
+    ListModel {
+        id: superSourceBoxInputModel
+    }
+
+    ListModel {
+        id: atemMediaPlayersModel
+    }
+
+    ListModel {
+        id: atemMediaModel
+    }
+
+    ListModel {
+        id: keyAndMasksModel
+    }
+
+    /* AUX / Output connections */
+    ListModel {
+        id: outputsModel
+    }
+
+    /* Sources that can be routed to an output */
+    ListModel {
+        id: outputSourcesModel
+    }
+
     ConnectDialog {
         id: nyaDialog
         model: deviceModel
@@ -375,20 +409,35 @@ ApplicationWindow {
             Label {
                 Layout.fillWidth: false
                 visible: streaming.streamingDatarate>0 && atem.connected
-                text: streaming.streamingTime
+                text: Qt.formatTime(streaming.streamingTime, 'HH:mm:ss');
                 Layout.alignment: Qt.AlignRight
             }
             Label {
                 Layout.fillWidth: false
                 visible: streaming.streamingDatarate>0 && atem.connected
-                text: streaming.streamingDatarate/1000/1000 + " Mbps"
+                text: formatDatarate(streaming.streamingDatarate) + " Mbps"
                 Layout.alignment: Qt.AlignRight
+                function formatDatarate(dr) {
+                    let v=dr/1000/1000;
+                    return v.toFixed(2);
+                }
             }
             Label {
                 Layout.fillWidth: false
                 visible: streaming.streamingDatarate>0 && atem.connected
-                text: streaming.streamingCache
+                text: formatCacheStatus(streaming.streamingCache)
                 Layout.alignment: Qt.AlignRight
+                function formatCacheStatus(cs) {
+                    switch (cs) {
+                    case 1:
+                        return ''
+                    case 2:
+                        return 'Connecting'
+                    case 3:
+                        return 'OK'
+                    }
+                    return '';
+                }
             }
             ColumnLayout {
                 Layout.preferredWidth: 100
@@ -431,6 +480,10 @@ ApplicationWindow {
             atemStream: streaming
             atemRecording: recording
             forcePreview: forcePreviewMenu.checked
+
+            meSourcesModel: inputSourcesModel
+            mediaPlayersModel: atemMediaPlayersModel
+            mediaModel: atemMediaModel
         }
     }
 
@@ -494,7 +547,7 @@ ApplicationWindow {
 
         property string deviceID: ""
 
-        property int camInputs: 0
+        property int camInputs: inputSourcesModel.count
         property int mixers: 0
         property int supersources: 0
         property int dves: 0
@@ -516,7 +569,7 @@ ApplicationWindow {
             console.debug(colorGeneratorColor(1))
 
             console.debug(tallyIndexCount())
-            camInputs=tallyIndexCount()
+            //camInputs=tallyIndexCount()
 
             console.debug(mediaPlayerType(0))
 
@@ -582,7 +635,7 @@ ApplicationWindow {
                 console.debug(" LTX:"+input.longText)
                 console.debug(" STX:"+input.shortText)
 
-                atemSources.append(input)
+                //atemSources.append(input)
             }
         }
 
@@ -636,6 +689,20 @@ ApplicationWindow {
             console.debug("Disconnected")
             conMsg.text='';
             mqttClient.publishActive(0)
+            mixers=0
+            supersources=0
+            stingers=0
+            outputs=0
+            downstreamKeyers=0
+            upstreamKeyers=0
+            colorGenerators=0
+            dves=0
+
+            inputSourcesModel.clear()
+            superSourcesModel.clear()
+            outputsModel.clear()
+            atemMediaPlayersModel.clear()
+            atemMediaModel.clear()
         }
 
         onTimeChanged: {
@@ -654,11 +721,34 @@ ApplicationWindow {
             infoMsg.text=warningString;
         }
 
-        onInputInfoChanged: console.debug(info)
+        onInputInfoChanged: {
+            console.debug(info)
+            if (info.externalType>0 && info.meAvailability>0) {
+                console.debug("************** CAMERA INPUT", info)
+                inputSourcesModel.append(info)
+            } else if (info.internalType==129) {
+                console.debug("************** AUX/OUTPUT", info)
+                outputsModel.append(info)
+            } else if (info.internalType==6) {
+                console.debug("************** SUPERSOURCE PLAYER INPUT", info)
+                superSourcesModel.append(info)
+            } else if (info.internalType==4) {
+                console.debug("************** MEDIA PLAYER INPUT", info)
+                atemMediaPlayersModel.append(info)
+            }
 
-        onMediaInfoChanged: console.debug(info)
+            if (info.availability & 1) {
+                outputSourcesModel.append(info)
+            }
+            if (info.availability & 8) {
+                superSourceBoxInputModel.append(info)
+            }
+        }
 
-
+        onMediaInfoChanged: {
+            console.debug(info)
+            atemMediaModel.append(info)
+        }
 
         onTimecodeLockedChanged: {
             console.debug("TimecodeLock"+locked)
@@ -740,6 +830,9 @@ ApplicationWindow {
         id: superSource
         atemConnection: atem
         // superSourceID: 0
+
+        property alias inputModel: superSourceBoxInputModel
+
         onSuperSourceChanged: {
             console.debug("SuperSource updated for box: "+boxid)
         }

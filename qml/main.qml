@@ -342,8 +342,30 @@ ApplicationWindow {
         Menu {
             title: "&Macros"
             MenuItem {
-                text: "Show interface"
+                text: "Edit macros..."
                 action: actionMacros
+            }
+            MenuSeparator {
+
+            }
+            Repeater {
+                model: 10
+                MenuItem {
+                    required property int index
+                    text: "Run macro "+(index+1);
+                    enabled: atem.connected
+                    onTriggered: {
+                        atem.runMacro(index)
+                    }
+                }
+            }
+            MenuSeparator {
+
+            }
+            MenuItem {
+                text: "Add pause"
+                enabled: atem.connected && atem.macroRecording
+                onClicked: atem.addMacroPause(30)
             }
         }
     }
@@ -405,7 +427,7 @@ ApplicationWindow {
                 id: timeMsg
                 text: sTime
                 Layout.fillWidth: true
-            }
+            }            
             Label {
                 Layout.fillWidth: false
                 visible: streaming.streamingDatarate>0 && atem.connected
@@ -455,6 +477,11 @@ ApplicationWindow {
                     from: 0
                     to: 100
                 }
+            }
+            Label {
+                visible: atem.connected && atem.macroRecording
+                text: "MREC"
+                color: "red"
             }
         }
     }

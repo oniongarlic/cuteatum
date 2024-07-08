@@ -166,10 +166,15 @@ Page {
 
     TableModel {
         id: timelineModel
-        TableModelColumn { display: "f" }
-        TableModelColumn { display: "x" }
-        TableModelColumn { display: "y" }
-        TableModelColumn { display: "s" }
+        TableModelColumn { display: "f" } // Frame
+        TableModelColumn { display: "x" } // XPos
+        TableModelColumn { display: "y" } // YPos
+        TableModelColumn { display: "s" } // Size 0-1
+        TableModelColumn { display: "c" } // Crop
+        TableModelColumn { display: "cl" }
+        TableModelColumn { display: "cr" }
+        TableModelColumn { display: "ct" }
+        TableModelColumn { display: "cb" }
 
         function syncFromProxy(p) {
             timelineModel.clear()
@@ -285,7 +290,7 @@ Page {
         function addKeyframe(box, frame) {
             let b=ssBoxParent.itemAt(box)
             ssTimeLine.endFrame=Math.max(frame, ssTimeLine.endFrame)
-            addBoxKeyframe(box, frame, b.setX, b.setY, b.boxSize)
+            addBoxKeyframe(box, frame, b.setX, b.setY, b.boxSize, b.crop, b.cropLeft, b.cropRight, b.cropTop, b.cropBottom)
         }
 
         animations: [
@@ -487,6 +492,9 @@ Page {
                             onInputSourceChanged: {
                                 updateAtemLive(ssboxDelegate, true);
                             }
+                            onAnimationTick: {
+                                console.debug("tick", boxId)
+                            }
                         }
                     }
                 }
@@ -665,8 +673,8 @@ Page {
                 RowLayout {
                     Button {
                         text: "Debug"
-                        enabled: true
-                        onClicked: dumpBoxState();
+                        enabled: selectedBox ? true : false
+                        onClicked: dumpBoxState(selectedBox);
                     }
                 }
                 RowLayout {
@@ -734,6 +742,7 @@ Page {
                         from: 1
                         to: 10
                         value: 1
+                        wheelEnabled: true
                         onValueModified: {
                             selectedBox.animateDuration=value*1000;
                         }
@@ -744,12 +753,18 @@ Page {
                     Layout.fillWidth: true
                     Button {
                         text: "1 KF"
+                        ToolTip.text: "Add keyframe for selected box"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 1000
                         onClicked: {
                             ssTimeLine.addKeyframe(ssBoxParent.currentIndex, ssFrame.value)
                         }
                     }
                     Button {
                         text: "A KF"
+                        ToolTip.text: "Add keyframe for all boxes"
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 1000
                         onClicked: {
                             ssTimeLine.addKeyframe(0, ssFrame.value)
                             ssTimeLine.addKeyframe(1, ssFrame.value)
@@ -851,63 +866,77 @@ Page {
                         }
                     }
 
-                    HorizontalHeaderView {
-                        id: horizontalHeader
-                        Layout.fillWidth: true
-                        syncView: timelineList
-                        clip: true
-                        model: [ "Frame", "X", "Y", "Size" ]
-                    }
-
                     function setFromRow(r) {
                         let v=timelineList.model.getRow(r)
                         selectedBox.setSize(v.s)
                         selectedBox.setCenter(v.x, v.y)
                     }
 
-                    TableView {
-                        id: timelineList
+                    Rectangle {
+                        color: "#e5f7c9"
+                        border.width: 1
+                        border.color: "black"
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        boundsBehavior: Flickable.StopAtBounds
-                        boundsMovement: Flickable.StopAtBounds
-                        clip: true
-                        columnSpacing: 2
-                        rowSpacing: 2
-                        alternatingRows: true
-                        model: timelineModel
-                        animate: false
-                        selectionModel: ItemSelectionModel { }
-                        selectionBehavior: TableView.SelectRows
-                        ScrollBar.vertical: ScrollBar { }
-                        delegate: Rectangle {
-                            id: cellDelegate
-                            required property bool selected
-                            required property bool current
-                            implicitHeight: l.contentHeight
-                            implicitWidth: Math.max(l.contentWidth, 56)
-                            color: row === timelineList.currentRow
-                                   ? palette.highlight
-                                   : (timelineList.alternatingRows && row % 2 !== 0
-                                      ? palette.alternateBase
-                                      : palette.base)
-                            Label {
-                                id: l
-                                anchors.fill: parent
-                                anchors.leftMargin: 2
-                                anchors.rightMargin: 2
-                                horizontalAlignment: Text.AlignRight
-                                leftInset: 2
-                                rightInset: 2
-                                text: model.display
-                                font.bold: cellDelegate.current
-                            }
+                        HorizontalHeaderView {
+                            id: horizontalHeader
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 1
+                            syncView: timelineList
+                            clip: true
+                            resizableColumns: true
+                            model: [ "Frame", "X", "Y", "Size", "Crop", "CL", "CR", "CT", "CB" ]
                         }
-                        onCurrentRowChanged: {
-                            if (currentRow==-1)
-                                return;
-                            tlc.setFromRow(currentRow)
-                            tlFrame.value=currentRow
+
+                        TableView {
+                            id: timelineList
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: horizontalHeader.bottom
+                            anchors.bottom: parent.bottom
+                            anchors.margins: 1
+                            boundsBehavior: Flickable.StopAtBounds
+                            boundsMovement: Flickable.StopAtBounds
+                            clip: true
+                            columnSpacing: 2
+                            rowSpacing: 2
+                            alternatingRows: true
+                            model: timelineModel
+                            animate: false
+                            selectionModel: ItemSelectionModel { }
+                            selectionBehavior: TableView.SelectRows
+                            ScrollBar.vertical: ScrollBar { }
+                            delegate: Rectangle {
+                                id: cellDelegate
+                                required property bool selected
+                                required property bool current
+                                implicitHeight: l.contentHeight
+                                implicitWidth: Math.max(l.contentWidth, 56)
+                                color: row === timelineList.currentRow
+                                       ? palette.highlight
+                                       : (timelineList.alternatingRows && row % 2 !== 0
+                                          ? palette.alternateBase
+                                          : palette.base)
+                                Label {
+                                    id: l
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 2
+                                    anchors.rightMargin: 2
+                                    horizontalAlignment: Text.AlignRight
+                                    leftInset: 2
+                                    rightInset: 2
+                                    text: model.display
+                                    font.bold: cellDelegate.current
+                                }
+                            }
+                            onCurrentRowChanged: {
+                                if (currentRow==-1)
+                                    return;
+                                tlc.setFromRow(currentRow)
+                                tlFrame.value=currentRow
+                            }
                         }
                     }
                 }

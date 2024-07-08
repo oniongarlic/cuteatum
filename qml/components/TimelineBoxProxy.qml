@@ -4,6 +4,7 @@ QtObject {
     property double x;
     property double y;
     property double s;
+    property bool cropEnabled: false;
     property int cropTop: 0;
     property int cropBottom: 0;
     property int cropLeft: 0;
@@ -24,7 +25,12 @@ QtObject {
         let v={ "f": frame++,
             "x": x.toFixed(4),
             "y": y.toFixed(4),
-            "s": s.toFixed(4) }
+            "s": s.toFixed(4),
+            "c": cropEnabled,
+            "cl": cropLeft,
+            "cr": cropRight,
+            "ct": cropTop,
+            "cb": cropBottom }
         console.debug(v)
         keyFrames.push(v)
         newFrame(v)

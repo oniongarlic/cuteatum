@@ -170,9 +170,11 @@ Rectangle {
     }
 
     property vector3d anim;
+    signal animationTick();
 
     onAnimChanged: {
         setPositionVector3d(anim)
+        animationTick();
     }
 
     // Position animation

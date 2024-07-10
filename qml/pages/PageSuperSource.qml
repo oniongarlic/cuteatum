@@ -92,6 +92,14 @@ Page {
         }
     }
 
+    Connections {
+        target: atem
+        onConnected: {
+            console.debug("SuperSource got connected", supersources)
+            syncBoxStates();
+        }
+    }
+
     function savePositions(bid) {
         savedPosition[bid]=[];
         for (var i=0;i<4;i++) {
@@ -134,10 +142,10 @@ Page {
 
     ListModel {
         id: ssModel
-        ListElement { box: 1; dx: -0.25; dy: -0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
-        ListElement { box: 2; dx: 0.25; dy: -0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
-        ListElement { box: 3; dx: -0.25; dy: 0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
-        ListElement { box: 4; dx: 0.25; dy: 0.25; s: 0.5; ena: true; crop: false; cropLeft: 0; cropRight: 0; cropTop: 0; cropBottom: 0; }
+        ListElement { box: 1; src: 0; dx: -0.25; dy: -0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
+        ListElement { box: 2; src: 0; dx: 0.25; dy: -0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
+        ListElement { box: 3; src: 0; dx: -0.25; dy: 0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
+        ListElement { box: 4; src: 0; dx: 0.25; dy: 0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
     }
 
     TimelineBoxProxy {
@@ -170,6 +178,7 @@ Page {
         TableModelColumn { display: "x" } // XPos
         TableModelColumn { display: "y" } // YPos
         TableModelColumn { display: "s" } // Size 0-1
+        TableModelColumn { display: "src" } // Source
         TableModelColumn { display: "c" } // Crop
         TableModelColumn { display: "cl" }
         TableModelColumn { display: "cr" }
@@ -465,6 +474,12 @@ Page {
                             defaultY: dy
                             defaultSize: s
                             enabled: ena
+                            inputSource: src
+                            crop: c
+                            cropLeft: cLeft
+                            cropRight: cRight
+                            cropTop: cTop
+                            cropBottom: cBottom
                             visible: enabled || !ssHideDisabled.checked
                             selected: ssBoxParent.currentIndex==boxId-1
                             onClicked: {
@@ -505,29 +520,53 @@ Page {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignTop
-                enabled: selectedBox!=null
+                //enabled: selectedBox!=null
+
+                ButtonGroup {
+                    id: boxGroup
+                    property int activeBox: ssBoxParent.currentIndex
+                    onActiveBoxChanged: {
+                        for (var i = 0; i < buttons.length; ++i) {
+                            if (buttons[i].boxIndex == activeBox)
+                                buttons[i].checked=true;
+                        }
+                    }
+                    onClicked: {
+                         ssBoxParent.currentIndex=button.boxIndex
+                    }
+                }
 
                 RowLayout {
-
-                    ComboBox {
-                        id: boxId
-                        Layout.fillWidth: true
+                    Layout.fillWidth: true
+                    Repeater {
                         model: ssModel
-                        displayText: "Box: " + currentText
-                        textRole: "box"
-                        currentIndex: ssBoxParent.currentIndex
-                        onCurrentIndexChanged: ssBoxParent.currentIndex=currentIndex
+                        ColumnLayout {
+                            required property int index;
+                            required property bool ena;
+                            required property bool c
+                            required property var model;
+                            Layout.fillWidth: true
+                            Button {
+                                property int boxIndex: index
+                                Layout.fillWidth: true
+                                text: "Box "+(index+1)
+                                checkable: true
+                                ButtonGroup.group: boxGroup
+                            }
+                            CheckBox {
+                                id: ssChecks
+                                text: "Visible"
+                                checked: ena
+                                onCheckedChanged: ssModel.setProperty(index, "ena", checked)
+                            }
+                            CheckBox {
+                                id: ssCrops
+                                checked: c
+                                text: "Crop"
+                                onCheckedChanged: model.c=checked
+                            }
+                        }
                     }
-
-                    CheckBox {
-                        id: ssCheck
-                        property SuperSourceBox ssbox;
-                        enabled: selectedBox!=null
-                        text: "Visible"
-                        checked: selectedBox && selectedBox.enabled
-                        onCheckedChanged: selectedBox.enabled=checked
-                    }
-
                 }
 
                 ComboBox {
@@ -826,7 +865,7 @@ Page {
                             visible: tlKeyFrame.enabled
                             icon.name: "media-playback-play"
                             onClicked: {
-                                ssTimeLine.currentFrame=0
+                                ssTimeLine.currentFrame=tlReverse.checked ? ssTimeLine.endFrame : 0
                                 playbackTicker.start()
                             }
                             Timer {
@@ -834,16 +873,34 @@ Page {
                                 repeat: true
                                 interval: 100
                                 onTriggered: {
-                                    ssTimeLine.currentFrame++
-                                    console.debug("tick")
+                                    console.debug("tick", ssTimeLine.currentFrame)
+
+                                    if (!tlReverse.checked) {
+                                        ssTimeLine.currentFrame++
+                                        if (ssTimeLine.endFrame==ssTimeLine.currentFrame)
+                                            stop();
+                                    } else {
+                                        ssTimeLine.currentFrame--
+                                        if (ssTimeLine.currentFrame==0)
+                                            stop();                                    }
+
+                                    // Add 1 frame pause if macro recording is on
                                     if (atem.connected && atem.macroRecording) {
                                         console.debug("macroPause")
                                         atem.addMacroPause(1)
                                     }
-                                    if (ssTimeLine.endFrame==ssTimeLine.currentFrame)
-                                        stop();
+
                                 }
                             }
+                        }
+                        Button {
+                            text: "Stop"
+                            visible: playbackTicker.running
+                            onClicked: playbackTicker.stop()
+                        }
+                        CheckBox {
+                            id: tlReverse
+                            text: "Rev"
                         }
                         Slider {
                             id: tlKeyFrame

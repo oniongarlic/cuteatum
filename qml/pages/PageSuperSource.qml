@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -40,6 +41,11 @@ Page {
     Component.onCompleted: {
         savePositions(0);
         savePositions(1);
+    }
+
+    Settings {
+        id: ssSettings
+        category: "SuperSource"
     }
 
     header: ToolBar {
@@ -107,6 +113,8 @@ Page {
             let v=item.getPositionVector3d();
             savedPosition[bid][i]=v;
         }
+        let s=JSON.stringify(savedPosition);
+        ssSettings.setValue("ss_"+bid, s)
     }
 
     function preparePositions(bid) {
@@ -119,6 +127,7 @@ Page {
     }
 
     function loadPositions(bid) {
+        let s=ssSettings.value("ss_"+bid, false)
         for (var i=0;i<4;i++) {
             let v=savedPosition[bid][i];
             let item=ssBoxParent.itemAt(i)
@@ -146,6 +155,24 @@ Page {
         ListElement { box: 2; src: 0; dx: 0.25; dy: -0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
         ListElement { box: 3; src: 0; dx: -0.25; dy: 0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
         ListElement { box: 4; src: 0; dx: 0.25; dy: 0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
+
+        function toJSONat(i) {
+            var o=get(i);
+            return JSON.stringify(o);
+        }
+        function toJSON() {
+            let o=[];
+            for (let i=0;i<4;i++) {
+                o[i]=get(i)
+            }
+            return JSON.stringify(o)
+        }
+        function fromJSON(j) {
+            let o=JSON.parse(j);
+            for (let i=0;i<4;i++) {
+                set(i, o)
+            }
+        }
     }
 
     TimelineBoxProxy {
@@ -532,7 +559,7 @@ Page {
                         }
                     }
                     onClicked: {
-                         ssBoxParent.currentIndex=button.boxIndex
+                        ssBoxParent.currentIndex=button.boxIndex
                     }
                 }
 
@@ -709,11 +736,9 @@ Page {
                         onClicked: selectedBox.boxSize=1.00
                     }
                 }
-                GridLayout {
+                RowLayout {
                     Layout.fillWidth: true
                     enabled: selectedBox && selectedBox.crop
-                    rows: 2
-                    columns: 3
                     SpinBox {
                         from: 0
                         to: 1800
@@ -737,10 +762,21 @@ Page {
                     Button {
                         text: "25%"
                         onClicked: {
-                            selectedBox.cropLeft=450
-                            selectedBox.cropRight=450
+                            selectedBox.cropBottom=225
+                            selectedBox.cropTop=225
                         }
                     }
+                    Button {
+                        text: "50%"
+                        onClicked: {
+                            selectedBox.cropBottom=450
+                            selectedBox.cropTop=450
+                        }
+                    }
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    enabled: selectedBox && selectedBox.crop
                     SpinBox {
                         from: 0
                         to: 3200
@@ -762,10 +798,17 @@ Page {
                         onValueModified: selectedBox.cropRight=value
                     }
                     Button {
+                        text: "25%"
+                        onClicked: {
+                            selectedBox.cropLeft=400
+                            selectedBox.cropRight=400
+                        }
+                    }
+                    Button {
                         text: "50%"
                         onClicked: {
-                            selectedBox.cropLeft=900
-                            selectedBox.cropRight=900
+                            selectedBox.cropLeft=800
+                            selectedBox.cropRight=800
                         }
                     }
                 }
@@ -1042,8 +1085,11 @@ Page {
 
             Button {
                 text: "Debug"
-                enabled: selectedBox ? true : false
-                onClicked: dumpBoxState(selectedBox);
+                onClicked: {
+                    console.debug(ssModel.toJSON());
+                    if (selectedBox)
+                        dumpBoxState(selectedBox);
+                }
             }
 
             RowLayout {

@@ -709,49 +709,63 @@ Page {
                         onClicked: selectedBox.boxSize=1.00
                     }
                 }
-                RowLayout {
-                    Button {
-                        text: "Debug"
-                        enabled: selectedBox ? true : false
-                        onClicked: dumpBoxState(selectedBox);
-                    }
-                }
-                RowLayout {
+                GridLayout {
                     Layout.fillWidth: true
-                    Button {
-                        text: "Set A"
-                        onClicked: {
-                            savePositions(0);
-                        }
+                    enabled: selectedBox && selectedBox.crop
+                    rows: 2
+                    columns: 3
+                    SpinBox {
+                        from: 0
+                        to: 1800
+                        stepSize: 1
+                        wheelEnabled: true
+                        editable: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                        value: selectedBox ? selectedBox.cropTop : 0
+                        onValueModified: selectedBox.cropTop=value
+                    }
+                    SpinBox {
+                        from: 0
+                        to: 1800
+                        stepSize: 1
+                        wheelEnabled: true
+                        editable: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                        value: selectedBox ? selectedBox.cropBottom : 0
+                        onValueModified: selectedBox.cropBottom=value
                     }
                     Button {
-                        text: "Get A"
+                        text: "25%"
                         onClicked: {
-                            loadPositions(0);
+                            selectedBox.cropLeft=450
+                            selectedBox.cropRight=450
                         }
                     }
-                    Button {
-                        text: "Set B"
-                        onClicked: {
-                            savePositions(1);
-                        }
+                    SpinBox {
+                        from: 0
+                        to: 3200
+                        stepSize: 1
+                        wheelEnabled: true
+                        editable: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                        value: selectedBox ? selectedBox.cropLeft : 0
+                        onValueModified: selectedBox.cropLeft=value
+                    }
+                    SpinBox {
+                        from: 0
+                        to: 3200
+                        stepSize: 1
+                        wheelEnabled: true
+                        editable: true
+                        inputMethodHints: Qt.ImhDigitsOnly
+                        value: selectedBox ? selectedBox.cropRight : 0
+                        onValueModified: selectedBox.cropRight=value
                     }
                     Button {
-                        text: "Get B"
+                        text: "50%"
                         onClicked: {
-                            loadPositions(1);
-                        }
-                    }
-                    Button {
-                        text: "Run A"
-                        onClicked: {
-                            animateSuperSource(0);
-                        }
-                    }
-                    Button {
-                        text: "Run B"
-                        onClicked: {
-                            animateSuperSource(1);
+                            selectedBox.cropLeft=900
+                            selectedBox.cropRight=900
                         }
                     }
                 }
@@ -1025,71 +1039,50 @@ Page {
                 id: ssHideDisabled
                 text: "Hide disabled"
             }
-            CheckBox {
-                id: ssCropCheck
-                enabled: selectedBox!=null
-                text: "Crop"
-                checked: selectedBox && selectedBox.crop
-                onCheckedChanged: selectedBox.crop=checked
-            }
-        }
-        GridLayout {
-            Layout.fillWidth: true
-            enabled: selectedBox && selectedBox.crop
-            rows: 2
-            columns: 3
-            SpinBox {
-                from: 0
-                to: 1800
-                stepSize: 1
-                wheelEnabled: true
-                editable: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox ? selectedBox.cropTop : 0
-                onValueModified: selectedBox.cropTop=value
-            }
-            SpinBox {
-                from: 0
-                to: 1800
-                stepSize: 1
-                wheelEnabled: true
-                editable: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox ? selectedBox.cropBottom : 0
-                onValueModified: selectedBox.cropBottom=value
-            }
+
             Button {
-                text: "25%"
-                onClicked: {
-                    selectedBox.cropLeft=450
-                    selectedBox.cropRight=450
+                text: "Debug"
+                enabled: selectedBox ? true : false
+                onClicked: dumpBoxState(selectedBox);
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Button {
+                    text: "Set A"
+                    onClicked: {
+                        savePositions(0);
+                    }
                 }
-            }
-            SpinBox {
-                from: 0
-                to: 3200
-                stepSize: 1
-                wheelEnabled: true
-                editable: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox ? selectedBox.cropLeft : 0
-                onValueModified: selectedBox.cropLeft=value
-            }
-            SpinBox {
-                from: 0
-                to: 3200
-                stepSize: 1
-                wheelEnabled: true
-                editable: true
-                inputMethodHints: Qt.ImhDigitsOnly
-                value: selectedBox ? selectedBox.cropRight : 0
-                onValueModified: selectedBox.cropRight=value
-            }
-            Button {
-                text: "50%"
-                onClicked: {
-                    selectedBox.cropLeft=900
-                    selectedBox.cropRight=900
+                Button {
+                    text: "Get A"
+                    onClicked: {
+                        loadPositions(0);
+                    }
+                }
+                Button {
+                    text: "Set B"
+                    onClicked: {
+                        savePositions(1);
+                    }
+                }
+                Button {
+                    text: "Get B"
+                    onClicked: {
+                        loadPositions(1);
+                    }
+                }
+                Button {
+                    text: "Run A"
+                    onClicked: {
+                        animateSuperSource(0);
+                    }
+                }
+                Button {
+                    text: "Run B"
+                    onClicked: {
+                        animateSuperSource(1);
+                    }
                 }
             }
         }

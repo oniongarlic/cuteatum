@@ -676,18 +676,18 @@ Page {
                     }
                 }
 
-                SpinBox {
-                    id: boxSize
-                    Layout.fillWidth: true
-                    from: 0
-                    to: 100
-                    wheelEnabled: true
-                    value: selectedBox ? selectedBox.boxSize*100 : 0
-                    onValueModified: {
-                        selectedBox.setSize(value/100)
-                    }
-                }
                 RowLayout {
+                    SpinBox {
+                        id: boxSize
+                        Layout.fillWidth: true
+                        from: 0
+                        to: 100
+                        wheelEnabled: true
+                        value: selectedBox ? selectedBox.boxSize*100 : 0
+                        onValueModified: {
+                            selectedBox.setSize(value/100)
+                        }
+                    }
                     Button {
                         text: "25%"
                         Layout.fillWidth: false

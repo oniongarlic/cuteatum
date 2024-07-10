@@ -151,10 +151,26 @@ Page {
 
     ListModel {
         id: ssModel
-        ListElement { box: 1; src: 0; dx: -0.25; dy: -0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
-        ListElement { box: 2; src: 0; dx: 0.25; dy: -0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
-        ListElement { box: 3; src: 0; dx: -0.25; dy: 0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
-        ListElement { box: 4; src: 0; dx: 0.25; dy: 0.25; s: 0.5; ena: true; c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0; }
+        ListElement { box: 1; src: 1000;
+            dx: -0.25; dy: -0.25; ds: 0.5; ena: true;
+            cx: -0.25; cy: -0.25; cs: 0.5;
+            c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+        }
+        ListElement { box: 2; src: 1001;
+            dx: 0.25; dy: -0.25; ds: 0.5; ena: true;
+            cx: 0.25; cy: -0.25; cs: 0.5;
+            c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+        }
+        ListElement { box: 3; src: 1002;
+            dx: -0.25; dy: 0.25; ds: 0.5; ena: true;
+            cx: -0.25; cy: 0.25; cs: 0.5;
+            c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+        }
+        ListElement { box: 4; src: 1003;
+            dx: 0.25; dy: 0.25; ds: 0.5; ena: true;
+            cx: 0.25; cy: 0.25; cs: 0.5;
+            c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+        }
 
         function toJSONat(i) {
             var o=get(i);
@@ -173,7 +189,7 @@ Page {
                 set(i, o)
             }
         }
-    }
+    }    
 
     TimelineBoxProxy {
         id: sproxy1
@@ -499,7 +515,7 @@ Page {
                             boxId: box
                             defaultX: dx
                             defaultY: dy
-                            defaultSize: s
+                            defaultSize: ds
                             enabled: ena
                             inputSource: src
                             crop: c
@@ -515,6 +531,13 @@ Page {
                             onFocusChanged: {
                                 if (focus)
                                     ssBoxParent.currentIndex=index
+                            }
+                            onBoxSizeChanged: {
+                                model.cs=boxSize
+                            }
+                            onBoxCenterChanged: {
+                                model.cx=boxCenter.x
+                                model.cy=boxCenter.y
                             }
                             onAtemCropChanged: {
                                 updateAtemLive(ssboxDelegate, true);

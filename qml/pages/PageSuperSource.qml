@@ -189,7 +189,7 @@ Page {
                 set(i, o)
             }
         }
-    }    
+    }
 
     TimelineBoxProxy {
         id: sproxy1
@@ -315,6 +315,18 @@ Page {
             kg.keyframes.push(kf.createObject(ssTimeLine, { frame: f, value: v, easing: e }))
         }
 
+        function clearKeyframeGroupsForBox(ki) {
+            let k=boxes[ki];
+            for (let i=0;i<3;i++) {
+                console.debug(i,k[i])
+                clearKeyframesInGroup(k[i]);
+            }
+        }
+
+        function clearKeyframesInGroup(kg) {
+            kg.keyframes=[]
+        }
+
         /* Per SuperSource box keyframe group */
         function createBoxGroup(proxy) {
             let tx=kfg.createObject(ssTimeLine, { target: proxy, property: "x" });
@@ -337,6 +349,11 @@ Page {
             sproxy3.clear()
             sproxy4.clear()
             timelineModel.clear()
+
+            clearKeyframeGroupsForBox(0)
+            clearKeyframeGroupsForBox(1)
+            clearKeyframeGroupsForBox(2)
+            clearKeyframeGroupsForBox(3)
         }
 
         function addKeyframe(box, frame) {

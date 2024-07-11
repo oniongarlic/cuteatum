@@ -6,7 +6,6 @@ Button {
     id: btn
     autoExclusive: true
     checkable: true
-    anchors.margins: 0
 
     Layout.fillWidth: true
     Layout.fillHeight: true

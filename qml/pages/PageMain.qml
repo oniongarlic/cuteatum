@@ -30,6 +30,7 @@ Page {
     required property ListModel meSourcesModel;
     required property ListModel mediaPlayersModel;
     required property ListModel mediaModel;
+    required property ListModel keySourceModel;
     //required property ListModel utputsModel;
     //required property ListModel outputSourcesModel;
 
@@ -63,9 +64,9 @@ Page {
 
     Keys.onDigit9Pressed: root.setProgram(9)
 
-    function setDVEKey(checked) {
+    function setDVEKey(key, checked) {
         if (keyType.currentValue!==3)
-            me.setUpstreamKeyFlyEnabled(0, checked)
+            me.setUpstreamKeyFlyEnabled(key, checked)
         else
             me.setDVEKeyEnabled(checked)
     }
@@ -263,11 +264,10 @@ Page {
                 isPreview: true
                 ButtonGroup.group: previewGroup
             }
-            InputButton {
-                text: "Still"
-                inputID: 3010
+            InputButtonRepeater {
+                model: mediaPlayersModel
                 isPreview: true
-                ButtonGroup.group: previewGroup
+                bg: previewGroup
             }
             ColumnLayout {
                 spacing: 0
@@ -313,34 +313,12 @@ Page {
             Layout.row: 3
             Layout.margins: 4
 
-            ColumnLayout {
-                ComboBox {
-                    id: keyType
-                    textRole: "text"
-                    valueRole: "keyType"
-                    model: ListModelKeyType {
-                    }
-                    onActivated: {
-                        me.setUpstreamKeyType(0, currentValue)
-                        setDVEKey(checkDVEKey.checked)
-                    }
-                }
-                Button {
-                    text: "Key1 sources"
-                    onClicked: keySourceDrawer.open()
-                }
-
-                CheckBox {
-                    text: "Key1"
-                    onClicked: {
-                        me.setUpstreamKeyOnAir(0, checked)
-                    }
-                }
-                CheckBox {
-                    text: "KeyOnChange"
-                    onClicked: {
-                        me.setUpstreamKeyOnNextTransition(0, checked)
-                    }
+            Repeater {
+                model: atem.connected ? me.upstreamKeyCount() : 0
+                UpstreamKeyBaseControls {
+                    required property int index;
+                    usk: index
+                    me: mainPage.me
                 }
             }
 
@@ -412,16 +390,18 @@ Page {
                     text: "DVE"
                 }
                 RowLayout {
-                    CheckBox {
+                    Button {
                         id: checkDVEKey
                         text: "Key"
+                        checkable: true
                         onClicked: {
-                            setDVEKey(checked)
+                            setDVEKey(0, checked)
                         }
                     }
-                    CheckBox {
+                    Button {
                         id: checkDownstream
                         text: "DSK1"
+                        checkable: true
                         onCheckedChanged: {
                             dsk.setOnAir(checked)
                         }
@@ -626,7 +606,6 @@ Page {
                 id: btnCut
                 text: "Cut"
                 onClicked: {
-
                     me.cut();
                 }
             }
@@ -635,8 +614,16 @@ Page {
                 id: btnAuto
                 text: "Auto"
                 onClicked: {
-
                     me.autoTransition();
+                }
+            }
+
+            ComboBox {
+                textRole: "name"
+                valueRole: "style"
+                model: ListModelTransitions {}
+                onActivated: {
+                    me.setTransitionType(currentValue);
                 }
             }
 
@@ -646,11 +633,12 @@ Page {
                     id: easingType
                     textRole: "text"
                     valueRole: "easingType"
+                    property int _tmp: 0
                     model: ListModelEasing {
 
                     }
                     onActivated: {
-                        easingTransition.easing=currentValue
+                        easingTransition.easing.type=currentValue
                     }
                     Component.onCompleted: {
                         currentIndex = indexOfValue(Easing.InCubic)

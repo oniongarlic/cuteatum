@@ -6,7 +6,6 @@ Button {
     id: btn
     autoExclusive: true
     checkable: true
-    anchors.margins: 0
 
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -15,13 +14,12 @@ Button {
     Layout.minimumHeight: 25
     Layout.minimumWidth: 40
 
-    property int inputID: 0
+    required property int inputID;
+
     property bool compact: false
     property bool isPreview: false
-
+    property string  textLong;
     property string  textShort;
-
-    onCheckedChanged: console.debug("ABC"+checked)
 
     background: Item {
         implicitWidth: btn.compact ? 50 : 60
@@ -29,8 +27,8 @@ Button {
         Rectangle {
             id: btnbg
             anchors.fill: parent
-            radius: 2
-            color: isPreview ? "#20f520" : "#f53030"
+            radius: 4
+            color: btn.checked ? (isPreview ? "#20f520" : "#f53030") : (isPreview ? "#d0f5d0" : "#f5d0d0")
             border.width: btn.checked ? 2 : 1
             border.color: btn.checked ? "#90e520" : "#101010"
         }

@@ -19,5 +19,6 @@
         <file>qml/components/OutputMenuItem.qml</file>
         <file>qml/components/OutputButtonGroup.qml</file>
         <file>qml/components/InputButtonRepeater.qml</file>
+        <file>qml/components/UpstreamKeyBaseControls.qml</file>
     </qresource>
 </RCC>

@@ -30,6 +30,7 @@ Page {
     required property ListModel meSourcesModel;
     required property ListModel mediaPlayersModel;
     required property ListModel mediaModel;
+    required property ListModel keySourceModel;
     //required property ListModel utputsModel;
     //required property ListModel outputSourcesModel;
 
@@ -63,9 +64,9 @@ Page {
 
     Keys.onDigit9Pressed: root.setProgram(9)
 
-    function setDVEKey(checked) {
+    function setDVEKey(key, checked) {
         if (keyType.currentValue!==3)
-            me.setUpstreamKeyFlyEnabled(0, checked)
+            me.setUpstreamKeyFlyEnabled(key, checked)
         else
             me.setDVEKeyEnabled(checked)
     }
@@ -312,36 +313,12 @@ Page {
             Layout.row: 3
             Layout.margins: 4
 
-            ColumnLayout {
-                ComboBox {
-                    id: keyType
-                    textRole: "text"
-                    valueRole: "keyType"
-                    model: ListModelKeyType {
-                    }
-                    onActivated: {
-                        me.setUpstreamKeyType(0, currentValue)
-                        setDVEKey(checkDVEKey.checked)
-                    }
-                }
-                Button {
-                    text: "Key1 sources"
-                    onClicked: keySourceDrawer.open()
-                }
-
-                Button {
-                    text: "Key1"
-                    checkable: true
-                    onClicked: {
-                        me.setUpstreamKeyOnAir(0, checked)
-                    }
-                }
-                Button {
-                    text: "NT"
-                    checkable: true
-                    onClicked: {
-                        me.setUpstreamKeyOnNextTransition(0, checked)
-                    }
+            Repeater {
+                model: atem.connected ? me.upstreamKeyCount() : 0
+                UpstreamKeyBaseControls {
+                    required property int index;
+                    usk: index
+                    me: mainPage.me
                 }
             }
 

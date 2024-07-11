@@ -35,6 +35,7 @@ ColumnLayout {
         valueRole: "index"
         model: keySourceModel
         Layout.fillWidth: true
+        visible: keyType.currentValue===0
         onActivated: {
             me.setUpstreamKeyKeySource(usk, currentValue)
         }

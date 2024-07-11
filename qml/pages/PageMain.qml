@@ -36,8 +36,8 @@ Page {
 
     background: Rectangle {
         gradient: Gradient {
-            GradientStop { position: 0; color: "#bfa0a0" }
-            GradientStop { position: 1; color: "#605050" }
+            GradientStop { position: 0; color: "#605050" }
+            GradientStop { position: 1; color: "#af9090" }
         }
     }
 
@@ -572,23 +572,34 @@ Page {
             Layout.rowSpan: 4
 
             Slider {
-                Layout.fillHeight: true
-                Layout.alignment: Qt.AlignHCenter
                 id: sliderTbar
+
+                Layout.fillHeight: true
+                Layout.maximumHeight: parent.height/2
+                Layout.alignment: Qt.AlignHCenter
+
                 orientation: Qt.Vertical
                 to: 10000
                 from: 0
                 stepSize: 100
                 enabled: !easingTransition.running
+                handle: Rectangle {
+                    color: sliderTbar.enabled ? "green" : "grey"
+                    border.color: "black"
+                    implicitHeight: 32
+                    implicitWidth: 80
+                    x: sliderTbar.leftPadding + sliderTbar.visualPosition * (sliderTbar.availableWidth - width)
+                    y: sliderTbar.topPadding + sliderTbar.availableHeight / 2 - height / 2
+                    radius: 8
+                }
+
                 onValueChanged: {
                     if (easingTransition.running) {
 
                         me.setTransitionPosition(value);
                     }
                 }
-
                 onMoved: {
-
                     me.setTransitionPosition(value);
                 }
                 onPressedChanged: {
@@ -603,6 +614,7 @@ Page {
 
             Button {
                 Layout.fillWidth: true
+                Layout.minimumHeight: 40
                 id: btnCut
                 text: "Cut"
                 onClicked: {
@@ -611,13 +623,13 @@ Page {
             }
             Button {
                 Layout.fillWidth: true
+                Layout.minimumHeight: 40
                 id: btnAuto
                 text: "Auto"
                 onClicked: {
                     me.autoTransition();
                 }
             }
-
             ComboBox {
                 textRole: "name"
                 valueRole: "style"
@@ -628,6 +640,17 @@ Page {
             }
 
             ColumnLayout {
+                Layout.fillWidth: true
+
+                Button {
+                    Layout.fillWidth: true
+                    id: btnEasing
+                    text: "Easing"
+                    enabled: !easingTransition.running
+                    onClicked: {
+                        easingTransition.start()
+                    }
+                }
 
                 ComboBox {
                     id: easingType
@@ -656,16 +679,6 @@ Page {
                         easingTransition.duration=value*1000;
                     }
                     background.implicitWidth: 100
-                }
-
-                Button {
-                    Layout.fillWidth: true
-                    id: btnEasing
-                    text: "Easing"
-                    enabled: !easingTransition.running
-                    onClicked: {
-                        easingTransition.start()
-                    }
                 }
             }
 

@@ -21,5 +21,6 @@
         <file>qml/components/InputButtonRepeater.qml</file>
         <file>qml/components/UpstreamKeyBaseControls.qml</file>
         <file>qml/models/ListModelTransitions.qml</file>
+        <file>qml/components/SliderTBar.qml</file>
     </qresource>
 </RCC>

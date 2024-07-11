@@ -571,46 +571,13 @@ Page {
             Layout.row: 0
             Layout.rowSpan: 4
 
-            Slider {
+            SliderTBar {
                 id: sliderTbar
-
+                me: mainPage.me
                 Layout.fillHeight: true
                 Layout.maximumHeight: parent.height/2
                 Layout.alignment: Qt.AlignHCenter
-
-                orientation: Qt.Vertical
-                to: 10000
-                from: 0
-                stepSize: 100
-                enabled: !easingTransition.running
-                handle: Rectangle {
-                    color: sliderTbar.enabled ? "green" : "grey"
-                    border.color: "black"
-                    implicitHeight: 32
-                    implicitWidth: 80
-                    x: sliderTbar.leftPadding + sliderTbar.visualPosition * (sliderTbar.availableWidth - width)
-                    y: sliderTbar.topPadding + sliderTbar.availableHeight / 2 - height / 2
-                    radius: 8
-                }
-
-                onValueChanged: {
-                    if (easingTransition.running) {
-
-                        me.setTransitionPosition(value);
-                    }
-                }
-                onMoved: {
-                    me.setTransitionPosition(value);
-                }
-                onPressedChanged: {
-                    if (!pressed) {
-                        value=0;
-
-                        me.setTransitionPosition(0);
-                    }
-                }
             }
-
 
             Button {
                 Layout.fillWidth: true
@@ -646,9 +613,9 @@ Page {
                     Layout.fillWidth: true
                     id: btnEasing
                     text: "Easing"
-                    enabled: !easingTransition.running
+                    enabled: !sliderTbar.running
                     onClicked: {
-                        easingTransition.start()
+                        sliderTbar.start()
                     }
                 }
 
@@ -661,7 +628,7 @@ Page {
 
                     }
                     onActivated: {
-                        easingTransition.easing.type=currentValue
+                        sliderTbar.easingType=currentValue
                     }
                     Component.onCompleted: {
                         currentIndex = indexOfValue(Easing.InCubic)
@@ -676,7 +643,7 @@ Page {
                     to: 10
                     value: 2
                     onValueModified: {
-                        easingTransition.duration=value*1000;
+                        sliderTbar.easingDuration=value*1000;
                     }
                     background.implicitWidth: 100
                 }

@@ -395,7 +395,7 @@ Page {
                         text: "Key"
                         checkable: true
                         onClicked: {
-                            setDVEKey(checked)
+                            setDVEKey(0, checked)
                         }
                     }
                     Button {
@@ -615,6 +615,15 @@ Page {
                 text: "Auto"
                 onClicked: {
                     me.autoTransition();
+                }
+            }
+
+            ComboBox {
+                textRole: "name"
+                valueRole: "style"
+                model: ListModelTransitions {}
+                onActivated: {
+                    me.setTransitionType(currentValue);
                 }
             }
 

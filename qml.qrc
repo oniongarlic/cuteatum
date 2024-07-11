@@ -20,5 +20,6 @@
         <file>qml/components/OutputButtonGroup.qml</file>
         <file>qml/components/InputButtonRepeater.qml</file>
         <file>qml/components/UpstreamKeyBaseControls.qml</file>
+        <file>qml/models/ListModelTransitions.qml</file>
     </qresource>
 </RCC>

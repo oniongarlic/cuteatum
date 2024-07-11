@@ -891,13 +891,13 @@ ApplicationWindow {
         property bool ftb_fading: false;
         property int ftb_frame;
 
-        function onProgramInputChanged(newIndex) {
-            console.debug("onProgramInputChanged:" +newIndex)
+        function onProgramInputChanged(me, oldIndex, newIndex) {
+            console.debug("onProgramInputChanged",newIndex,oldIndex,me)
             program=newIndex;
             mqttClient.publishProgram(newIndex)
         }
-        function onPreviewInputChanged(newIndex) {
-            console.debug("onPreviewInputChanged:" +newIndex)
+        function onPreviewInputChanged(me, oldIndex, newIndex) {
+            console.debug("onPreviewInputChanged:",newIndex,oldIndex,me)
             preview=newIndex;
             mqttClient.publishPreview(newIndex)
         }

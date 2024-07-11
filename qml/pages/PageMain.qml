@@ -263,11 +263,10 @@ Page {
                 isPreview: true
                 ButtonGroup.group: previewGroup
             }
-            InputButton {
-                text: "Still"
-                inputID: 3010
+            InputButtonRepeater {
+                model: mediaPlayersModel
                 isPreview: true
-                ButtonGroup.group: previewGroup
+                bg: previewGroup
             }
             ColumnLayout {
                 spacing: 0
@@ -330,14 +329,16 @@ Page {
                     onClicked: keySourceDrawer.open()
                 }
 
-                CheckBox {
+                Button {
                     text: "Key1"
+                    checkable: true
                     onClicked: {
                         me.setUpstreamKeyOnAir(0, checked)
                     }
                 }
-                CheckBox {
-                    text: "KeyOnChange"
+                Button {
+                    text: "NT"
+                    checkable: true
                     onClicked: {
                         me.setUpstreamKeyOnNextTransition(0, checked)
                     }
@@ -412,16 +413,18 @@ Page {
                     text: "DVE"
                 }
                 RowLayout {
-                    CheckBox {
+                    Button {
                         id: checkDVEKey
                         text: "Key"
+                        checkable: true
                         onClicked: {
                             setDVEKey(checked)
                         }
                     }
-                    CheckBox {
+                    Button {
                         id: checkDownstream
                         text: "DSK1"
+                        checkable: true
                         onCheckedChanged: {
                             dsk.setOnAir(checked)
                         }
@@ -626,7 +629,6 @@ Page {
                 id: btnCut
                 text: "Cut"
                 onClicked: {
-
                     me.cut();
                 }
             }
@@ -635,7 +637,6 @@ Page {
                 id: btnAuto
                 text: "Auto"
                 onClicked: {
-
                     me.autoTransition();
                 }
             }
@@ -646,11 +647,12 @@ Page {
                     id: easingType
                     textRole: "text"
                     valueRole: "easingType"
+                    property int _tmp: 0
                     model: ListModelEasing {
 
                     }
                     onActivated: {
-                        easingTransition.easing=currentValue
+                        easingTransition.easing.type=currentValue
                     }
                     Component.onCompleted: {
                         currentIndex = indexOfValue(Easing.InCubic)

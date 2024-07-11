@@ -14,11 +14,6 @@ Button {
     property color checkedColor: "red"
     property color notCheckedColor: "green"
 
-    implicitHeight: 25
-
-    Layout.minimumHeight: 25
-    Layout.minimumWidth: 40
-
     background: Rectangle {
         id: btnBg
         implicitWidth: btn.compact ? 50 : 60

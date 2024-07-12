@@ -34,6 +34,9 @@ Slider {
     onValueChanged: {
         if (easingTransition.running) {
             me.setTransitionPosition(value);
+            if (atem.macroRecording) {
+                atem.addMacroPause(1)
+            }
         }
     }
     onMoved: {

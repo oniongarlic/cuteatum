@@ -64,13 +64,6 @@ Page {
 
     Keys.onDigit9Pressed: root.setProgram(9)
 
-    function setDVEKey(key, checked) {
-        if (keyType.currentValue!==3)
-            me.setUpstreamKeyFlyEnabled(key, checked)
-        else
-            me.setDVEKeyEnabled(checked)
-    }
-
     Connections {
         id: me0
         target: me
@@ -133,6 +126,20 @@ Page {
         key: 0
     }
 
+    UpstreamKeyDrawer {
+        id: uskDrawer
+        edge: Qt.RightEdge
+        me: mainPage.me
+        key: 0
+    }
+
+    DownstreamKeyDrawer {
+        id: dskDrawer
+        edge: Qt.RightEdge
+        dsk: mainPage.dsk
+        me: mainPage.me
+    }
+
     GridLayout {
         id: container
         rowSpacing: 1
@@ -141,13 +148,14 @@ Page {
         rows: 4
         anchors.fill: parent
         anchors.margins: 4
-        enabled: atem.connected
+        //enabled: atem.connected || root.debugEnabled
+        visible: enabled
 
         RowLayout {
             id: inputProgramButtonRow
             Layout.fillWidth: true
             Layout.fillHeight: true
-            //Layout.alignment: Qt.AlignHCenter
+            Layout.alignment: Qt.AlignTop
             Layout.margins: 0
             Layout.column: 0
             Layout.row: 0
@@ -233,7 +241,7 @@ Page {
         RowLayout {
             id: inputPreviewButtonRow
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
+            Layout.alignment: Qt.AlignTop
             Layout.margins: 0
             Layout.column: 0
             Layout.row: 1
@@ -319,166 +327,25 @@ Page {
                     required property int index;
                     usk: index
                     me: mainPage.me
-                }
-            }
-
-            GridLayout {
-                rows: 3
-                columns: 2
-
-                Button {
-                    text: "FS"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 50
-                    onClicked: {
-                        me.runUpstreamKeyTo(0, 3, 0)
+                    Button {
+                        text: "Properties"
+                        onClicked: uskDrawer.open()
                     }
                 }
-                Button {
-                    text: "INF"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 50
-                    onClicked: {
-                        me.runUpstreamKeyTo(0, 4, 0) // center
-                    }
-                }
-                Button {
-                    text: "A"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 50
-                    onClicked: {
-                        me.runUpstreamKeyTo(0, 1, 0)
-                    }
-                }
-                Button {
-                    text: "B"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 50
-                    onClicked: {
-                        me.runUpstreamKeyTo(0, 2, 0)
-                    }
-                }
-                Button {
-                    text: "Animate"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 100
-                    Layout.columnSpan: 2
-                    onClicked: {
-                        me.setUpstreamKeyDVEKeyFrame(0, 2)
-                    }
-                }
-                DelayButton {
-                    text: "Set A"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 50
-                    onActivated: {
-                        me.setUpstreamKeyDVEKeyFrame(0, 1)
-                    }
-                }
-                DelayButton {
-                    text: "Set B"
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 50
-                    onActivated: {
-                        me.setUpstreamKeyDVEKeyFrame(0, 2)
-                    }
-                }
-            }
+            }            
 
             ColumnLayout {
                 Label {
-                    text: "DVE"
+                    text: "DSK 1"
                 }
-                RowLayout {
-                    Button {
-                        id: checkDVEKey
-                        text: "Key"
-                        checkable: true
-                        onClicked: {
-                            setDVEKey(0, checked)
-                        }
-                    }
-                    Button {
-                        id: checkDownstream
-                        text: "DSK1"
-                        checkable: true
-                        onCheckedChanged: {
-                            dsk.setOnAir(checked)
-                        }
-                    }
-                    Button {
-                        text: "Auto"
-                        onClicked: {
-                            dsk.doAuto();
-                        }
-                    }
+                DownstreamKeyBaseControls {
+                    me: mainPage.me
+                    dsk: mainPage.dsk
+                    model: keyAndMasksModel
                 }
-                Label {
-                    text: "DVE Position"
-                }
-                RowLayout {
-                    SpinBox {
-                        id: dveXPos
-                        editable: true
-                        from: -2000
-                        to: 2000
-                        stepSize: 10
-                        wheelEnabled: true
-                        onValueModified: {
-                            if (!enabled) return;
-                            me.setUpstreamKeyDVEPosition(0, value/100.0, me.upstreamKeyDVEYPosition(0))
-                        }
-                    }
-
-                    SpinBox {
-                        id: dveYPos
-                        editable: true
-                        from: -2000
-                        to: 2000
-                        stepSize: 10
-                        wheelEnabled: true
-                        onValueModified: {
-                            if (!enabled) return;
-                            me.setUpstreamKeyDVEPosition(0, me.upstreamKeyDVEXPosition(0), value/100.0)
-                        }
-                    }
-                }
-
-                RowLayout {
-                    SpinBox {
-                        id: dveXSize
-                        editable: true
-                        from: 0
-                        to: 100
-                        wheelEnabled: true
-                        onValueModified: {
-                            var v=value/100.0;
-                            me.setUpstreamKeyDVESize(0, v, lockAspect ? v : me.upstreamKeyDVEYSize(0))
-                            if (lockAspect.checked)
-                                dveYSize.value=value
-                        }
-                    }
-
-                    CheckBox {
-                        id: lockAspect
-                        // text: "Lock"
-                        checked: true
-                    }
-
-                    SpinBox {
-                        id: dveYSize
-                        editable: true
-                        //visible: !lockAspect.checked
-                        from: 0
-                        to: 100
-                        wheelEnabled: true
-                        onValueModified: {
-                            var v=value/100.0;
-                            me.setUpstreamKeyDVESize(0, lockAspect ? v : me.upstreamKeyDVEXSize(0), v)
-                            if (lockAspect.checked)
-                                dveXSize.value=value
-                        }
-                    }
+                Button {
+                    text: "Properties"
+                    onClicked: dskDrawer.open()
                 }
             }
 
@@ -532,17 +399,7 @@ Page {
                     }
                 }
             }
-        }
-        
-        PropertyAnimation {
-            id: easingTransition
-            duration: 2000
-            easing.type: Easing.InCubic
-            target: sliderTbar
-            property: "value"
-            from: 0
-            to: 10000
-        }
+        }        
 
         ParallelAnimation {
             id: dveAnimation
@@ -640,10 +497,12 @@ Page {
                     id: easingDuration
                     editable: false
                     from: 0
-                    to: 10
-                    value: 2
+                    to: 5000
+                    value: 2000
+                    stepSize: 100
+                    wheelEnabled: true
                     onValueModified: {
-                        sliderTbar.easingDuration=value*1000;
+                        sliderTbar.easingDuration=value;
                     }
                     background.implicitWidth: 100
                 }

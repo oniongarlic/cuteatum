@@ -22,5 +22,9 @@
         <file>qml/components/UpstreamKeyBaseControls.qml</file>
         <file>qml/models/ListModelTransitions.qml</file>
         <file>qml/components/SliderTBar.qml</file>
+        <file>qml/components/ToggleButton.qml</file>
+        <file>qml/components/DownstreamKeyBaseControls.qml</file>
+        <file>qml/drawers/UpstreamKeyDrawer.qml</file>
+        <file>qml/drawers/DownstreamKeyDrawer.qml</file>
     </qresource>
 </RCC>

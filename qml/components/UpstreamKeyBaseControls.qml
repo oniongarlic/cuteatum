@@ -10,6 +10,14 @@ ColumnLayout {
     Layout.fillWidth: false
     property int usk: 0
     required property AtemMixEffect me;
+
+    function setDVEKey(key, checked) {
+        if (keyType.currentValue!==3)
+            me.setUpstreamKeyFlyEnabled(key, checked)
+        else
+            me.setDVEKeyEnabled(checked)
+    }
+
     Button {
         id: uskActive
         text: "Key "+(usk+1)
@@ -52,11 +60,9 @@ ColumnLayout {
             setDVEKey(usk, checkDVEKey.checked)
         }
     }
-    Button {
+    ToggleButton {
         id: uskNextTransition
         text: "NT"
-        checkable: true
-        Layout.fillWidth: true
         onClicked: {
             me.setUpstreamKeyOnNextTransition(usk, checked)
         }

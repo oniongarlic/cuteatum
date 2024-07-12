@@ -5,7 +5,7 @@ import QtQuick.Controls
 import org.bm 1.0
 
 Slider {
-    id: sliderTbar
+    id: control
 
     Layout.fillHeight: true
     Layout.maximumHeight: parent.height/2
@@ -23,12 +23,12 @@ Slider {
     from: 0
     stepSize: 100
     handle: Rectangle {
-        color: sliderTbar.enabled ? "green" : "grey"
+        color: control.enabled ? "green" : "grey"
         border.color: "black"
         implicitHeight: 32
         implicitWidth: 80
-        x: sliderTbar.leftPadding + sliderTbar.visualPosition * (sliderTbar.availableWidth - width)
-        y: sliderTbar.topPadding + sliderTbar.availableHeight / 2 - height / 2
+        x: control.leftPadding + (control.horizontal ? control.visualPosition * (control.availableWidth - width) : (control.availableWidth - width) / 2)
+        y: control.topPadding + (control.horizontal ? (control.availableHeight - height) / 2 : control.visualPosition * (control.availableHeight - height))
         radius: 8
     }
     onValueChanged: {
@@ -61,7 +61,7 @@ Slider {
         id: easingTransition
         duration: 2000
         easing.type: Easing.InCubic
-        target: sliderTbar
+        target: control
         property: "value"
         from: 0
         to: 10000

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 
 Rectangle {
     id: sizeRect
@@ -189,6 +190,8 @@ Rectangle {
     property bool snapToGrid: false
     property bool dragOutside: true
 
+    property bool locked: false
+
     function animate() {
         boxAnimation.restart();
     }
@@ -316,6 +319,8 @@ Rectangle {
 
         focus: true
 
+        enabled: !locked
+
         function wheelSizeAdjust(delta) {
             if (boxSize<=0)
                 boxSize=0.01;
@@ -382,7 +387,7 @@ Rectangle {
         }
 
         onPressAndHold: {
-            //reset();
+            sizeRect.locked=true
         }
 
         onDoubleClicked: {
@@ -390,14 +395,33 @@ Rectangle {
         }        
     }
 
-    Text {
-        text: '#'+boxId+(crop ? "c" : "")
-        anchors.centerIn: parent
-        color: sizeRect.enabled ? "green" : "black"
-        font.bold: activated
-        font.strikeout: !sizeRect.enabled
-        font.pixelSize: boxSize < 0.3 ? 18 : 24
+    MouseArea {
+        id: lockedArea
+        anchors.fill: cropCenterRectangle
+        enabled: !dragArea.enabled
+        onDoubleClicked: {
+            sizeRect.locked=false
+        }
     }
+
+    RowLayout {
+        anchors.centerIn: parent
+        Text {
+            id: boxLabel
+            text: '#'+boxId+(crop ? "c" : "")
+            color: sizeRect.enabled ? "white" : "black"
+            font.bold: activated
+            font.strikeout: !sizeRect.enabled
+            font.italic: sizeRect.locked
+            font.pixelSize: boxSize < 0.3 ? 22 : 32
+        }
+        Text {
+            id: inputLabel
+            color: sizeRect.enabled ? "white" : "black"
+            font.pixelSize: boxSize < 0.3 ? 18 : 24
+        }
+    }
+
 
     DragBox {
         id: bottomRightDrag

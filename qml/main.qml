@@ -108,7 +108,15 @@ ApplicationWindow {
     }
 
     ListModel {
+        id: multiviewSourcesModel
+    }
+
+    ListModel {
         id: superSourcesModel
+    }
+
+    ListModel {
+        id: superSourceArtModel
     }
 
     ListModel {
@@ -729,9 +737,12 @@ ApplicationWindow {
             inputSourcesModel.clear()
             superSourcesModel.clear()
             outputsModel.clear()
+            outputSourcesModel.clear()
             atemMediaPlayersModel.clear()
             atemMediaModel.clear()
             keyAndMasksModel.clear()
+            multiviewSourcesModel.clear()
+            superSourceBoxInputModel.clear();
         }
 
         onTimeChanged: {
@@ -764,12 +775,28 @@ ApplicationWindow {
             } else if (info.internalType==4) {
                 console.debug("************** MEDIA PLAYER INPUT", info)
                 atemMediaPlayersModel.append(info)
+            } else if (info.internalType==128 && info.meAvailability>0) {
+                // XXX: handle ME2-4 case when we support more than ME1
+                console.debug("************** ME", info)
+                inputSourcesModel.append(info)
             }
+
+            // 1: Auxiliary
+            // 2: Multiviewer
+            // 4: SuperSource Art
+            // 8: SuperSource Box
+            // 16: Key Sources
 
             if (info.availability & 1) {
                 outputSourcesModel.append(info)
             }
+            if (info.availability & 1) {
+                multiviewSourcesModel.append(info)
+            }
             if (info.availability & 4) {
+                superSourceArtModel.append(info)
+            }
+            if (info.availability & 8) {
                 keyAndMasksModel.append(info)
             }
             if (info.availability & 8) {

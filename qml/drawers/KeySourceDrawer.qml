@@ -43,6 +43,7 @@ Drawer {
             Component {
                 id: upstreamKeyFillButtonComponent
                 InputButton {
+                    required property int index;
                     text: "C"+(index+1)
                     inputID: index+1
                     isPreview: true

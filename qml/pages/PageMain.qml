@@ -161,6 +161,7 @@ Page {
             Layout.row: 0
             spacing: 2
             visible: !forcePreview
+
             GridLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -170,7 +171,7 @@ Page {
                 InputButtonRepeater {
                     model: meSourcesModel
                     bg: programGroup
-                }
+                }                
             }
             InputButton {
                 text: "SS1"
@@ -445,6 +446,7 @@ Page {
             Layout.column: 1
             Layout.row: 0
             Layout.rowSpan: 4
+            Layout.alignment: Qt.AlignTop
 
             SliderTBar {
                 id: sliderTbar
@@ -528,6 +530,7 @@ Page {
 
             BlinkButton {
                 Layout.fillWidth: true
+                Layout.topMargin: 16
                 id: btnFTB
                 text: !meCon.ftb_fading ? "FTB" : meCon.ftb_frame
                 display: AbstractButton.TextUnderIcon

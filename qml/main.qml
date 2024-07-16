@@ -478,12 +478,12 @@ ApplicationWindow {
                 ProgressBar {
                     id: audioLevelMainLeft
                     from: 0
-                    to: 100
+                    to: 10000
                 }
                 ProgressBar {
                     id: audioLevelMainRight
                     from: 0
-                    to: 100
+                    to: 10000
                 }
             }
             Label {
@@ -837,8 +837,9 @@ ApplicationWindow {
         }
 
         onMasterAudioLevelChanged: {
-            audioLevelMainLeft.value=levelLeft/6553
-            audioLevelMainRight.value=levelRight/6553
+            audioLevelMainLeft.value=10000+levelLeft
+            audioLevelMainRight.value=10000+levelRight
+            console.debug("***MAL:",levelLeft,levelRight)
         }
 
         onTallyChanged: {

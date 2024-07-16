@@ -188,6 +188,7 @@ Page {
                 model: mediaPlayersModel
                 bg: programGroup
             }
+
             ColumnLayout {
                 spacing: 0
                 Layout.margins: 0
@@ -346,6 +347,23 @@ Page {
                 Button {
                     text: "Properties"
                     onClicked: dskDrawer.open()
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Label {
+                    text: "Media 1"
+                }
+                ComboBox {
+                    Layout.fillWidth: true
+                    id: mediaPlayerMedia1
+                    textRole: "name"
+                    valueRole: "index"
+                    model: mediaModel
+                    onActivated: {
+                        atem.setMediaPlayerSource(0, false, index)
+                    }
                 }
             }
 

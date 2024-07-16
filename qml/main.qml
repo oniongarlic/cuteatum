@@ -806,7 +806,9 @@ ApplicationWindow {
 
         onMediaInfoChanged: {
             console.debug(info)
-            atemMediaModel.append(info)
+            // xxx use own models for clips/sound
+            if (info.type==1)
+                atemMediaModel.append(info)
         }
 
         onTimecodeLockedChanged: {
@@ -839,11 +841,11 @@ ApplicationWindow {
         onMasterAudioLevelChanged: {
             audioLevelMainLeft.value=10000+levelLeft
             audioLevelMainRight.value=10000+levelRight
-            console.debug("***MAL:",levelLeft,levelRight)
+            // console.debug("***MAL:",levelLeft,levelRight)
         }
 
         onTallyChanged: {
-            console.debug('audioTally: '+audioSource)
+            console.debug('audioTally: ', audioSource, state)
         }
     }
 

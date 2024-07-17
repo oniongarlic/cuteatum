@@ -366,20 +366,12 @@ Page {
                 }
             }
 
-            ColumnLayout {
-                Layout.fillWidth: true
-                Label {
-                    text: "Media 1"
-                }
-                ComboBox {
-                    Layout.fillWidth: true
-                    id: mediaPlayerMedia1
-                    textRole: "name"
-                    valueRole: "index"
-                    model: mediaModel
-                    onActivated: {
-                        atem.setMediaPlayerSource(0, false, index)
-                    }
+            Repeater {
+                model: mediaPlayersModel.count
+
+                MediaPlayerBaseControls {
+                    required property int index;
+                    mp: index
                 }
             }
 

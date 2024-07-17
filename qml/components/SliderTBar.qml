@@ -15,6 +15,7 @@ Slider {
 
     property alias easingType: easingTransition.easing.type
     property alias easingDuration: easingTransition.duration
+    property alias easingRunning: easingTransition.running
 
     enabled: !easingTransition.running
 
@@ -22,6 +23,7 @@ Slider {
     to: 10000
     from: 0
     stepSize: 100
+    wheelEnabled: true
     handle: Rectangle {
         color: control.enabled ? "green" : "grey"
         border.color: "black"
@@ -37,6 +39,8 @@ Slider {
             if (atem.macroRecording) {
                 atem.addMacroPause(1)
             }
+        } else if (value==to) {
+            value=0
         }
     }
     onMoved: {
@@ -61,9 +65,13 @@ Slider {
         id: easingTransition
         duration: 2000
         easing.type: Easing.InCubic
+        alwaysRunToEnd: true
         target: control
         property: "value"
         from: 0
         to: 10000
+        onFinished: {
+            control.value=0
+        }
     }
 }

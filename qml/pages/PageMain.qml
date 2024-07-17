@@ -488,7 +488,7 @@ Page {
                     Layout.fillWidth: true
                     id: btnEasing
                     text: "Easing"
-                    enabled: !sliderTbar.running
+                    enabled: sliderTbar.enabled
                     onClicked: {
                         sliderTbar.start()
                     }

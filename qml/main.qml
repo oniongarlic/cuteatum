@@ -811,8 +811,28 @@ ApplicationWindow {
                 atemMediaModel.append(info)
         }
 
+        onMediaPlayerChanged: {
+            console.debug("MediaPlayer", player, type, still, clip)
+        }
+
+        onMediaPlayerStateChanged: {
+            console.debug("MediaPlayerState", player, state)
+        }
+
+        onMediaPoolClip1SizeChanged: {
+            console.debug("MediaPool-1", size)
+        }
+
+        onMediaPoolClip2SizeChanged: {
+            console.debug("MediaPool-2", size)
+        }
+
         onTimecodeLockedChanged: {
             console.debug("TimecodeLock"+locked)
+        }
+
+        onColorGeneratorColorChanged: {
+            console.debug("ColorGenerator", generator, color)
         }
 
         onAuxSourceChanged: {

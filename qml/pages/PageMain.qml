@@ -89,6 +89,7 @@ Page {
         onUpstreamKeyDVEYSizeChanged: {
             console.debug("YS:"+ySize)
         }
+
     }
 
     Connections {
@@ -99,8 +100,22 @@ Page {
         target: atem
         function onConnectedChanged() {
             console.debug("ATEM Main Page: Connected")
-            progColor1.color=""+atem.colorGeneratorColor(0)
-            progColor2.color=""+atem.colorGeneratorColor(1)
+            progColor1.statusIndicator.color=""+atem.colorGeneratorColor(0)
+            progColor2.statusIndicator.color=""+atem.colorGeneratorColor(1)
+        }
+
+        function onColorGeneratorColorChanged(generator, color) {
+            console.debug("onColorGeneratorColorChanged", generator, color)
+            switch (generator) {
+            case 0:
+                progColor1.statusIndicator.color=color
+                break;
+            case 1:
+                progColor2.statusIndicator.color=color
+                break;
+            }
+
+
         }
     }
 
@@ -171,7 +186,7 @@ Page {
                 InputButtonRepeater {
                     model: meSourcesModel
                     bg: programGroup
-                }                
+                }
             }
             InputButton {
                 text: "SS1"
@@ -185,9 +200,11 @@ Page {
                 visible: atem.supersources>1
                 ButtonGroup.group: programGroup
             }
-            InputButtonRepeater {
-                model: mediaPlayersModel
-                bg: programGroup
+            ColumnLayout {
+                InputButtonRepeater {
+                    model: mediaPlayersModel
+                    bg: programGroup
+                }
             }
 
             ColumnLayout {
@@ -210,32 +227,20 @@ Page {
                 spacing: 0
                 Layout.margins: 0
                 InputButton {
+                    id: progColor1
                     text: "Color 1"
                     inputID: AtemMixEffect.ColorGenerator1
                     compact: true
+                    statusIndicator.visible: true
                     ButtonGroup.group: programGroup
-                    Rectangle {
-                        id: progColor1
-                        width: 8
-                        height: 8
-                        x: 2
-                        y: 2
-                        visible: atem.connected
-                    }
                 }
                 InputButton {
+                    id: progColor2
                     text: "Color 2"
                     inputID: AtemMixEffect.ColorGenerator2
                     compact: true
+                    statusIndicator.visible: true
                     ButtonGroup.group: programGroup
-                    Rectangle {
-                        id: progColor2
-                        width: 8
-                        height: 8
-                        x: 2
-                        y: 2
-                        visible: atem.connected
-                    }
                 }
             }
         }
@@ -334,7 +339,7 @@ Page {
                         onClicked: uskDrawer.open()
                     }
                 }
-            }            
+            }
 
             ColumnLayout {
                 Label {

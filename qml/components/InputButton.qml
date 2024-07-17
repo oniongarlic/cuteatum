@@ -21,6 +21,8 @@ Button {
     property string  textLong;
     property string  textShort;
 
+    property Rectangle statusIndicator: inputStatus;
+
     background: Item {
         implicitWidth: btn.compact ? 50 : 60
         implicitHeight: btn.compact ? 25 : 60
@@ -31,6 +33,18 @@ Button {
             color: btn.checked ? (isPreview ? "#20f520" : "#f53030") : (isPreview ? "#d0f5d0" : "#f5d0d0")
             border.width: btn.checked ? 2 : 1
             border.color: btn.checked ? "#90e520" : "#101010"
+
+            Rectangle {
+                id: inputStatus
+                width: 12
+                height: 12
+                radius: width/2
+                border.width: 1
+                border.color: "darkgrey"
+                visible: false
+                x: 2
+                y: 2
+            }
         }
     }
 }

@@ -13,7 +13,7 @@ Repeater {
             required property int index
             required property string longText
             required property string shortText
-            text: longText
+            textLong: longText
             textShort: shortText
             inputID: index
             isPreview: r.isPreview

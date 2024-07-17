@@ -148,7 +148,7 @@ Page {
         rows: 4
         anchors.fill: parent
         anchors.margins: 4
-        //enabled: atem.connected || root.debugEnabled
+        enabled: atem.connected || root.debugEnabled
         visible: enabled
 
         RowLayout {
@@ -417,7 +417,7 @@ Page {
                     }
                 }
             }
-        }        
+        }
 
         ParallelAnimation {
             id: dveAnimation

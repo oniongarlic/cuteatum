@@ -188,17 +188,21 @@ Page {
                     bg: programGroup
                 }
             }
-            InputButton {
-                text: "SS1"
-                inputID: AtemMixEffect.SuperSource1
-                visible: atem.supersources>0
-                ButtonGroup.group: programGroup
-            }
-            InputButton {
-                text: "SS2"
-                inputID: AtemMixEffect.SuperSource2
-                visible: atem.supersources>1
-                ButtonGroup.group: programGroup
+            ColumnLayout {
+                InputButton {
+                    textLong: "Super Source 1"
+                    textShort: "SS1"
+                    inputID: AtemMixEffect.SuperSource1
+                    visible: atem.supersources>0
+                    ButtonGroup.group: programGroup
+                }
+                InputButton {
+                    textLong: "Super Source 2"
+                    textShort: "SS2"
+                    inputID: AtemMixEffect.SuperSource2
+                    visible: atem.supersources>1
+                    ButtonGroup.group: programGroup
+                }
             }
             ColumnLayout {
                 InputButtonRepeater {
@@ -206,10 +210,7 @@ Page {
                     bg: programGroup
                 }
             }
-
             ColumnLayout {
-                spacing: 0
-                Layout.margins: 0
                 InputButton {
                     text: "Black"
                     inputID: AtemMixEffect.BlackInput
@@ -224,8 +225,6 @@ Page {
                 }
             }
             ColumnLayout {
-                spacing: 0
-                Layout.margins: 0
                 InputButton {
                     id: progColor1
                     text: "Color 1"
@@ -265,24 +264,30 @@ Page {
                     bg: previewGroup
                 }
             }
-            InputButton {
-                text: "SS1"
-                inputID: AtemMixEffect.SuperSource1
-                visible: atem.supersources>0
-                isPreview: true
-                ButtonGroup.group: previewGroup
+            ColumnLayout {
+                InputButton {
+                    textLong: "Super Source 1"
+                    textShort: "SS1"
+                    inputID: AtemMixEffect.SuperSource1
+                    visible: atem.supersources>0
+                    isPreview: true
+                    ButtonGroup.group: previewGroup
+                }
+                InputButton {
+                    textLong: "Super Source 2"
+                    textShort: "SS2"
+                    inputID: AtemMixEffect.SuperSource2
+                    visible: atem.supersources>1
+                    isPreview: true
+                    ButtonGroup.group: previewGroup
+                }
             }
-            InputButton {
-                text: "SS2"
-                inputID: AtemMixEffect.SuperSource2
-                visible: atem.supersources>1
-                isPreview: true
-                ButtonGroup.group: previewGroup
-            }
-            InputButtonRepeater {
-                model: mediaPlayersModel
-                isPreview: true
-                bg: previewGroup
+            ColumnLayout {
+                InputButtonRepeater {
+                    model: mediaPlayersModel
+                    isPreview: true
+                    bg: previewGroup
+                }
             }
             ColumnLayout {
                 spacing: 0
@@ -306,14 +311,16 @@ Page {
                 spacing: 0
                 Layout.margins: 0
                 InputButton {
-                    text: "Color 1"
+                    textLong: "Color 1"
+                    textShort: "COL1"
                     inputID: 2001
                     isPreview: true
                     compact: true
                     ButtonGroup.group: previewGroup
                 }
                 InputButton {
-                    text: "Color 2"
+                    textLong: "Color 2"
+                    textShort: "COL2"
                     inputID: 2002
                     isPreview: true
                     compact: true
@@ -341,18 +348,21 @@ Page {
                 }
             }
 
-            ColumnLayout {
-                Label {
-                    text: "DSK 1"
-                }
-                DownstreamKeyBaseControls {
-                    me: mainPage.me
-                    dsk: mainPage.dsk
-                    model: keyAndMasksModel
-                }
-                Button {
-                    text: "Properties"
-                    onClicked: dskDrawer.open()
+            Repeater {
+                model: atem.downstreamKeyers
+
+                ColumnLayout {
+                    required property int index;
+                    DownstreamKeyBaseControls {
+                        me: mainPage.me
+                        dsk: atem.connected ? atem.downstreamKey(index) : null
+                        dskIndex: index+1
+                        model: keyAndMasksModel
+                    }
+                    Button {
+                        text: "Properties"
+                        onClicked: dskDrawer.open()
+                    }
                 }
             }
 

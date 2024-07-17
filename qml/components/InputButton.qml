@@ -18,8 +18,15 @@ Button {
 
     property bool compact: false
     property bool isPreview: false
-    property string  textLong;
-    property string  textShort;
+    property string textLong;
+    property string textShort;
+
+    text: (compact || width<60) && textShort!='' ? textShort : textLong
+
+    ToolTip.visible: hovered
+    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+    ToolTip.timeout: 5000
+    ToolTip.text: textLong +" - "+ textShort
 
     property Rectangle statusIndicator: inputStatus;
 

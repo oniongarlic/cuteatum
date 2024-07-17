@@ -11,15 +11,26 @@ ColumnLayout {
     required property AtemDownstreamKey dsk;
     required property ListModel model;
 
+    required property int dskIndex;
+
+    onDskChanged: {
+        if (!dsk)
+            return;
+
+        checkDownstream.checked=dsk.onAir()
+        dskTie.checked=dsk.tie()
+    }
+
     ToggleButton {
         id: checkDownstream
-        text: "DSK1"
+        text: "DSK "+dskIndex
         checkable: true
         onCheckedChanged: {
             dsk.setOnAir(checked)
         }
     }
     ToggleButton {
+        id: dskTie
         text: "Tie"
         onClicked: {
             dsk.setTie(checked);

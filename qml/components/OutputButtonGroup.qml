@@ -4,7 +4,7 @@ import QtQuick.Controls
 ButtonGroup {
     id: outputSourceGroup
     property int activeSource: -1
-    property int outputIndex: 0
+    property int outputIndex: -1
     onActiveSourceChanged: {
         for (var i = 0; i < buttons.length; ++i) {
             if (buttons[i].inputID == activeSource)

@@ -270,81 +270,57 @@ ApplicationWindow {
             title: "&Outputs"
             enabled: atem.connected
             Instantiator {
-                model: atem.outputs
-                active: outputGroups.active && outputGroups.count>0
+                model: outputsModel
+                active: atem.connected
                 delegate: Menu {
                     id: om
-                    title: "Output "+index;
-                    required property int index;
-                    OutputMenuItem {
-                        text: "Multiview"
-                        ButtonGroup.group: outputGroups.objectAt(om.index)
-                        inputID: 9001
+                    required property string longText;
+                    required property var model;
+                    required property int index; // Note: Not model index, it is the ATEM Input info index
+                    title: longText
+                    property alias outputIndex: ombg.outputIndex
+                    OutputButtonGroup {
+                        id: ombg
+                        // outputIndex: om.model.index
+                        onClicked: {
+                            atem.setAuxSource(outputIndex, button.inputID);
+                        }
+                        onOutputIndexChanged: {
+                            if (outputIndex<0)
+                                return;
+                            activeSource=atem.auxSource(outputIndex)
+                        }
+                        Component.onCompleted: {
+                            //activeSource=atem.auxSource(outputIndex)
+                            console.debug("OutputGroup created", outputIndex, activeSource)
+                        }
                     }
-                    OutputMenuItem {
-                        text: "Program"
-                        inputID: 10010
-                        ButtonGroup.group: outputGroups.objectAt(om.index)
-                    }
-                    OutputMenuItem {
-                        text: "Preview"
-                        inputID: 10011
-                        ButtonGroup.group: outputGroups.objectAt(om.index)
+                    Connections {
+                        target: atem
+                        onAuxSourceChanged: (aux, source) => {
+                            console.debug("AUXMENU: ", ombg.outputIndex, aux, source)
+                            if (aux!=ombg.outputIndex)
+                                return;
+                            ombg.activeSource=source
+                        }
                     }
                     Repeater {
-                        model: 4
+                        model: outputSourcesModel
                         OutputMenuItem {
-                            required property int index;
-                            text: "Input "+index+1
-                            inputID: index+1
-                            ButtonGroup.group: outputGroups.objectAt(om.index)
+                            required property int index; // Note: Not model index, it is the ATEM Input info index
+                            required property string longText;
+                            text: longText
+                            inputID: index
+                            ButtonGroup.group: ombg
                         }
                     }
                     Component.onCompleted: console.debug("OutputMenu created", index)
                 }
-                onObjectAdded: (index, object) => outputsMenu.insertMenu(index, object)
+                onObjectAdded: (index, object) => {
+                                object.outputIndex=index
+                                outputsMenu.addMenu(object)
+                            }
                 onObjectRemoved: (index, object) => outputsMenu.removeMenu(object)
-            }
-
-            OutputMenuItem {
-                text: "Multiview"
-                inputID: 9001
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Program"
-                inputID: 10010
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Preview"
-                inputID: 10011
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Input 1"
-                inputID: 1
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Input 2"
-                inputID: 2
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Input 3"
-                inputID: 3
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Input 4"
-                inputID: 4
-                ButtonGroup.group: outputGroup
-            }
-            OutputMenuItem {
-                text: "Direct input 1"
-                inputID: 11001
-                ButtonGroup.group: outputGroup
             }
         }
         Menu {
@@ -388,33 +364,6 @@ ApplicationWindow {
         id: macroDrawer
     }
 
-    Instantiator {
-        id: outputGroups
-        model: atem.outputs
-        active: atem.connected && atem.outputs>0
-        delegate: OutputButtonGroup {
-            required property int index;
-            // activeSource: atem.auxSource(index)
-            outputIndex: index
-            onClicked: {
-                atem.setAuxSource(outputIndex, button.inputID);
-            }
-            Component.onCompleted: {
-                activeSource=atem.auxSource(index)
-                console.debug("OutputGroup created", index)
-            }
-        }
-    }
-
-    OutputButtonGroup {
-        id: outputGroup
-        activeSource: atem.connected ? atem.auxSource(0) : 0
-        outputIndex: 0
-        onClicked: {
-            atem.setAuxSource(0, button.inputID);
-        }
-    }
-
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
@@ -435,7 +384,7 @@ ApplicationWindow {
                 id: timeMsg
                 text: sTime
                 Layout.fillWidth: true
-            }            
+            }
             Label {
                 Layout.fillWidth: false
                 visible: streaming.streamingDatarate>0 && atem.connected
@@ -837,9 +786,7 @@ ApplicationWindow {
 
         onAuxSourceChanged: {
             console.debug("AUX:"+aux+" = "+source)
-            outputGroup.activeSource=source
-            mqttClient.publishOutput(source)
-            outputGroups.objectAt(aux).activeSource=source;
+            mqttClient.publishOutput(aux, source)
         }
 
         onAudioMasterLevelsChanged: {
@@ -1004,8 +951,8 @@ ApplicationWindow {
         function publishPreview(i) {
             publish(topicBase+"preview", i)
         }
-        function publishOutput(i) {
-            publish(topicBase+"output", i)
+        function publishOutput(aux, i) {
+            publish(topicBase+"output/"+aux, i)
         }
         function publishFTB(i) {
             publish(topicBase+"ftb", i)

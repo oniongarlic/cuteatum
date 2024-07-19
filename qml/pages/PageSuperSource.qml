@@ -24,6 +24,7 @@ Page {
     property var proxies: [];
 
     property var savedPosition: [];
+    property var savedCrop: [];
 
     onSavedPositionChanged: console.debug(savedPosition)
 
@@ -53,6 +54,15 @@ Page {
             ToolButton {
                 text: "Close"
                 onClicked: rootStack.pop();
+            }
+            ToolSeparator {}
+            ToolButton {
+                text: "Save"
+                enabled: false
+            }
+            ToolButton {
+                text: "Load";
+                enabled: false
             }
         }
     }
@@ -108,30 +118,44 @@ Page {
 
     function savePositions(bid) {
         savedPosition[bid]=[];
+        savedCrop[bid]=[];
         for (var i=0;i<4;i++) {
-            let item=ssBoxParent.itemAt(i)
-            let v=item.getPositionVector3d();
-            savedPosition[bid][i]=v;
+            let item=ssBoxParent.itemAt(i)            
+            savedPosition[bid][i]=item.getPositionVector3d();
+            savedCrop[bid][i]=item.getCropVector4d()
         }
         let s=JSON.stringify(savedPosition);
-        ssSettings.setValue("ss_"+bid, s)
+        let c=JSON.stringify(savedCrop);
+
+        ssSettings.setValue("ss_pos_"+bid, s)
+        ssSettings.setValue("ss_crop_"+bid, c)
     }
 
     function preparePositions(bid) {
         for (var i=0;i<4;i++) {
-            let v=savedPosition[bid][i];
             let item=ssBoxParent.itemAt(i)
+
+            let v=savedPosition[bid][i];
+            let c=savedCrop[bid][i];
+
             item.animateFrom=item.getPositionVector3d();
             item.animateTo=v;
+
+            item.animateCropFrom=item.getCropVector4d();
+            item.animateCropTo=c;
         }
     }
 
     function loadPositions(bid) {
         let s=ssSettings.value("ss_"+bid, false)
         for (var i=0;i<4;i++) {
-            let v=savedPosition[bid][i];
             let item=ssBoxParent.itemAt(i)
+
+            let v=savedPosition[bid][i];
+            let c=savedCrop[bid][i];
+
             item.setPositionVector3d(v);
+            item.setCropVector4d(c);
         }
     }
 

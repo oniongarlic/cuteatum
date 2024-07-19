@@ -170,6 +170,14 @@ Rectangle {
         setSize(v.z)
     }
 
+    function getCropVector4d() {
+        return Qt.vector4d(cropTop, cropBottom, cropLeft, cropRight)
+    }
+
+    function setCropVector4d(c) {
+        setCrop(c.x, c.y, c.z, c.w)
+    }
+
     property vector3d anim;
     signal animationTick();
 
@@ -181,6 +189,10 @@ Rectangle {
     // Position animation
     property vector3d animateFrom;
     property vector3d animateTo;
+
+    property vector4d animateCropFrom;
+    property vector4d animateCropTo;
+
     property alias animateEasing: boxAnimation.easing.type
     property alias animateDuration: boxAnimation.duration
 
@@ -194,10 +206,37 @@ Rectangle {
 
     function animate() {
         boxAnimation.restart();
+        if (crop)
+            v4.restart();
     }
 
     function animateStop() {
-        boxAnimation.stop();
+        boxAnimation.stop();        
+        v4.stop();
+    }
+
+    ParallelAnimation {
+        id: v4
+        property double x;
+        property double y;
+        property double z;
+        property double w;
+
+        property vector4d from: animateCropFrom;
+        property vector4d to: animateCropTo;
+
+        readonly property vector4d anim: Qt.vector4d(x,y,z,w)
+
+        onAnimChanged: {
+            setCropVector4d(anim)
+        }
+
+        property int duration: 1000;
+
+        PropertyAnimation { target: v4; property: "x"; from: v4.from.x; to: v4.to.x; duration: v4.duration; easing.type: Easing.InOutCubic;}
+        PropertyAnimation { target: v4; property: "y"; from: v4.from.y; to: v4.to.y; duration: v4.duration; easing.type: Easing.InOutCubic;}
+        PropertyAnimation { target: v4; property: "z"; from: v4.from.z; to: v4.to.z; duration: v4.duration; easing.type: Easing.InOutCubic;}
+        PropertyAnimation { target: v4; property: "w"; from: v4.from.w; to: v4.to.w; duration: v4.duration; easing.type: Easing.InOutCubic;}
     }
 
     Vector3dAnimation {

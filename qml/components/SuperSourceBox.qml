@@ -329,12 +329,13 @@ Rectangle {
     }
 
     // XXX
-    Rectangle {
+    Rectangle {        
         x: 0+((parent.width/cropRatioLR)*cropLeft)
         y: 0+((parent.height/cropRatioTB)*cropTop)
         width: parent.width-((parent.width/cropRatioLR)*cropRight)-x
         height: parent.height-((parent.height/cropRatioTB)*cropBottom)-y
-        color: "transparent"
+        color: "#914ddf4d"
+        visible: crop
         border.color: "black"
         border.width: crop ? 1 : 0
     }

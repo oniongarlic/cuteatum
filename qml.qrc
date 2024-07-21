@@ -27,5 +27,6 @@
         <file>qml/drawers/UpstreamKeyDrawer.qml</file>
         <file>qml/drawers/DownstreamKeyDrawer.qml</file>
         <file>qml/components/MediaPlayerBaseControls.qml</file>
+        <file>qml/components/SnapToGrid.qml</file>
     </qresource>
 </RCC>

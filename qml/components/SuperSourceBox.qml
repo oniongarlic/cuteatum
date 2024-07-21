@@ -413,11 +413,13 @@ Rectangle {
             if (!drag.active) {
                 setX=(boxSize/2)+bx-0.5
                 setY=(boxSize/2)+by-0.5
+                if (snapToGrid) { //xxx
+                    setX=snapX.output
+                    setY=snapY.output
+                }
             } else {
                 sizeRect.focus=true
-                if (snapToGrid) {
 
-                }
             }
         }
 
@@ -432,7 +434,18 @@ Rectangle {
 
         onDoubleClicked: {
             sizeRect.enabled=!sizeRect.enabled
-        }        
+        }
+
+        SnapToGrid {
+            id: snapX
+            input: setX
+            size: 20
+        }
+        SnapToGrid {
+            id: snapY
+            input: setY
+            size: 20
+        }
     }
 
     MouseArea {

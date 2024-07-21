@@ -64,6 +64,13 @@ Page {
                 text: "Load";
                 enabled: false
             }
+            ToolSeparator {}
+            ToolButton {
+                id: snapToGridTool
+                text: "Snap"
+                checkable: true
+                checked: false
+            }
         }
     }
 
@@ -566,6 +573,8 @@ Page {
                             cropBottom: cBottom
                             visible: enabled || !ssHideDisabled.checked
                             selected: ssBoxParent.currentIndex==boxId-1
+                            snapToGrid: snapToGridTool.checked
+
                             onClicked: {
                                 ssBoxParent.currentIndex=index
                             }

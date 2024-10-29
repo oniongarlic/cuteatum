@@ -30,6 +30,11 @@ Rectangle {
     property double cropLeft: 0
     property double cropRight: 0
 
+    property bool borderEnabled: false
+    property color borderColor: "#ffffff"
+    property int borderWidthInner: 0
+    property int borderWidthOuter: 0
+
     property int boxId: 1
     property double defaultX: 0
     property double defaultY: 0

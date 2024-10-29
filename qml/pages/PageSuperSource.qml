@@ -92,14 +92,16 @@ Page {
             boxes[i]=ss.getSuperSourceBox(i);
             dumpBoxState(boxes[i])
             var sb=ssBoxParent.itemAt(i);
-            syncBoxState(boxes[i],sb)
+            syncBoxState(boxes[i], i, sb)
         }
     }
 
-    function syncBoxState(b, sb) {
-        sb.enabled=b.enabled
-        sb.inputSource=b.source
-        sb.crop=b.cropEnabled
+    function syncBoxState(b, i, sb) {
+        ssModel.setProperty(i, "ena", b.enabled)
+        ssModel.setProperty(i, "src", b.source)
+        ssModel.setProperty(i, "c", b.cropEnabled)
+        ssModel.setProperty(i, "border", b.borderEnabled)
+
         sb.setAtemPosition(b.position)
         sb.setSize(b.size/1000)
         sb.setAtemCrop(b.crop)
@@ -111,7 +113,7 @@ Page {
             console.debug('SSChanged: '+boxid)
             var b=ss.getSuperSourceBox(boxid);
             var sb=ssBoxParent.itemAt(boxid);
-            syncBoxState(b, sb)
+            syncBoxState(b, boxid, sb)
         }
     }
 
@@ -127,7 +129,7 @@ Page {
         savedPosition[bid]=[];
         savedCrop[bid]=[];
         for (var i=0;i<4;i++) {
-            let item=ssBoxParent.itemAt(i)            
+            let item=ssBoxParent.itemAt(i)
             savedPosition[bid][i]=item.getPositionVector3d();
             savedCrop[bid][i]=item.getCropVector4d()
         }
@@ -186,21 +188,25 @@ Page {
             dx: -0.25; dy: -0.25; ds: 0.5; ena: true;
             cx: -0.25; cy: -0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+            border: false; borderColor: "#ffffff"
         }
         ListElement { box: 2; src: 1001;
             dx: 0.25; dy: -0.25; ds: 0.5; ena: true;
             cx: 0.25; cy: -0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+            border: false; borderColor: "#ffffff"
         }
         ListElement { box: 3; src: 1002;
             dx: -0.25; dy: 0.25; ds: 0.5; ena: true;
             cx: -0.25; cy: 0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+            border: false; borderColor: "#ffffff"
         }
         ListElement { box: 4; src: 1003;
             dx: 0.25; dy: 0.25; ds: 0.5; ena: true;
             cx: 0.25; cy: 0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
+            border: false; borderColor: "#ffffff"
         }
 
         function toJSONat(i) {
@@ -433,6 +439,12 @@ Page {
         }
     }
 
+    function updateAtemLiveBorder(box, force) {
+        if (ssLiveCheck.checked || force) {
+            ss.setBorder(box.boxId-1, box.borderEnabled)
+        }
+    }
+
     onSelectedBoxChanged: {
         inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(selectedBox.inputSource)
         easingType.currentIndex=easingType.indexOfValue(selectedBox.animateEasing)
@@ -601,6 +613,9 @@ Page {
                             onCropChanged: {
                                 updateAtemLive(ssboxDelegate, true);
                             }
+                            onBorderEnabledChanged: {
+                                updateAtemLiveBorder(ssboxDelegate, true);
+                            }
                             onEnabledChanged: {
                                 updateAtemLive(ssboxDelegate, true);
                             }
@@ -644,6 +659,8 @@ Page {
                             required property int index;
                             required property bool ena;
                             required property bool c
+                            required property bool border
+                            required property color borderColor
                             required property var model;
                             Layout.fillWidth: true
                             Button {
@@ -663,7 +680,23 @@ Page {
                                 id: ssCrops
                                 checked: c
                                 text: "Crop"
-                                onCheckedChanged: model.c=checked
+                                onCheckedChanged: ssModel.setProperty(index, "c", checked)
+                            }
+                            RowLayout {
+                                CheckBox {
+                                    id: ssBorder
+                                    checked: border
+                                    // visible: ss.bordersSupported
+                                    text: "Border"
+                                    onCheckedChanged: ssModel.setProperty(index, "border", checked)
+                                }
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    color: borderColor
+                                    border.width: 1
+                                    border.color: "#101010"
+                                }
                             }
                         }
                     }

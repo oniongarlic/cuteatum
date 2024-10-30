@@ -334,10 +334,11 @@ ApplicationWindow {
             }
             Repeater {
                 model: 10
+                enabled: atem.connected
                 MenuItem {
                     required property int index
-                    text: "Run macro "+(index+1);
-                    enabled: atem.connected
+                    text: macrosModel.get(index).name //"Run macro "+(index+1);
+                    enabled: atem.connected && macrosModel.get(index).used
                     onTriggered: {
                         atem.runMacro(index)
                     }

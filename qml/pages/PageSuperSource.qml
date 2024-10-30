@@ -105,6 +105,8 @@ Page {
         ssModel.setProperty(i, "src", b.source)
         ssModel.setProperty(i, "c", b.cropEnabled)
 
+        ssModel.setProperty(i, "ds", b.size/1000);
+
         ssModel.setProperty(i, "borderEnabled", b.borderEnabled)
         ssModel.setProperty(i, "borderColor", ""+b.borderColor)
 
@@ -658,7 +660,7 @@ Page {
                             required property int index;
                             required property bool ena;
                             required property bool c
-                            required property bool border
+                            required property bool borderEnabled
                             required property color borderColor
                             required property var model;
                             Layout.fillWidth: true
@@ -684,7 +686,7 @@ Page {
                             RowLayout {
                                 CheckBox {
                                     id: ssBorder
-                                    checked: border
+                                    checked: borderEnabled
                                     // visible: ss.bordersSupported
                                     text: "Border"
                                     onCheckedChanged: ssModel.setProperty(index, "border", checked)

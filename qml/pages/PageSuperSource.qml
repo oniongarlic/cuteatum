@@ -81,6 +81,8 @@ Page {
         console.debug(b.size)
         console.debug(b.cropEnabled)
         console.debug(b.crop)
+        console.debug(b.borderEnabled)
+        console.debug(b.borderColor)
     }
 
     property bool animating: false
@@ -88,6 +90,7 @@ Page {
     function syncBoxStates() {
         if (!atem.connected)
             return;
+        console.debug("Syncing all boxes")
         for (var i=0;i<4;i++) {
             boxes[i]=ss.getSuperSourceBox(i);
             dumpBoxState(boxes[i])
@@ -97,10 +100,13 @@ Page {
     }
 
     function syncBoxState(b, i, sb) {
+        console.debug("Syncing box", i, b)
         ssModel.setProperty(i, "ena", b.enabled)
         ssModel.setProperty(i, "src", b.source)
         ssModel.setProperty(i, "c", b.cropEnabled)
-        ssModel.setProperty(i, "border", b.borderEnabled)
+
+        ssModel.setProperty(i, "borderEnabled", b.borderEnabled)
+        ssModel.setProperty(i, "borderColor", ""+b.borderColor)
 
         sb.setAtemPosition(b.position)
         sb.setSize(b.size/1000)
@@ -114,6 +120,13 @@ Page {
             var b=ss.getSuperSourceBox(boxid);
             var sb=ssBoxParent.itemAt(boxid);
             syncBoxState(b, boxid, sb)
+        }
+        function onSuperSourceBorderPropertiesChanged(boxid) {
+            var b=ss.getSuperSourceBox(boxid);
+            console.debug('SSBorder: ', boxid)
+            console.debug(b, b.borderEnabled, b.borderColor)
+            ssModel.setProperty(boxid, "borderEnabled", b.borderEnabled)
+            ssModel.setProperty(boxid, "borderColor", ""+b.borderColor)
         }
     }
 
@@ -188,25 +201,25 @@ Page {
             dx: -0.25; dy: -0.25; ds: 0.5; ena: true;
             cx: -0.25; cy: -0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
-            border: false; borderColor: "#ffffff"
+            borderEnabled: false; borderColor: "#ffffff"
         }
         ListElement { box: 2; src: 1001;
             dx: 0.25; dy: -0.25; ds: 0.5; ena: true;
             cx: 0.25; cy: -0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
-            border: false; borderColor: "#ffffff"
+            borderEnabled: false; borderColor: "#ffffff"
         }
         ListElement { box: 3; src: 1002;
             dx: -0.25; dy: 0.25; ds: 0.5; ena: true;
             cx: -0.25; cy: 0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
-            border: false; borderColor: "#ffffff"
+            borderEnabled: false; borderColor: "#ffffff"
         }
         ListElement { box: 4; src: 1003;
             dx: 0.25; dy: 0.25; ds: 0.5; ena: true;
             cx: 0.25; cy: 0.25; cs: 0.5;
             c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
-            border: false; borderColor: "#ffffff"
+            borderEnabled: false; borderColor: "#ffffff"
         }
 
         function toJSONat(i) {
@@ -440,8 +453,10 @@ Page {
     }
 
     function updateAtemLiveBorder(box, force) {
+        console.debug("updateLiveBorder", box.boxId)
         if (ssLiveCheck.checked || force) {
             ss.setBorder(box.boxId-1, box.borderEnabled)
+            ss.setBorderColor(box.boxId-1, box.borderColor)
         }
     }
 
@@ -571,6 +586,22 @@ Page {
                         }
                         model: ssModel
                         delegate: SuperSourceBox {
+                            required property int index;
+                            required property int box;
+                            required property int dx;
+                            required property int dy;
+                            required property int ds;
+                            required property bool ena;
+                            required property int src;
+                            required property bool c;
+                            required property int cLeft;
+                            required property int cRight;
+                            required property int cTop;
+                            required property int cBottom;
+                            //required property bool borderEnabled;
+                            //required property color borderColor;
+                            required property var model;
+
                             id: ssboxDelegate
                             boxId: box
                             defaultX: dx
@@ -578,11 +609,16 @@ Page {
                             defaultSize: ds
                             enabled: ena
                             inputSource: src
+
                             crop: c
                             cropLeft: cLeft
                             cropRight: cRight
                             cropTop: cTop
                             cropBottom: cBottom
+
+                            borderEnabled: model.borderEnabled
+                            borderColor: model.borderColor
+
                             visible: enabled || !ssHideDisabled.checked
                             selected: ssBoxParent.currentIndex==boxId-1
                             snapToGrid: snapToGridTool.checked
@@ -613,7 +649,12 @@ Page {
                             onCropChanged: {
                                 updateAtemLive(ssboxDelegate, true);
                             }
+                            onBorderColorChanged: {
+                                console.debug("BorderColorChanged", borderColor)
+                            }
+
                             onBorderEnabledChanged: {
+                                console.debug("")
                                 updateAtemLiveBorder(ssboxDelegate, true);
                             }
                             onEnabledChanged: {

@@ -29,5 +29,6 @@
         <file>qml/components/MediaPlayerBaseControls.qml</file>
         <file>qml/components/SnapToGrid.qml</file>
         <file>qml/components/Vector4dAnimation.qml</file>
+        <file>qml/models/ListModelSuperSourceBoxes.qml</file>
     </qresource>
 </RCC>

@@ -591,7 +591,7 @@ Page {
                                     ssBoxParent.currentIndex=index
                             }
                             onBoxSizeChanged: {
-                                model.cs=boxSize
+                                model.ds=boxSize
                             }
                             onBoxCenterChanged: {
                                 model.cx=boxCenter.x
@@ -689,7 +689,7 @@ Page {
                                     checked: borderEnabled
                                     // visible: ss.bordersSupported
                                     text: "Border"
-                                    onCheckedChanged: ssModel.setProperty(index, "border", checked)
+                                    onCheckedChanged: ssModel.setProperty(index, "borderEnabled", checked)
                                 }
                                 Rectangle {
                                     width: 24

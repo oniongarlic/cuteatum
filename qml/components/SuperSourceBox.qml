@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import org.bm 1.0
+
 Rectangle {
     id: sizeRect
     x: parent.width*boxX
@@ -13,6 +15,8 @@ Rectangle {
     opacity: enabled ? 1 : 0.2
     activeFocusOnTab: true
 
+    required property AtemSuperSourceBox assb;
+
     property int dragMargin: 16
 
     property bool selected: false
@@ -23,6 +27,8 @@ Rectangle {
 
     property bool keepCenter: true
     property bool keepInside: false
+
+    property bool keepSync: true
 
     property bool crop: false
     property double cropTop: 0
@@ -75,6 +81,37 @@ Rectangle {
     onBoxYChanged: y=parent.height*boxY
 
     readonly property double _phw: parent.width+parent.height
+
+    // Sync changes from mixer to values
+    Connections {
+        target: assb
+        enabled: keepSync
+        function onBoxPropertiesChanged() {
+            syncBoxState();
+        }
+        function onBorderPropertiesChanged() {
+            syncBoxBorderState();
+        }
+    }
+
+    function syncBoxState() {
+        console.debug("Syncing live ssbox properties", assb)
+        setAtemPosition(assb.position);
+        setSize(assb.size/1000);
+        setAtemCrop(assb.crop);
+        inputSource=assb.source;
+    }
+
+    function syncBoxBorderState() {
+        console.debug("Syncing live ssbox border properties", assb)
+        borderEnabled=assb.border;
+        borderColor=assb.borderColor;
+    }
+
+    function syncToDevice() {
+        console.debug("Syncing ssbox properties to device", assb)
+        assb.setSuperSource(enabled, inputSource, atemPosition, atemSize, crop, atemCrop);
+    }
 
     on_PhwChanged: {
         _updateXY();
@@ -237,10 +274,12 @@ Rectangle {
         to: animateTo
     }
 
-    Keys.onLeftPressed: setX-=0.001
-    Keys.onRightPressed: setX+=0.001
-    Keys.onUpPressed: setY-=0.001
-    Keys.onDownPressed: setY+=0.001
+    readonly property double keyMove: snapToGrid ? 0.02 : 0.001
+
+    Keys.onLeftPressed: setX-=keyMove
+    Keys.onRightPressed: setX+=keyMove
+    Keys.onUpPressed: setY-=keyMove
+    Keys.onDownPressed: setY+=keyMove
     Keys.onSpacePressed: sizeRect.enabled=!enabled
     Keys.onAsteriskPressed: sizeRect.crop=!crop
     Keys.onPressed: (event) => {
@@ -280,12 +319,20 @@ Rectangle {
 
     Keys.onReleased: {
         setKeyboardDefaults()
+        if (snapToGrid) {
+            setX=snapX.output
+            setY=snapY.output
+        }
     }
 
     function setKeyboardDefaults() {
-        slowDown=false;
-        snapToGrid=false
+        slowDown=false;        
         dragOutside=true;
+    }
+
+    function snapGrid() {
+        setX=snapX.output
+        setY=snapY.output
     }
 
     function snapInside() {
@@ -301,6 +348,7 @@ Rectangle {
     }
 
     function reset() {
+        console.debug("Reset ssbox", defaultX, defaultY, defaultSize)
         boxSize=defaultSize
         setX=defaultX
         setY=defaultY

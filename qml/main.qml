@@ -339,6 +339,7 @@ ApplicationWindow {
                     required property int index
                     text: macrosModel.get(index).name //"Run macro "+(index+1);
                     enabled: atem.connected && macrosModel.get(index).used
+                    visible: atem.connected
                     onTriggered: {
                         atem.runMacro(index)
                     }
@@ -859,7 +860,7 @@ ApplicationWindow {
     AtemSuperSource {
         id: superSource
         atemConnection: atem
-        // superSourceID: 0
+        superSourceID: 0
 
         property alias inputModel: superSourceBoxInputModel
 

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     Settings settings;
 
-    QQuickStyle::setStyle("Universal");
+    //QQuickStyle::setStyle("Universal");
     //QQuickStyle::setStyle("Material");
 
     QQmlApplicationEngine engine;
@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<QAtemCameraControl>("org.bm", 1, 0, "AtemCameraControl", "AtemCameraControl can not be created");
     qmlRegisterType<QAtemFairlight>("org.bm", 1, 0, "AtemFairlight");
     qmlRegisterType<QAtemSuperSource>("org.bm", 1, 0, "AtemSuperSource");
+    qmlRegisterUncreatableType<QAtemSuperSourceBox>("org.bm", 1, 0, "AtemSuperSourceBox", "Used in C++ only");
+
     qmlRegisterType<QAtemStreaming>("org.bm", 1, 0, "AtemStreaming");
     qmlRegisterType<QAtemRecording>("org.bm", 1, 0, "AtemRecording");
 
@@ -64,14 +66,18 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
     qRegisterMetaType<QAtemDownstreamKey*>("AtemDownstreamKey");
+    qRegisterMetaType<QAtemSuperSourceBox*>("QAtemSuperSourceBox");
+    qRegisterMetaType<QAtem::SuperSourceBoxSettings>();    
 
-    qRegisterMetaType<QAtem::SuperSourceBoxSettings>();
+    qmlRegisterUncreatableType<QList<QAtemSuperSourceBox>*>("org.bm", 1, 0, "AtemSuperSourceBoxes", "Used in C++ only");
+
     qRegisterMetaType<QAtem::InputInfo>();
     qRegisterMetaType<QAtem::Topology>();
-    qRegisterMetaType<quint8>();
-    qRegisterMetaType<quint16>();
     qRegisterMetaType<QAtem::MediaInfo>();
     qRegisterMetaType<QAtem::MacroInfo>();
+
+    qRegisterMetaType<quint8>();
+    qRegisterMetaType<quint16>();
     qRegisterMetaType<QMap<quint16,QAtem::InputInfo>>();
 
     qmlRegisterType<CuteMqttClient>("org.tal.mqtt", 1, 0, "MqttClient");

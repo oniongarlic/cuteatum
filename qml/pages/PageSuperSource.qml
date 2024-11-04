@@ -39,10 +39,15 @@ Page {
                          }
                      }
 
+    property var ssm;
+
     Component.onCompleted: {
         savePositions(0);
         savePositions(1);
-    }
+
+        ssm=ss.getSuperSourceBoxes();
+        console.debug("sss", ssm.length, ssm[0])
+    }    
 
     Settings {
         id: ssSettings
@@ -70,9 +75,9 @@ Page {
                 text: "Snap"
                 checkable: true
                 checked: false
-            }
+            }            
         }
-    }
+    }    
 
     function dumpBoxState(b) {
         console.debug(b.enabled)
@@ -95,7 +100,7 @@ Page {
             boxes[i]=ss.getSuperSourceBox(i);
             dumpBoxState(boxes[i])
             var sb=ssBoxParent.itemAt(i);
-            syncBoxState(boxes[i], i, sb)
+            syncBoxState()
         }
     }
 
@@ -137,6 +142,8 @@ Page {
         onConnected: {
             console.debug("SuperSource got connected", supersources)
             syncBoxStates();
+            ssm=ss.getSuperSources();
+            console.debug(ssm)
         }
     }
 
@@ -194,7 +201,7 @@ Page {
     function syncBoxFromProxy(boxid, proxy) {
         var sb=ssBoxParent.itemAt(boxid);
         sb.setCenter(proxy.x, proxy.y)
-        sb.setSize(proxy.s)
+        sb.setSize(proxy.s)        
     }
 
     ListModelSuperSourceBoxes {
@@ -563,6 +570,9 @@ Page {
                             required property var model;
 
                             id: ssboxDelegate
+
+                            assb: ss.getSuperSourceBox(index)
+
                             boxId: box
                             defaultX: dx
                             defaultY: dy
@@ -706,6 +716,7 @@ Page {
                 ComboBox {
                     id: inputSourceCombo
                     Layout.fillWidth: true
+                    enabled: selectedBox!=null
                     model: atem.superSourceBoxInputModel
                     onActivated: {
                         selectedBox.inputSource=currentValue;
@@ -714,6 +725,7 @@ Page {
 
                 RowLayout {
                     Layout.fillWidth: true
+                    enabled: selectedBox!=null
                     SpinBox {
                         id: boxX
                         Layout.fillWidth: true
@@ -745,6 +757,7 @@ Page {
                     rows: 3
                     columns: 3
                     Layout.fillWidth: true
+                    enabled: selectedBox!=null
                     Button {
                         text: "LU"
                         onClicked: selectedBox.setCenter(-0.25, -0.25)
@@ -792,6 +805,7 @@ Page {
                     }
                 }
                 RowLayout {
+                    enabled: selectedBox!=null
                     Button {
                         text: "F"
                         onClicked: {
@@ -811,6 +825,7 @@ Page {
                 }
 
                 RowLayout {
+                    enabled: selectedBox!=null
                     SpinBox {
                         id: boxSize
                         Layout.fillWidth: true
@@ -1172,16 +1187,20 @@ Page {
                 checked: true
             }
             Button {
-                text: "Commit"
+                text: "Commit 1"
                 enabled: selectedBox && !ssLiveCheck.checked
                 onClicked: {
-                    ss.setSuperSource(selectedBox.boxId-1,
-                                      selectedBox.enabled,
-                                      selectedBox.inputSource,
-                                      selectedBox.atemPosition,
-                                      selectedBox.atemSize,
-                                      selectedBox.crop,
-                                      selectedBox.atemCrop)
+                    selectedBox.syncToDevice();
+                }
+            }
+            Button {
+                text: "Commit A"
+                enabled: !ssLiveCheck.checked
+                onClicked: {
+                    for (var i=0;i<4;i++) {
+                        var sb=ssBoxParent.itemAt(i);
+                        sb.syncToDevice();
+                    }
                 }
             }
 

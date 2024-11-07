@@ -69,13 +69,14 @@ Rectangle {
     // Position & crop in mixer values
     readonly property point atemPosition: Qt.point(boxCenterX*3200, -boxCenterY*1800)
     readonly property int atemSize: boxSize*1000
-    readonly property rect atemCrop: Qt.rect(cropLeft*10,
+    readonly property rect atemCrop: Qt.vector4d(cropLeft*10,
                                     cropTop*10,
                                     cropRight*10,
                                     cropBottom*10)
 
-    onAtemCropChanged: console.debug("atemCrop "+ atemCrop)
-    onAtemPositionChanged: console.debug("AtemPos "+ atemPosition)
+    onAtemCropChanged: console.debug("atemCrop", atemCrop)
+    onAtemSizeChanged: console.debug("AtemSize", atemSize)
+    onAtemPositionChanged: console.debug("AtemPos", atemPosition)
 
     onBoxXChanged: x=parent.width*boxX
     onBoxYChanged: y=parent.height*boxY
@@ -87,30 +88,50 @@ Rectangle {
         target: assb
         enabled: keepSync
         function onBoxPropertiesChanged() {
+            console.debug("Device sent box property update")
             syncBoxState();
         }
         function onBorderPropertiesChanged() {
+            console.debug("Device sent box border update")
             syncBoxBorderState();
         }
     }
 
+    onDefaultSizeChanged: boxSize=defaultSize
+    Component.onCompleted: {
+        if (atem.connected) {
+            console.debug("Initial sync from device")
+            syncBoxState();
+            syncBoxBorderState();
+        } else {
+            console.debug("Not connected, using local defaults")
+            reset()
+        }
+        _updateXY();
+    }
+
     function syncBoxState() {
-        console.debug("Syncing live ssbox properties", assb)
+        console.debug("Syncing live ssbox properties", assb.position, assb.size, assb.crop, assb.source)
+
+        console.debug(assb.cropRect.left, assb.cropRect.right, assb.cropRect.top, assb.cropRect.bottom)
+
         setAtemPosition(assb.position);
         setSize(assb.size/1000);
-        setAtemCrop(assb.crop);
+        setAtemCrop(assb.cropRect);
+        crop=assb.crop
         inputSource=assb.source;
+        enabled=assb.onAir
     }
 
     function syncBoxBorderState() {
-        console.debug("Syncing live ssbox border properties", assb)
+        console.debug("Syncing live ssbox border properties", assb.border, assb.borderColor)
         borderEnabled=assb.border;
         borderColor=assb.borderColor;
     }
 
     function syncToDevice() {
         console.debug("Syncing ssbox properties to device", assb)
-        assb.setSuperSource(enabled, inputSource, atemPosition, atemSize, crop, atemCrop);
+        assb.setBox(enabled, inputSource, atemPosition, atemSize, crop, atemCrop);
     }
 
     on_PhwChanged: {
@@ -130,12 +151,6 @@ Rectangle {
 
     signal clicked()
 
-    onDefaultSizeChanged: boxSize=defaultSize
-    Component.onCompleted: {
-        reset()
-        _updateXY();
-    }
-
     function setCenter(cx,cy) {
         setX=cx;
         setY=cy;
@@ -150,32 +165,33 @@ Rectangle {
     }
 
     function setAtemPosition(p) {
+        console.debug(p)
         setCenter(p.x/3200, -p.y/1800)
     }
 
     function setCrop(ct, cb, cl, cr) {
         cropLeft=cl;
-        cropBottom=cb;
-        cropTop=ct;
         cropRight=cr;
+        cropTop=ct;
+        cropBottom=cb;
     }
 
     function setAtemCrop(c) {
-        setCrop(c.y/10, c.height/10, c.x/10, c.width/10)
+        setCrop(c.top/10, c.bottom/10, c.left/10, c.right/10)
     }
 
-    function mapNormalizedRect() {
-        return Qt.rect(sizeRect.x/parent.width,
-                       sizeRect.y/parent.height,
-                       sizeRect.width/parent.width,
-                       sizeRect.height/parent.height)
-    }
-    function cropNormalizedRect() {
-        return Qt.rect(cropLeft/cropRatioLR,
-                       cropTop/cropRatioTB,
-                       cropRight/cropRatioLR,
-                       cropBottom/cropRatioTB)
-    }
+    // function mapNormalizedRect() {
+    //     return Qt.rect(sizeRect.x/parent.width,
+    //                    sizeRect.y/parent.height,
+    //                    sizeRect.width/parent.width,
+    //                    sizeRect.height/parent.height)
+    // }
+    // function cropNormalizedRect() {
+    //     return Qt.rect(cropLeft/cropRatioLR,
+    //                    cropTop/cropRatioTB,
+    //                    cropRight/cropRatioLR,
+    //                    cropBottom/cropRatioTB)
+    // }
 
     function setSize(s) {
         boxSize=s;

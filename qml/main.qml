@@ -491,6 +491,7 @@ ApplicationWindow {
         id: superSourceView
         PageSuperSource {
             ss: superSource
+            superSourceInputModel: superSourceBoxInputModel
         }
     }
 
@@ -741,17 +742,17 @@ ApplicationWindow {
             if (info.availability & 1) {
                 outputSourcesModel.append(info)
             }
-            if (info.availability & 1) {
+            if (info.availability & 2) {
                 multiviewSourcesModel.append(info)
             }
             if (info.availability & 4) {
                 superSourceArtModel.append(info)
             }
             if (info.availability & 8) {
-                keyAndMasksModel.append(info)
-            }
-            if (info.availability & 8) {
                 superSourceBoxInputModel.append(info)
+            }
+            if (info.availability & 16) {
+                keyAndMasksModel.append(info)
             }
         }
 

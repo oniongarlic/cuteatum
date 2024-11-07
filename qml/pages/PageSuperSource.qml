@@ -18,9 +18,9 @@ Page {
     readonly property double ratio: 16/9
     property int boxDragMargin: 16
 
-    property AtemSuperSource ss;
+    required property AtemSuperSource ss;
+    required property ListModel superSourceInputModel;
 
-    property var boxes: [];
     property var proxies: [];
 
     property var savedPosition: [];
@@ -39,14 +39,11 @@ Page {
                          }
                      }
 
-    property var ssm;
+    property bool animating: false
 
     Component.onCompleted: {
         savePositions(0);
         savePositions(1);
-
-        ssm=ss.getSuperSourceBoxes();
-        console.debug("sss", ssm.length, ssm[0])
     }    
 
     Settings {
@@ -77,74 +74,17 @@ Page {
                 checked: false
             }            
         }
-    }    
-
-    function dumpBoxState(b) {
-        console.debug(b.enabled)
-        console.debug(b.source)
-        console.debug(b.position)
-        console.debug(b.size)
-        console.debug(b.cropEnabled)
-        console.debug(b.crop)
-        console.debug(b.borderEnabled)
-        console.debug(b.borderColor)
-    }
-
-    property bool animating: false
-
-    function syncBoxStates() {
-        if (!atem.connected)
-            return;
-        console.debug("Syncing all boxes")
-        for (var i=0;i<4;i++) {
-            boxes[i]=ss.getSuperSourceBox(i);
-            dumpBoxState(boxes[i])
-            var sb=ssBoxParent.itemAt(i);
-            syncBoxState()
-        }
-    }
-
-    function syncBoxState(b, i, sb) {
-        console.debug("Syncing box", i, b)
-        ssModel.setProperty(i, "ena", b.enabled)
-        ssModel.setProperty(i, "src", b.source)
-        ssModel.setProperty(i, "c", b.cropEnabled)
-
-        ssModel.setProperty(i, "ds", b.size/1000);
-
-        ssModel.setProperty(i, "borderEnabled", b.borderEnabled)
-        ssModel.setProperty(i, "borderColor", ""+b.borderColor)
-
-        sb.setAtemPosition(b.position)
-        sb.setSize(b.size/1000)
-        sb.setAtemCrop(b.crop)
-    }
-
-    Connections {
-        target: ss
-        function onSuperSourceChanged(boxid) {
-            console.debug('SSChanged: '+boxid)
-            var b=ss.getSuperSourceBox(boxid);
-            var sb=ssBoxParent.itemAt(boxid);
-            syncBoxState(b, boxid, sb)
-        }
-        function onSuperSourceBorderPropertiesChanged(boxid) {
-            var b=ss.getSuperSourceBox(boxid);
-            console.debug('SSBorder: ', boxid)
-            console.debug(b, b.borderEnabled, b.borderColor)
-            ssModel.setProperty(boxid, "borderEnabled", b.borderEnabled)
-            ssModel.setProperty(boxid, "borderColor", ""+b.borderColor)
-        }
     }
 
     Connections {
         target: atem
         onConnected: {
-            console.debug("SuperSource got connected", supersources)
-            syncBoxStates();
-            ssm=ss.getSuperSources();
-            console.debug(ssm)
+            console.debug("SuperSource got connected")
         }
+    }
+
+    function syncBoxStates() {
+
     }
 
     function savePositions(bid) {
@@ -408,6 +348,8 @@ Page {
     property SuperSourceBox selectedBox;
 
     function updateAtemLive(box, force) {
+        console.debug("ATEM UPDATE TO DEVICE")
+        return;
         if (ssLiveCheck.checked || force) {
             ss.setSuperSource(box.boxId-1,
                               box.enabled,
@@ -420,6 +362,7 @@ Page {
     }
 
     function updateAtemLiveBorder(box, force) {
+        return
         console.debug("updateLiveBorder", box.boxId)
         if (ssLiveCheck.checked || force) {
             ss.setBorder(box.boxId-1, box.borderEnabled)
@@ -555,10 +498,10 @@ Page {
                         delegate: SuperSourceBox {
                             required property int index;
                             required property int box;
-                            required property int dx;
-                            required property int dy;
-                            required property int ds;
-                            required property bool ena;
+                            required property double dx;
+                            required property double dy;
+                            required property double ds;
+                            required property bool onair;
                             required property int src;
                             required property bool c;
                             required property int cLeft;
@@ -577,6 +520,7 @@ Page {
                             defaultX: dx
                             defaultY: dy
                             defaultSize: ds
+
                             enabled: ena
                             inputSource: src
 
@@ -602,6 +546,7 @@ Page {
                             }
                             onBoxSizeChanged: {
                                 model.ds=boxSize
+
                             }
                             onBoxCenterChanged: {
                                 model.cx=boxCenter.x
@@ -612,9 +557,11 @@ Page {
                             }
                             onAtemSizeChanged: {
                                 updateAtemLive(ssboxDelegate, true);
+                                assb.setPosition(atemPosition, atemSize)
                             }
                             onAtemPositionChanged: {
                                 updateAtemLive(ssboxDelegate, true);
+                                assb.setPosition(atemPosition)
                             }
                             onCropChanged: {
                                 updateAtemLive(ssboxDelegate, true);
@@ -622,9 +569,8 @@ Page {
                             onBorderColorChanged: {
                                 console.debug("BorderColorChanged", borderColor)
                             }
-
                             onBorderEnabledChanged: {
-                                console.debug("")
+                                console.debug("Border changed")
                                 updateAtemLiveBorder(ssboxDelegate, true);
                             }
                             onEnabledChanged: {
@@ -668,14 +614,16 @@ Page {
                         model: ssModel
                         ColumnLayout {
                             required property int index;
-                            required property bool ena;
+                            required property bool onair;
                             required property bool c
                             required property bool borderEnabled
                             required property color borderColor
                             required property var model;
+
+                            property AtemSuperSourceBox assb: ss.getSuperSourceBox(index);
+
                             Layout.fillWidth: true
                             Button {
-                                property int boxIndex: index
                                 Layout.fillWidth: true
                                 text: "Box "+(index+1)
                                 checkable: true
@@ -684,27 +632,30 @@ Page {
                             CheckBox {
                                 id: ssChecks
                                 text: "Visible"
-                                checked: ena
-                                onCheckedChanged: ssModel.setProperty(index, "ena", checked)
+                                checked: assb.onAir
+                                // onCheckedChanged: ssModel.setProperty(index, "onair", checked)
+                                onCheckedChanged: assb.setOnAir(checked)
                             }
                             CheckBox {
                                 id: ssCrops
-                                checked: c
+                                checked: assb.crop
                                 text: "Crop"
-                                onCheckedChanged: ssModel.setProperty(index, "c", checked)
+                                // onCheckedChanged: ssModel.setProperty(index, "c", checked)
+                                onCheckedChanged: assb.setCropEnabled(checked)
                             }
                             RowLayout {
+                                // visible: ss.bordersSupported
                                 CheckBox {
                                     id: ssBorder
-                                    checked: borderEnabled
-                                    // visible: ss.bordersSupported
+                                    checked: assb.border
                                     text: "Border"
-                                    onCheckedChanged: ssModel.setProperty(index, "borderEnabled", checked)
+                                    //onCheckedChanged: ssModel.setProperty(index, "borderEnabled", checked)
+                                    onCheckedChanged: assb.setBorder(checked)
                                 }
                                 Rectangle {
                                     width: 24
                                     height: 24
-                                    color: borderColor
+                                    color: assb.borderColor
                                     border.width: 1
                                     border.color: "#101010"
                                 }
@@ -717,7 +668,9 @@ Page {
                     id: inputSourceCombo
                     Layout.fillWidth: true
                     enabled: selectedBox!=null
-                    model: atem.superSourceBoxInputModel
+                    model: superSourceInputModel
+                    textRole: "longText"
+                    valueRole: "index"
                     onActivated: {
                         selectedBox.inputSource=currentValue;
                     }

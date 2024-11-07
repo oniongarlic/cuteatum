@@ -17,8 +17,8 @@ ColumnLayout {
         if (!dsk)
             return;
 
-        checkDownstream.checked=dsk.onAir()
-        dskTie.checked=dsk.tie()
+        checkDownstream.checked=dsk.onAir
+        dskTie.checked=dsk.tie
     }
 
     ToggleButton {

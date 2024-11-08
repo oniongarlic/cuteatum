@@ -41,6 +41,9 @@ Page {
 
     property bool animating: false
 
+    // Page global current box index
+    property int currentBoxIndex: -1;
+
     Component.onCompleted: {
         savePositions(0);
         savePositions(1);
@@ -481,9 +484,9 @@ Page {
 
                     Repeater {
                         id: ssBoxParent
-                        property int currentIndex: -1
+                        property int currentIndex: currentBoxIndex
                         onCurrentIndexChanged: {
-                            console.debug(currentIndex)
+                            console.debug("Box selected", currentIndex)
                             for (var i=0;i<count;i++) {
                                 var item=itemAt(i)
                                 if (i==currentIndex) {
@@ -538,11 +541,11 @@ Page {
                             snapToGrid: snapToGridTool.checked
 
                             onClicked: {
-                                ssBoxParent.currentIndex=index
+                                currentBoxIndex=index
                             }
                             onFocusChanged: {
                                 if (focus)
-                                    ssBoxParent.currentIndex=index
+                                    currentBoxIndex=index
                             }
                             onBoxSizeChanged: {
                                 model.ds=boxSize
@@ -596,7 +599,7 @@ Page {
 
                 ButtonGroup {
                     id: boxGroup
-                    property int activeBox: ssBoxParent.currentIndex
+                    property int activeBox: currentBoxIndex
                     onActiveBoxChanged: {
                         for (var i = 0; i < buttons.length; ++i) {
                             if (buttons[i].boxIndex == activeBox)
@@ -604,7 +607,7 @@ Page {
                         }
                     }
                     onClicked: {
-                        ssBoxParent.currentIndex=button.boxIndex
+                        currentBoxIndex=button.boxIndex
                     }
                 }
 
@@ -624,6 +627,7 @@ Page {
 
                             Layout.fillWidth: true
                             Button {
+                                property int boxIndex: index
                                 Layout.fillWidth: true
                                 text: "Box "+(index+1)
                                 checkable: true

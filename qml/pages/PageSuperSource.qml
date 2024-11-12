@@ -28,8 +28,6 @@ Page {
 
     onSavedPositionChanged: console.debug(savedPosition)
 
-    StackView.onActivating: syncBoxStates();
-
     objectName: "supersource"
 
     Keys.onReleased: (event) => {
@@ -43,6 +41,10 @@ Page {
 
     // Page global current box index
     property int currentBoxIndex: -1;
+
+    onCurrentBoxIndexChanged: {
+        selectedBox=currentBoxIndex>-1 ? ssBoxParent.itemAt(currentBoxIndex) : null
+    }
 
     Component.onCompleted: {
         savePositions(0);
@@ -86,8 +88,11 @@ Page {
         }
     }
 
-    function syncBoxStates() {
-
+    function syncBoxStatesToDevice() {
+        for (var i=0;i<4;i++) {
+            var sb=ssBoxParent.itemAt(i);
+            sb.syncToDevice();
+        }
     }
 
     function savePositions(bid) {
@@ -149,6 +154,144 @@ Page {
 
     ListModelSuperSourceBoxes {
         id: ssModel
+    }
+
+    Repeater {
+        id: syncProxyRepeater
+        model: ssModel
+        delegate: syncProxyComponent
+
+        property bool keepSync: true
+
+        Component.onCompleted: {
+            if (atem.connected) {
+                console.debug("Initial sync from device")
+                syncFromDevice()
+            } else {
+                console.debug("Not connected, using local defaults")
+                // reset()
+            }
+        }
+
+        function syncItemToDevice(i) {
+            let item=itemAt(i)
+            item.syncBoxState();
+            item.syncBoxBorderState();
+        }
+
+        function syncFromDevice() {
+            for (var i=0;i<4;i++) {
+                syncItemToDevice(i)
+            }
+        }
+        function syncToDevice() {
+            for (var i=0;i<4;i++) {
+                let item=itemAt(i)
+                item.syncToDevice();
+            }
+        }
+    }
+
+    // Model syncer, keeps model update with device changes and local changes
+    Component {
+        id: syncProxyComponent
+        Item {
+            id: spci
+            required property int index;
+            required property var model;
+
+            required property bool onair;
+            required property int src;
+
+            required property double cx;
+            required property double cy;
+            required property double cs;
+
+            required property bool c;
+            required property int cLeft;
+            required property int cRight;
+            required property int cTop;
+            required property int cBottom;
+
+            required property AtemSuperSourceBox assb;
+            assb: ss.getSuperSourceBox(index)
+
+            visible: false
+            enabled: false
+
+            readonly property point atemPosition: Qt.point(cx*3200, -cy*1800)
+            readonly property int atemSize: cs*1000
+            readonly property rect atemCrop: Qt.vector4d(cLeft*10,
+                                            cTop*10,
+                                            cRight*10,
+                                            cBottom*10)
+
+            onCChanged: {
+                assb.setCropEnabled(c)
+            }
+
+            onOnairChanged: {
+                assb.setOnAir(onair)
+            }
+
+            onSrcChanged: {
+                assb.setSource(src)
+            }
+
+            onAtemPositionChanged: {
+                assb.setPosition(atemPosition)
+            }
+
+            onAtemSizeChanged: {
+                assb.setPosition(atemPosition, atemSize)
+            }
+
+            Connections {
+                target: assb
+                enabled: syncProxyRepeater.keepSync
+                function onBoxPropertiesChanged() {
+                    console.debug("Device sent box property update, syncing to model")
+                    spci.syncBoxState();
+                }
+                function onBorderPropertiesChanged() {
+                    console.debug("Device sent box border update, syncing to model")
+                    spci.syncBoxBorderState();
+                }
+            }
+
+            function syncBoxState() {
+                console.debug("Syncing live ssbox properties", assb.position, assb.size, assb.crop, assb.source)
+                console.debug(assb.cropRect.left, assb.cropRect.right, assb.cropRect.top, assb.cropRect.bottom)
+
+                // Model has normalized values
+                model.cx=assb.position.x/3200.0
+                model.cy=-assb.position.y/1800.0
+                model.cs=assb.size/1000.0
+                model.c=assb.crop
+                model.cLeft=assb.cropRect.left/10.0
+                model.cRight=assb.cropRect.right/10.0
+                model.cTop=assb.cropRect.top/10.0
+                model.cBottom=assb.cropRect.bottom/10.0
+                model.src=assb.source;
+                model.onair=assb.onAir
+            }
+
+            function syncBoxBorderState() {
+                console.debug("Syncing live ssbox border properties", assb.border, assb.borderColor)
+                model.borderEnabled=assb.border;
+                model.borderColor=""+assb.borderColor;
+            }
+
+            function syncToDevice() {
+                console.debug("Syncing ssbox properties to device", assb)
+                assb.setBox(model.onair, model.src, atemPosition, atemSize, model.c, atemCrop);
+                syncBorderToDevice();
+            }
+            function syncBorderToDevice() {
+                assb.setBorder(model.borderEnabled);
+                assb.setBorderColor(model.borderColor);
+            }
+        }
     }
 
     TimelineBoxProxy {
@@ -350,34 +493,10 @@ Page {
 
     property SuperSourceBox selectedBox;
 
-    function updateAtemLive(box, force) {
-        console.debug("ATEM UPDATE TO DEVICE")
-        return;
-        if (ssLiveCheck.checked || force) {
-            ss.setSuperSource(box.boxId-1,
-                              box.enabled,
-                              box.inputSource,
-                              box.atemPosition,
-                              box.atemSize,
-                              box.crop,
-                              box.atemCrop)
-        }
-    }
-
-    function updateAtemLiveBorder(box, force) {
-        return
-        console.debug("updateLiveBorder", box.boxId)
-        if (ssLiveCheck.checked || force) {
-            ss.setBorder(box.boxId-1, box.borderEnabled)
-            ss.setBorderColor(box.boxId-1, box.borderColor)
-        }
-    }
-
     onSelectedBoxChanged: {
         inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(selectedBox.inputSource)
         easingType.currentIndex=easingType.indexOfValue(selectedBox.animateEasing)
         easingDuration.value=selectedBox.animateDuration/1000;
-
         timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
     }
 
@@ -485,27 +604,23 @@ Page {
                     Repeater {
                         id: ssBoxParent
                         property int currentIndex: currentBoxIndex
-                        onCurrentIndexChanged: {
-                            console.debug("Box selected", currentIndex)
-                            for (var i=0;i<count;i++) {
-                                var item=itemAt(i)
-                                if (i==currentIndex) {
-                                    item.z=1
-                                    selectedBox=item;
-                                } else {
-                                    item.z=0;
-                                }
-                            }
-                        }
                         model: ssModel
                         delegate: SuperSourceBox {
                             required property int index;
                             required property int box;
+                            // Current Pos
+                            required property double cx;
+                            required property double cy;
+                            required property double cs;
+
+                            // Default pos
                             required property double dx;
                             required property double dy;
                             required property double ds;
+
                             required property bool onair;
                             required property int src;
+
                             required property bool c;
                             required property int cLeft;
                             required property int cRight;
@@ -516,6 +631,8 @@ Page {
                             required property var model;
 
                             id: ssboxDelegate
+                            // keep selected on top, otherwise in reverse index order (1,2,3,4 as on mixer)
+                            z: ssBoxParent.currentIndex==index ? 10 : 4-index
 
                             assb: ss.getSuperSourceBox(index)
 
@@ -524,14 +641,17 @@ Page {
                             defaultY: dy
                             defaultSize: ds
 
-                            enabled: ena
+                            enabled: onair
+                            onCxChanged: setCenterX(cx)
+                            onCyChanged: setCenterY(cy)
+                            onCsChanged: setSize(cs)
                             inputSource: src
 
                             crop: c
-                            cropLeft: cLeft
-                            cropRight: cRight
-                            cropTop: cTop
-                            cropBottom: cBottom
+                            cropLeft: cLeft*10
+                            cropRight: cRight*10
+                            cropTop: cTop*10
+                            cropBottom: cBottom*10
 
                             borderEnabled: model.borderEnabled
                             borderColor: model.borderColor
@@ -547,40 +667,9 @@ Page {
                                 if (focus)
                                     currentBoxIndex=index
                             }
-                            onBoxSizeChanged: {
-                                model.ds=boxSize
-
-                            }
                             onBoxCenterChanged: {
                                 model.cx=boxCenter.x
                                 model.cy=boxCenter.y
-                            }
-                            onAtemCropChanged: {
-                                updateAtemLive(ssboxDelegate, true);
-                            }
-                            onAtemSizeChanged: {
-                                updateAtemLive(ssboxDelegate, true);
-                                assb.setPosition(atemPosition, atemSize)
-                            }
-                            onAtemPositionChanged: {
-                                updateAtemLive(ssboxDelegate, true);
-                                assb.setPosition(atemPosition)
-                            }
-                            onCropChanged: {
-                                updateAtemLive(ssboxDelegate, true);
-                            }
-                            onBorderColorChanged: {
-                                console.debug("BorderColorChanged", borderColor)
-                            }
-                            onBorderEnabledChanged: {
-                                console.debug("Border changed")
-                                updateAtemLiveBorder(ssboxDelegate, true);
-                            }
-                            onEnabledChanged: {
-                                updateAtemLive(ssboxDelegate, true);
-                            }
-                            onInputSourceChanged: {
-                                updateAtemLive(ssboxDelegate, true);
                             }
                             onAnimationTick: {
                                 console.debug("tick", boxId)
@@ -620,7 +709,7 @@ Page {
                             required property bool onair;
                             required property bool c
                             required property bool borderEnabled
-                            required property color borderColor
+                            required property var borderColor
                             required property var model;
 
                             property AtemSuperSourceBox assb: ss.getSuperSourceBox(index);
@@ -636,30 +725,27 @@ Page {
                             CheckBox {
                                 id: ssChecks
                                 text: "Visible"
-                                checked: assb.onAir
-                                // onCheckedChanged: ssModel.setProperty(index, "onair", checked)
-                                onCheckedChanged: assb.setOnAir(checked)
+                                checked: onair
+                                onCheckedChanged: ssModel.setProperty(index, "onair", checked)
                             }
                             CheckBox {
                                 id: ssCrops
-                                checked: assb.crop
+                                checked: c
                                 text: "Crop"
-                                // onCheckedChanged: ssModel.setProperty(index, "c", checked)
-                                onCheckedChanged: assb.setCropEnabled(checked)
+                                onCheckedChanged: ssModel.setProperty(index, "c", checked)
                             }
                             RowLayout {
                                 // visible: ss.bordersSupported
                                 CheckBox {
                                     id: ssBorder
-                                    checked: assb.border
+                                    checked: borderEnabled
                                     text: "Border"
-                                    //onCheckedChanged: ssModel.setProperty(index, "borderEnabled", checked)
-                                    onCheckedChanged: assb.setBorder(checked)
+                                    onCheckedChanged: ssModel.setProperty(index, "borderEnabled", checked)
                                 }
                                 Rectangle {
-                                    width: 24
-                                    height: 24
-                                    color: assb.borderColor
+                                    width: height
+                                    height: ssBorder.height
+                                    color: borderColor
                                     border.width: 1
                                     border.color: "#101010"
                                 }
@@ -676,7 +762,7 @@ Page {
                     textRole: "longText"
                     valueRole: "index"
                     onActivated: {
-                        selectedBox.inputSource=currentValue;
+                        ssModel.setProperty(currentBoxIndex, "src", currentValue)
                     }
                 }
 
@@ -1147,17 +1233,14 @@ Page {
                 text: "Commit 1"
                 enabled: selectedBox && !ssLiveCheck.checked
                 onClicked: {
-                    selectedBox.syncToDevice();
+                    syncProxyRepeater.syncItemToDevice(currentBoxIndex)
                 }
             }
             Button {
                 text: "Commit A"
                 enabled: !ssLiveCheck.checked
                 onClicked: {
-                    for (var i=0;i<4;i++) {
-                        var sb=ssBoxParent.itemAt(i);
-                        sb.syncToDevice();
-                    }
+                    syncProxyRepeater.syncToDevice();
                 }
             }
 

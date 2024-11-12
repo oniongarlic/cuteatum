@@ -1,34 +1,44 @@
 import QtQuick
+import org.bm 1.0
 
 ListModel {
     id: ssModel
+
     ListElement {
         box: 1; src: 1000;
-        dx: -0.25; dy: -0.25; ds: 0.5; onair: true;
+        dx: -0.25; dy: -0.25; ds: 0.5;
+        onair: true;
         cx: -0.25; cy: -0.25; cs: 0.5;
         c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
         borderEnabled: false; borderColor: "#ffffff"
+        borderWidthInner: 1; borderWidthOuter: 0;
     }
     ListElement {
         box: 2; src: 1001;
-        dx: 0.25; dy: -0.25; ds: 0.5; onair: true;
+        dx: 0.25; dy: -0.25; ds: 0.5;
+        onair: true;
         cx: 0.25; cy: -0.25; cs: 0.5;
         c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
         borderEnabled: false; borderColor: "#ffffff"
+        borderWidthInner: 1; borderWidthOuter: 0;
     }
     ListElement {
         box: 3; src: 1002;
-        dx: -0.25; dy: 0.25; ds: 0.5; onair: true;
+        dx: -0.25; dy: 0.25; ds: 0.5;
+        onair: true;
         cx: -0.25; cy: 0.25; cs: 0.5;
         c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
-        borderEnabled: false; borderColor: "#ffffff"
+        borderEnabled: false; borderColor: "#ffffff";
+        borderWidthInner: 1; borderWidthOuter: 0;
     }
     ListElement {
         box: 4; src: 1003;
-        dx: 0.25; dy: 0.25; ds: 0.5; onair: true;
+        dx: 0.25; dy: 0.25; ds: 0.5;
+        onair: true;
         cx: 0.25; cy: 0.25; cs: 0.5;
         c: false; cLeft: 0; cRight: 0; cTop: 0; cBottom: 0;
         borderEnabled: false; borderColor: "#ffffff"
+        borderWidthInner: 1; borderWidthOuter: 0;
     }
 
     function toJSONat(i) {

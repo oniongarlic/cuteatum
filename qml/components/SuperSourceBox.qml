@@ -78,75 +78,19 @@ Rectangle {
     onAtemSizeChanged: console.debug("AtemSize", atemSize)
     onAtemPositionChanged: console.debug("AtemPos", atemPosition)
 
-    onBoxXChanged: x=parent.width*boxX
-    onBoxYChanged: y=parent.height*boxY
+    //onBoxXChanged: x=parent.width*boxX
+    //onBoxYChanged: y=parent.height*boxY
 
     readonly property double _phw: parent.width+parent.height
-
-    // Sync changes from mixer to values
-    Connections {
-        target: assb
-        enabled: keepSync
-        function onBoxPropertiesChanged() {
-            console.debug("Device sent box property update")
-            syncBoxState();
-        }
-        function onBorderPropertiesChanged() {
-            console.debug("Device sent box border update")
-            syncBoxBorderState();
-        }
-    }
 
     onDefaultSizeChanged: boxSize=defaultSize
     Component.onCompleted: {
         if (atem.connected) {
             console.debug("Initial sync from device")
-            syncBoxState();
-            syncBoxBorderState();
         } else {
             console.debug("Not connected, using local defaults")
             reset()
         }
-        _updateXY();
-    }
-
-    function syncBoxState() {
-        console.debug("Syncing live ssbox properties", assb.position, assb.size, assb.crop, assb.source)
-
-        console.debug(assb.cropRect.left, assb.cropRect.right, assb.cropRect.top, assb.cropRect.bottom)
-
-        setAtemPosition(assb.position);
-        setSize(assb.size/1000);
-        setAtemCrop(assb.cropRect);
-        crop=assb.crop
-        inputSource=assb.source;
-        enabled=assb.onAir
-    }
-
-    function syncBoxBorderState() {
-        console.debug("Syncing live ssbox border properties", assb.border, assb.borderColor)
-        borderEnabled=assb.border;
-        borderColor=assb.borderColor;
-    }
-
-    function syncToDevice() {
-        console.debug("Syncing ssbox properties to device", assb)
-        assb.setBox(enabled, inputSource, atemPosition, atemSize, crop, atemCrop);
-    }
-
-    on_PhwChanged: {
-        _updateXY();
-    }
-
-    onParentChanged: {
-        _updateXY();
-    }
-
-    function _updateXY() {
-        x=parent.width*boxX
-        y=parent.height*boxY
-        width=parent.width*boxSize
-        height=parent.height*boxSize
     }
 
     signal clicked()
@@ -180,25 +124,9 @@ Rectangle {
         setCrop(c.top/10, c.bottom/10, c.left/10, c.right/10)
     }
 
-    // function mapNormalizedRect() {
-    //     return Qt.rect(sizeRect.x/parent.width,
-    //                    sizeRect.y/parent.height,
-    //                    sizeRect.width/parent.width,
-    //                    sizeRect.height/parent.height)
-    // }
-    // function cropNormalizedRect() {
-    //     return Qt.rect(cropLeft/cropRatioLR,
-    //                    cropTop/cropRatioTB,
-    //                    cropRight/cropRatioLR,
-    //                    cropBottom/cropRatioTB)
-    // }
-
     function setSize(s) {
         boxSize=s;
     }
-
-    //onXChanged: updatePositionData()
-    //onYChanged: updatePositionData()
 
     function updatePositionData() {
         var bx=x/parent.width

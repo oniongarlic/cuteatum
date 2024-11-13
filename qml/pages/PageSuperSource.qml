@@ -49,7 +49,7 @@ Page {
     Component.onCompleted: {
         savePositions(0);
         savePositions(1);
-    }    
+    }
 
     Settings {
         id: ssSettings
@@ -77,7 +77,7 @@ Page {
                 text: "Snap"
                 checkable: true
                 checked: false
-            }            
+            }
         }
     }
 
@@ -125,6 +125,7 @@ Page {
         }
     }
 
+    // XXX: Modify model!
     function loadPositions(bid) {
         let s=ssSettings.value("ss_"+bid, false)
         for (var i=0;i<4;i++) {
@@ -149,7 +150,7 @@ Page {
     function syncBoxFromProxy(boxid, proxy) {
         var sb=ssBoxParent.itemAt(boxid);
         sb.setCenter(proxy.x, proxy.y)
-        sb.setSize(proxy.s)        
+        sb.setSize(proxy.s)
     }
 
     ListModelSuperSourceBoxes {
@@ -171,6 +172,19 @@ Page {
                 console.debug("Not connected, using local defaults")
                 // reset()
             }
+        }
+
+        function setItemCenter(cx, cy) {
+            ssModel.setProperty(currentBoxIndex, "cx", cx);
+            ssModel.setProperty(currentBoxIndex, "cy", cy);
+        }
+
+        function setItemSize(s) {
+            ssModel.setProperty(currentBoxIndex, "cs", s);
+        }
+
+        function setItemCrop(ct, cb, cl, cr) {
+            ssModel.setProperty(currentBoxIndex, "cs", s);
         }
 
         function syncItemToDevice(i) {
@@ -221,29 +235,36 @@ Page {
 
             readonly property point atemPosition: Qt.point(cx*3200, -cy*1800)
             readonly property int atemSize: cs*1000
-            readonly property rect atemCrop: Qt.vector4d(cLeft*10,
-                                            cTop*10,
-                                            cRight*10,
-                                            cBottom*10)
+            readonly property vector4d atemCrop: Qt.vector4d(cTop, cBottom, cLeft, cRight)
 
             onCChanged: {
+                console.debug("Syncing cropping to device", c)
                 assb.setCropEnabled(c)
             }
 
             onOnairChanged: {
+                console.debug("Syncing ON AIR to device", onair)
                 assb.setOnAir(onair)
             }
 
             onSrcChanged: {
+                console.debug("Syncing input source to device", src)
                 assb.setSource(src)
             }
 
             onAtemPositionChanged: {
+                console.debug("Syncing position to device", atemPosition)
                 assb.setPosition(atemPosition)
             }
 
             onAtemSizeChanged: {
+                console.debug("Syncing size + position to device", atemSize)
                 assb.setPosition(atemPosition, atemSize)
+            }
+
+            onAtemCropChanged: {
+                console.debug("Syncing crop to device", atemCrop)
+                assb.setCrop(atemCrop);
             }
 
             Connections {
@@ -261,17 +282,19 @@ Page {
 
             function syncBoxState() {
                 console.debug("Syncing live ssbox properties", assb.position, assb.size, assb.crop, assb.source)
-                console.debug(assb.cropRect.left, assb.cropRect.right, assb.cropRect.top, assb.cropRect.bottom)
+                console.debug("CROP:", assb.cropRect)
 
-                // Model has normalized values
+                // Model has normalized values (xxx for now, this needs fixing)
                 model.cx=assb.position.x/3200.0
                 model.cy=-assb.position.y/1800.0
                 model.cs=assb.size/1000.0
+
                 model.c=assb.crop
-                model.cLeft=assb.cropRect.left/10.0
-                model.cRight=assb.cropRect.right/10.0
-                model.cTop=assb.cropRect.top/10.0
-                model.cBottom=assb.cropRect.bottom/10.0
+                model.cTop=assb.cropRect.x
+                model.cBottom=assb.cropRect.y
+                model.cLeft=assb.cropRect.z
+                model.cRight=assb.cropRect.w
+
                 model.src=assb.source;
                 model.onair=assb.onAir
             }
@@ -283,11 +306,12 @@ Page {
             }
 
             function syncToDevice() {
-                console.debug("Syncing ssbox properties to device", assb)
+                console.debug("Syncing all ssbox properties to device", assb)
                 assb.setBox(model.onair, model.src, atemPosition, atemSize, model.c, atemCrop);
                 syncBorderToDevice();
             }
             function syncBorderToDevice() {
+                console.debug("Syncing ssbox border to device", model.borderEnabled, model.borderColor)
                 assb.setBorder(model.borderEnabled);
                 assb.setBorderColor(model.borderColor);
             }
@@ -648,10 +672,10 @@ Page {
                             inputSource: src
 
                             crop: c
-                            cropLeft: cLeft*10
-                            cropRight: cRight*10
-                            cropTop: cTop*10
-                            cropBottom: cBottom*10
+                            cropLeft: cLeft
+                            cropRight: cRight
+                            cropTop: cTop
+                            cropBottom: cBottom
 
                             borderEnabled: model.borderEnabled
                             borderColor: model.borderColor
@@ -852,18 +876,24 @@ Page {
                     Button {
                         text: "F"
                         onClicked: {
-                            selectedBox.setSize(1)
-                            selectedBox.setCenterX(0)
-                            selectedBox.setCenterY(0)
+                            ssModel.setProperty(currentBoxIndex, "cs", 1);
+                            ssModel.setProperty(currentBoxIndex, "cx", 0);
+                            ssModel.setProperty(currentBoxIndex, "cy", 0);
                         }
                     }
                     Button {
                         text: "I"
-                        onClicked: selectedBox.snapInside()
+                        onClicked: {
+                            selectedBox.snapInside()
+                        }
                     }
                     Button {
                         text: "R"
-                        onClicked: selectedBox.reset()
+                        onClicked: {
+                            ssModel.setProperty(currentBoxIndex, "cs", 1);
+                            ssModel.setProperty(currentBoxIndex, "cx", 0);
+                            ssModel.setProperty(currentBoxIndex, "cy", 0);
+                        }
                     }
                 }
 
@@ -877,28 +907,28 @@ Page {
                         wheelEnabled: true
                         value: selectedBox ? selectedBox.boxSize*100 : 0
                         onValueModified: {
-                            selectedBox.setSize(value/100)
+                            ssModel.setProperty(currentBoxIndex, "cs", value/100);
                         }
                     }
                     Button {
                         text: "25%"
                         Layout.fillWidth: false
-                        onClicked: selectedBox.boxSize=0.25
+                        onClicked: ssModel.setProperty(currentBoxIndex, "cs", 0.25);
                     }
                     Button {
                         text: "50%"
                         Layout.fillWidth: false
-                        onClicked: selectedBox.boxSize=0.50
+                        onClicked: ssModel.setProperty(currentBoxIndex, "cs", 0.50);
                     }
                     Button {
                         text: "75%"
                         Layout.fillWidth: false
-                        onClicked: selectedBox.boxSize=0.75
+                        onClicked: ssModel.setProperty(currentBoxIndex, "cs", 0.75);
                     }
                     Button {
                         text: "100%"
                         Layout.fillWidth: false
-                        onClicked: selectedBox.boxSize=1.00
+                        onClicked: ssModel.setProperty(currentBoxIndex, "cs", 1.00);
                     }
                 }
                 RowLayout {
@@ -906,36 +936,36 @@ Page {
                     enabled: selectedBox && selectedBox.crop
                     SpinBox {
                         from: 0
-                        to: 1800
-                        stepSize: 1
+                        to: 18000
+                        stepSize: 10
                         wheelEnabled: true
                         editable: true
                         inputMethodHints: Qt.ImhDigitsOnly
                         value: selectedBox ? selectedBox.cropTop : 0
-                        onValueModified: selectedBox.cropTop=value
+                        onValueModified: ssModel.setProperty(currentBoxIndex, "cTop", value);
                     }
                     SpinBox {
                         from: 0
-                        to: 1800
-                        stepSize: 1
+                        to: 18000
+                        stepSize: 10
                         wheelEnabled: true
                         editable: true
                         inputMethodHints: Qt.ImhDigitsOnly
                         value: selectedBox ? selectedBox.cropBottom : 0
-                        onValueModified: selectedBox.cropBottom=value
+                        onValueModified: ssModel.setProperty(currentBoxIndex, "cBottom", value);
                     }
                     Button {
                         text: "25%"
                         onClicked: {
-                            selectedBox.cropBottom=225
-                            selectedBox.cropTop=225
+                            ssModel.setProperty(currentBoxIndex, "cTop", 2250)
+                            ssModel.setProperty(currentBoxIndex, "cBottom", 2250)
                         }
                     }
                     Button {
                         text: "50%"
                         onClicked: {
-                            selectedBox.cropBottom=450
-                            selectedBox.cropTop=450
+                            ssModel.setProperty(currentBoxIndex, "cTop", 4500)
+                            ssModel.setProperty(currentBoxIndex, "cBottom", 4500)
                         }
                     }
                 }
@@ -944,36 +974,43 @@ Page {
                     enabled: selectedBox && selectedBox.crop
                     SpinBox {
                         from: 0
-                        to: 3200
-                        stepSize: 1
+                        to: 32000
+                        stepSize: 10
                         wheelEnabled: true
                         editable: true
                         inputMethodHints: Qt.ImhDigitsOnly
                         value: selectedBox ? selectedBox.cropLeft : 0
-                        onValueModified: selectedBox.cropLeft=value
+                        onValueModified: ssModel.setProperty(currentBoxIndex, "cLeft", value);
                     }
                     SpinBox {
                         from: 0
-                        to: 3200
-                        stepSize: 1
+                        to: 32000
+                        stepSize: 10
                         wheelEnabled: true
                         editable: true
                         inputMethodHints: Qt.ImhDigitsOnly
                         value: selectedBox ? selectedBox.cropRight : 0
-                        onValueModified: selectedBox.cropRight=value
+                        onValueModified: ssModel.setProperty(currentBoxIndex, "cRight", value);
                     }
                     Button {
                         text: "25%"
                         onClicked: {
-                            selectedBox.cropLeft=400
-                            selectedBox.cropRight=400
+                            ssModel.setProperty(currentBoxIndex, "cLeft", 4000)
+                            ssModel.setProperty(currentBoxIndex, "cRight", 4000)
                         }
                     }
                     Button {
                         text: "50%"
                         onClicked: {
-                            selectedBox.cropLeft=800
-                            selectedBox.cropRight=800
+                            ssModel.setProperty(currentBoxIndex, "cLeft", 8000)
+                            ssModel.setProperty(currentBoxIndex, "cRight", 8000)
+                        }
+                    }
+                    Button {
+                        text: "75%"
+                        onClicked: {
+                            ssModel.setProperty(currentBoxIndex, "cLeft", 12000)
+                            ssModel.setProperty(currentBoxIndex, "cRight", 12000)
                         }
                     }
                 }

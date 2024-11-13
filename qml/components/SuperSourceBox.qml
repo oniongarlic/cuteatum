@@ -63,18 +63,15 @@ Rectangle {
     property int inputSource: 1000;
 
     readonly property double ratio: 16.0/9.0
-    readonly property double cropRatioTB: 1800
-    readonly property double cropRatioLR: 3200
+    readonly property double cropRatioTB: 18000
+    readonly property double cropRatioLR: 32000
 
     // Position & crop in mixer values
     readonly property point atemPosition: Qt.point(boxCenterX*3200, -boxCenterY*1800)
     readonly property int atemSize: boxSize*1000
-    readonly property rect atemCrop: Qt.vector4d(cropLeft*10,
-                                    cropTop*10,
-                                    cropRight*10,
-                                    cropBottom*10)
+    readonly property vector4d atemCrop: Qt.vector4d(cropTop, cropBottom, cropLeft, cropRight)
 
-    onAtemCropChanged: console.debug("atemCrop", atemCrop)
+    onAtemCropChanged: console.debug("AtemCrop", atemCrop)
     onAtemSizeChanged: console.debug("AtemSize", atemSize)
     onAtemPositionChanged: console.debug("AtemPos", atemPosition)
 
@@ -108,20 +105,12 @@ Rectangle {
         setY=cy;
     }
 
-    function setAtemPosition(p) {
-        console.debug(p)
-        setCenter(p.x/3200, -p.y/1800)
-    }
-
-    function setCrop(ct, cb, cl, cr) {
+    function _setCrop(ct, cb, cl, cr) {
+        console.debug("*************** XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *********************")
         cropLeft=cl;
         cropRight=cr;
         cropTop=ct;
         cropBottom=cb;
-    }
-
-    function setAtemCrop(c) {
-        setCrop(c.top/10, c.bottom/10, c.left/10, c.right/10)
     }
 
     function setSize(s) {
@@ -160,7 +149,8 @@ Rectangle {
         return Qt.vector4d(cropTop, cropBottom, cropLeft, cropRight)
     }
 
-    function setCropVector4d(c) {
+    function _setCropVector4d(c) {
+        // XXX
         setCrop(c.x, c.y, c.z, c.w)
     }
 
@@ -205,7 +195,7 @@ Rectangle {
         id: v4
         from: animateCropFrom
         to: animateCropTo
-        onValueChanged: setCropVector4d(value)
+        // XXX onValueChanged: setCropVector4d(value)
     }
 
     Vector3dAnimation {

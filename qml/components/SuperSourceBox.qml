@@ -75,10 +75,21 @@ Rectangle {
     onAtemSizeChanged: console.debug("AtemSize", atemSize)
     onAtemPositionChanged: console.debug("AtemPos", atemPosition)
 
-    //onBoxXChanged: x=parent.width*boxX
-    //onBoxYChanged: y=parent.height*boxY
+    onBoxXChanged: x=parent.width*boxX
+    onBoxYChanged: y=parent.height*boxY
 
-    readonly property double _phw: parent.width+parent.height
+    readonly property int ph: parent.height
+    readonly property int pw: parent.width
+
+    onPhChanged: _updateOnParent();
+    onPwChanged: _updateOnParent();
+
+    function _updateOnParent() {
+        x=parent.width*boxX
+        y=parent.height*boxY
+        width=parent.width*boxSize
+        height=parent.height*boxSize
+    }
 
     onDefaultSizeChanged: boxSize=defaultSize
     Component.onCompleted: {

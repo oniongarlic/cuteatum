@@ -42,6 +42,8 @@ Page {
     // Page global current box index
     property int currentBoxIndex: -1;
 
+    readonly property bool isLive: ssLiveCheck.checked
+
     onCurrentBoxIndexChanged: {
         selectedBox=currentBoxIndex>-1 ? ssBoxParent.itemAt(currentBoxIndex) : null
     }
@@ -162,7 +164,7 @@ Page {
         model: ssModel
         delegate: syncProxyComponent
 
-        property bool keepSync: true
+        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?
 
         Component.onCompleted: {
             if (atem.connected) {
@@ -1268,14 +1270,14 @@ Page {
             }
             Button {
                 text: "Commit 1"
-                enabled: selectedBox && !ssLiveCheck.checked
+                enabled: selectedBox && !isLive
                 onClicked: {
                     syncProxyRepeater.syncItemToDevice(currentBoxIndex)
                 }
             }
             Button {
                 text: "Commit A"
-                enabled: !ssLiveCheck.checked
+                enabled: !isLive
                 onClicked: {
                     syncProxyRepeater.syncToDevice();
                 }

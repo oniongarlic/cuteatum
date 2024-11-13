@@ -2,17 +2,18 @@
 
 Blackmagic Design ATEM Mini Switcher applications for Linux (or anything where Qt 6.5 can be run).
 
-* Built with C++, Qt 6.5 & QtQuick
+* Built with C++, Qt 6.6 & QtQuick
 * Uses the libqatemcontrol library
 * Works great on a Raspberry Pi with touchscreen (See screenshot and video)
 
-Currently experimental and not ready for any kind of production use. Very much work in progress.
+Currently experimental and not ready for any kind of production use.
+Very much work in progress, there might be breaking changes from time to time.
 
 ## Requirements
 
-* Qt 6.5 or later
-* QtMQTT 6.5 or later
-* [libqatemcontrol fork](https://github.com/oniongarlic/libqatemcontrol) fork
+* Qt 6.6 or later
+* QtMQTT 6.6 or later
+* [libqatemcontrol fork](https://github.com/oniongarlic/libqatemcontrol) fork, always to use latest version available
 
 ## Tested switchers:
 
@@ -32,6 +33,7 @@ Currently experimental and not ready for any kind of production use. Very much w
 * Recording start/stop
 * Macro interface
 * SuperSource editor
+* SuperSource animation
 * Can send switch status to MQTT broker
 * Can be controlled trough MQTT messages
 
@@ -42,7 +44,8 @@ Quickly adjust position with mouse or keyboard. Possible to animate live between
 
 Todo:
 * Support for recording animation macros is work in progress.
-* Saving positions
+* Saving and loading pre made positions
+* Animation timeline
 
 ### Macro interface
 

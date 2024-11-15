@@ -228,6 +228,7 @@ Page {
                 InputButton {
                     id: progColor1
                     text: "Color 1"
+                    textShort: "COL1"
                     inputID: AtemMixEffect.ColorGenerator1
                     compact: true
                     statusIndicator.visible: true
@@ -236,6 +237,7 @@ Page {
                 InputButton {
                     id: progColor2
                     text: "Color 2"
+                    textShort: "COL2"
                     inputID: AtemMixEffect.ColorGenerator2
                     compact: true
                     statusIndicator.visible: true
@@ -311,19 +313,23 @@ Page {
                 spacing: 0
                 Layout.margins: 0
                 InputButton {
-                    textLong: "Color 1"
+                    text: "Color 1"
                     textShort: "COL1"
                     inputID: 2001
                     isPreview: true
                     compact: true
+                    statusIndicator.visible: true
+                    statusIndicator.color: progColor1.statusIndicator.color
                     ButtonGroup.group: previewGroup
                 }
                 InputButton {
-                    textLong: "Color 2"
+                    text: "Color 2"
                     textShort: "COL2"
                     inputID: 2002
                     isPreview: true
                     compact: true
+                    statusIndicator.visible: true
+                    statusIndicator.color: progColor2.statusIndicator.color
                     ButtonGroup.group: previewGroup
                 }
             }

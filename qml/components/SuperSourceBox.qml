@@ -147,77 +147,11 @@ Rectangle {
         sizeRect.height=sizeRect.parent.height*boxSize
     }
 
-    function getPositionVector3d() {
-        return Qt.vector3d(boxCenterX, boxCenterY, boxSize)
-    }
-
-    function setPositionVector3d(v) {
-        setCenter(v.x,v.y)
-        setSize(v.z)
-    }
-
-    function getCropVector4d() {
-        return Qt.vector4d(cropTop, cropBottom, cropLeft, cropRight)
-    }
-
-    function _setCropVector4d(c) {
-        // XXX
-        setCrop(c.x, c.y, c.z, c.w)
-    }
-
-    property vector3d anim;
-    signal animationTick();
-
-    onAnimChanged: {
-        setPositionVector3d(anim)
-        animationTick();
-    }
-
-    // Position animation
-    property vector3d animateFrom;
-    property vector3d animateTo;
-
-    property vector4d animateCropFrom;
-    property vector4d animateCropTo;
-
-    property alias animateEasing: boxAnimation.easing.type
-    property alias animateDuration: boxAnimation.duration
-
-    readonly property alias animateRunning: boxAnimation.running
-
     property bool slowDown: false
     property bool snapToGrid: false
     property bool dragOutside: true
 
     property bool locked: false
-
-    function animate() {
-        boxAnimation.restart();
-        if (crop)
-            v4.restart();
-    }
-
-    function animateStop() {
-        boxAnimation.stop();        
-        v4.stop();
-    }
-
-    Vector4dAnimation {
-        id: v4
-        from: animateCropFrom
-        to: animateCropTo
-        // XXX onValueChanged: setCropVector4d(value)
-    }
-
-    Vector3dAnimation {
-        id: boxAnimation
-        easing.type: Easing.InOutCubic
-        target: sizeRect
-        duration: 1000
-        property: "anim"
-        from: animateFrom
-        to: animateTo
-    }
 
     readonly property double keyMove: snapToGrid ? 0.02 : 0.001
 

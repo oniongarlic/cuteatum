@@ -92,7 +92,7 @@ Page {
 
     function syncBoxStatesToDevice() {
         for (var i=0;i<4;i++) {
-            var sb=ssBoxParent.itemAt(i);
+            var sb=syncProxyRepeater.itemAt(i);
             sb.syncToDevice();
         }
     }
@@ -101,7 +101,7 @@ Page {
         savedPosition[bid]=[];
         savedCrop[bid]=[];
         for (var i=0;i<4;i++) {
-            let item=ssBoxParent.itemAt(i)
+            let item=syncProxyRepeater.itemAt(i)
             savedPosition[bid][i]=item.getPositionVector3d();
             savedCrop[bid][i]=item.getCropVector4d()
         }
@@ -114,7 +114,7 @@ Page {
 
     function preparePositions(bid) {
         for (var i=0;i<4;i++) {
-            let item=ssBoxParent.itemAt(i)
+            let item=syncProxyRepeater.itemAt(i)
 
             let v=savedPosition[bid][i];
             let c=savedCrop[bid][i];
@@ -131,7 +131,7 @@ Page {
     function loadPositions(bid) {
         let s=ssSettings.value("ss_"+bid, false)
         for (var i=0;i<4;i++) {
-            let item=ssBoxParent.itemAt(i)
+            let item=syncProxyRepeater.itemAt(i)
 
             let v=savedPosition[bid][i];
             let c=savedCrop[bid][i];
@@ -143,16 +143,13 @@ Page {
 
     function animateSuperSource(bid) {
         preparePositions(bid)
-        for (var i=0;i<4;i++) {
-            let item=ssBoxParent.itemAt(i)
-            item.animate();
-        }
+        syncProxyRepeater.animateStart();
     }
 
     function syncBoxFromProxy(boxid, proxy) {
-        var sb=ssBoxParent.itemAt(boxid);
-        sb.setCenter(proxy.x, proxy.y)
-        sb.setSize(proxy.s)
+        var sb=syncProxyRepeater.itemAt(boxid);
+        sb.setItemCenter(proxy.x, proxy.y)
+        sb.setItemSize(proxy.s)
     }
 
     ListModelSuperSourceBoxes {
@@ -164,7 +161,7 @@ Page {
         model: ssModel
         delegate: syncProxyComponent
 
-        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?
+        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?        
 
         Component.onCompleted: {
             if (atem.connected) {
@@ -200,10 +197,25 @@ Page {
                 syncItemToDevice(i)
             }
         }
+
         function syncToDevice() {
             for (var i=0;i<4;i++) {
                 let item=itemAt(i)
                 item.syncToDevice();
+            }
+        }
+
+        function animateStart() {
+            for (var i=0;i<4;i++) {
+                let item=itemAt(i)
+                item.animateStart();
+            }
+        }
+
+        function animateStop() {
+            for (var i=0;i<4;i++) {
+                let item=itemAt(i)
+                item.animateStop();
             }
         }
     }
@@ -213,6 +225,9 @@ Page {
         id: syncProxyComponent
         Item {
             id: spci
+            visible: false
+            enabled: false
+
             required property int index;
             required property var model;
 
@@ -232,12 +247,80 @@ Page {
             required property AtemSuperSourceBox assb;
             assb: ss.getSuperSourceBox(index)
 
-            visible: false
-            enabled: false
-
             readonly property point atemPosition: Qt.point(cx*3200, -cy*1800)
             readonly property int atemSize: cs*1000
             readonly property vector4d atemCrop: Qt.vector4d(cTop, cBottom, cLeft, cRight)
+
+            property vector3d animateFrom;
+            property vector3d animateTo;
+
+            property vector4d animateCropFrom;
+            property vector4d animateCropTo;
+
+            property vector4d anim;
+
+            property alias animateEasing: boxAnimation.easing.type
+            property alias animateDuration: boxAnimation.duration
+
+            readonly property alias animateRunning: boxAnimation.running
+
+            function animateStart() {
+                boxAnimation.restart();
+                if (c)
+                    v4.restart();
+            }
+
+            function animateStop() {
+                boxAnimation.stop();
+                v4.stop();
+            }
+
+            function getPositionVector3d() {
+                return Qt.vector3d(model.cx, model.cy, model.cs)
+            }
+
+            function getCropVector4d() {
+                return Qt.vector4d(model.cTop, model.cBottom, model.cLeft, model.cRight)
+            }
+
+            function setPositionVector3d(pv) {
+                model.cx=pv.x;
+                model.cy=pv.y;
+                model.cs=pv.z;
+            }
+
+            function setCropVector4d(cv) {
+                model.cTop=cv.x
+                model.cBottom=cv.y
+                model.cLeft=cv.z
+                model.cRight=cv.w
+            }
+
+            signal animationTick();
+
+            onAnimChanged: {
+                setPositionVector3d(anim)
+                animationTick();
+            }
+
+            Vector4dAnimation {
+                id: v4
+                from: animateCropFrom
+                to: animateCropTo
+                onValueChanged: {
+                    setCropVector4d(value);
+                }
+            }
+
+            Vector3dAnimation {
+                id: boxAnimation
+                easing.type: Easing.InOutCubic
+                target: spci
+                duration: 1000
+                property: "anim"
+                from: animateFrom
+                to: animateTo
+            }
 
             onCChanged: {
                 console.debug("Syncing cropping to device", c)
@@ -696,10 +779,7 @@ Page {
                             onBoxCenterChanged: {
                                 model.cx=boxCenter.x
                                 model.cy=boxCenter.y
-                            }
-                            onAnimationTick: {
-                                console.debug("tick", boxId)
-                            }
+                            }                            
                         }
                     }
                 }

@@ -9,6 +9,7 @@ import org.bm 1.0
 
 Drawer {
     id: keySourceDrawer
+    interactive: visible
     width: parent.width/1.5
 
     property int key: 0

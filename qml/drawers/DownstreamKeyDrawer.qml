@@ -9,6 +9,7 @@ import org.bm 1.0
 
 Drawer {
     id: dskDrawer
+    interactive: visible
     width: parent.width/2
     height: root.height
 

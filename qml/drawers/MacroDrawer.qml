@@ -7,6 +7,7 @@ import org.bm 1.0
 
 Drawer {
     id: macroDrawer
+    interactive: visible
     height: root.height
     width: root.width/1.4
 

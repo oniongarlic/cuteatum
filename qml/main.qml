@@ -330,11 +330,13 @@ ApplicationWindow {
                 action: actionMacros
             }
             MenuSeparator {
-
+                visible: macroMenuRepeater.enabled
             }
             Repeater {
-                model: 10
-                enabled: atem.connected
+                id: macroMenuRepeater
+                model: Math.min(10, macrosModel.count)
+                enabled: atem.connected && model.count>0
+                visible: enabled
                 MenuItem {
                     required property int index
                     text: macrosModel.get(index).name //"Run macro "+(index+1);
@@ -346,7 +348,7 @@ ApplicationWindow {
                 }
             }
             MenuSeparator {
-
+                visible: macroMenuRepeater.enabled
             }
             MenuItem {
                 text: "Add pause"

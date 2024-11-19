@@ -247,7 +247,7 @@ Page {
             required property AtemSuperSourceBox assb;
             assb: ss.getSuperSourceBox(index)
 
-            readonly property point atemPosition: Qt.point(cx*3200, -cy*1800)
+            readonly property point atemPosition: Qt.point(Math.round(cx*3200), Math.round(-cy*1800))
             readonly property int atemSize: cs*1000
             readonly property vector4d atemCrop: Qt.vector4d(cTop, cBottom, cLeft, cRight)
 
@@ -779,7 +779,10 @@ Page {
                             onBoxCenterChanged: {
                                 model.cx=boxCenter.x
                                 model.cy=boxCenter.y
-                            }                            
+                            }
+                            onBoxSizeChanged: {
+                                model.cs=boxSize
+                            }
                         }
                     }
                 }
@@ -1037,6 +1040,13 @@ Page {
                         onValueModified: ssModel.setProperty(currentBoxIndex, "cBottom", value);
                     }
                     Button {
+                        text: "0%"
+                        onClicked: {
+                            ssModel.setProperty(currentBoxIndex, "cTop", 0)
+                            ssModel.setProperty(currentBoxIndex, "cBottom", 0)
+                        }
+                    }
+                    Button {
                         text: "25%"
                         onClicked: {
                             ssModel.setProperty(currentBoxIndex, "cTop", 2250)
@@ -1073,6 +1083,13 @@ Page {
                         inputMethodHints: Qt.ImhDigitsOnly
                         value: selectedBox ? selectedBox.cropRight : 0
                         onValueModified: ssModel.setProperty(currentBoxIndex, "cRight", value);
+                    }
+                    Button {
+                        text: "0%"
+                        onClicked: {
+                            ssModel.setProperty(currentBoxIndex, "cLeft", 0)
+                            ssModel.setProperty(currentBoxIndex, "cRight", 0)
+                        }
                     }
                     Button {
                         text: "25%"

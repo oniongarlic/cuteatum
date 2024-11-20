@@ -46,6 +46,16 @@ Page {
 
     onCurrentBoxIndexChanged: {
         selectedBox=currentBoxIndex>-1 ? ssBoxParent.itemAt(currentBoxIndex) : null
+
+        var o=ssModel.get(currentBoxIndex);
+        inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(o.src)
+
+        var d;
+        d=syncProxyRepeater.itemAt(currentBoxIndex);
+        easingType.currentIndex=easingType.indexOfValue(d.animateEasing)
+        easingDuration.value=d.animateDuration/1000;
+
+        timelineModel.syncFromProxy(proxies[currentBoxIndex])
     }
 
     Component.onCompleted: {
@@ -161,7 +171,13 @@ Page {
         model: ssModel
         delegate: syncProxyComponent
 
-        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?        
+        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?
+
+        property int animatingCount: 0
+
+        readonly property bool isAnimating: animatingCount>0
+
+        onIsAnimatingChanged: console.debug("IsAnimating", isAnimating)
 
         Component.onCompleted: {
             if (atem.connected) {
@@ -310,6 +326,14 @@ Page {
                 onValueChanged: {
                     setCropVector4d(value);
                 }
+
+                onStarted: {
+
+                }
+
+                onStopped: {
+
+                }
             }
 
             Vector3dAnimation {
@@ -320,6 +344,14 @@ Page {
                 property: "anim"
                 from: animateFrom
                 to: animateTo
+
+                onStarted: {
+                    syncProxyRepeater.animatingCount++
+                }
+
+                onStopped: {
+                    syncProxyRepeater.animatingCount--
+                }
             }
 
             onCChanged: {
@@ -603,10 +635,7 @@ Page {
     property SuperSourceBox selectedBox;
 
     onSelectedBoxChanged: {
-        inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(selectedBox.inputSource)
-        easingType.currentIndex=easingType.indexOfValue(selectedBox.animateEasing)
-        easingDuration.value=selectedBox.animateDuration/1000;
-        timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
+
     }
 
     ColumnLayout {
@@ -1124,7 +1153,7 @@ Page {
 
                         }
                         onActivated: {
-                            selectedBox.animateEasing=currentValue
+                            syncProxyRepeater.itemAt(currentBoxIndex).animateEasing=currentValue
                         }
                         Component.onCompleted: {
                             currentIndex=indexOfValue(Easing.InCubic)
@@ -1141,7 +1170,7 @@ Page {
                         value: 1
                         wheelEnabled: true
                         onValueModified: {
-                            selectedBox.animateDuration=value*1000;
+                            syncProxyRepeater.itemAt(currentBoxIndex).animateDuration=value*1000;
                         }
                         //background.implicitWidth: 100
                     }
@@ -1396,6 +1425,7 @@ Page {
 
             RowLayout {
                 Layout.fillWidth: true
+                enabled: !syncProxyRepeater.isAnimating
                 Button {
                     text: "Set A"
                     onClicked: {

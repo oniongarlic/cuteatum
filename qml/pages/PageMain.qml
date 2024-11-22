@@ -64,33 +64,7 @@ Page {
 
     Keys.onDigit9Pressed: root.setProgram(9)
 
-    Connections {
-        id: me0
-        target: me
 
-        onUpstreamKeyDVEXPositionChanged: {
-            console.debug("X:"+xPosition)
-            dveXPos.enabled=false
-            dveXPos.value=Math.floor(xPosition*100)
-            dveXPos.enabled=true
-        }
-
-        onUpstreamKeyDVEYPositionChanged: {
-            console.debug("Y:"+yPosition)
-            dveYPos.enabled=false
-            dveYPos.value=Math.ceil(yPosition*100)
-            dveYPos.enabled=true
-        }
-
-        onUpstreamKeyDVEXSizeChanged: {
-            console.debug("XS:"+xSize)
-        }
-
-        onUpstreamKeyDVEYSizeChanged: {
-            console.debug("YS:"+ySize)
-        }
-
-    }
 
     Connections {
         id: dsk
@@ -146,6 +120,11 @@ Page {
         edge: Qt.RightEdge
         me: mainPage.me
         key: 0
+
+        function openUSK(i) {
+            key=i;
+            open();
+        }
     }
 
     DownstreamKeyDrawer {
@@ -344,12 +323,13 @@ Page {
             Repeater {
                 model: atem.connected ? me.upstreamKeyCount() : 0
                 UpstreamKeyBaseControls {
+                    id: uskbc
                     required property int index;
                     usk: index
                     me: mainPage.me
                     Button {
                         text: "Properties"
-                        onClicked: uskDrawer.open()
+                        onClicked: uskDrawer.openUSK(index)
                     }
                 }
             }
@@ -431,25 +411,6 @@ Page {
                     }
                 }
             }
-        }
-
-        ParallelAnimation {
-            id: dveAnimation
-
-            property real xPosStart: 0
-            property real xPosEnd: 0
-
-            property real yPosStart: 0
-            property real yPosEnd: 0
-
-            property real sizeStart: 0
-            property real sizeEnd: 0
-
-            property int duration: 1000
-
-            NumberAnimation { from: dveAnimation.xPosStart; to: dveAnimation.xPosEnd; duration: dveAnimation.duration; properties: "value"; target: dveXPos }
-            NumberAnimation { from: dveAnimation.yPosStart; to: dveAnimation.yPosEnd; duration: dveAnimation.duration; properties: "value"; target: dveYPos }
-            NumberAnimation { from: dveAnimation.sizeStart; to: dveAnimation.sizeEnd; duration: dveAnimation.duration; properties: "value"; targets: [ dveXSize, dveYSize ]}
         }
 
         ColumnLayout {

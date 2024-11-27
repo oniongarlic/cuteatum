@@ -67,11 +67,12 @@ Page {
             ToolSeparator {}
             ToolButton {
                 text: "Save"
-                enabled: false
+                onClicked: savedPositionsModel.savePosition();
             }
             ToolButton {
-                text: "Load";
-                enabled: false
+                text: "Load...";
+                enabled: savedPositionsModel.count>0
+                onClicked: savedPositionsDrawer.open()
             }
             ToolSeparator {}
             ToolButton {
@@ -80,6 +81,42 @@ Page {
                 checkable: true
                 checked: false
             }
+        }
+    }
+
+    ListModel {
+        id: savedPositionsModel
+
+        function savePosition() {
+            var p=getPositions();
+            console.debug(p)
+            append(p);
+        }
+    }
+
+    Drawer {
+        id: savedPositionsDrawer
+        interactive: visible
+        width: parent.width/2
+        height: parent.height
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 8
+
+            Label {
+                text: savedPositionsModel.count
+            }
+
+            ListView {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                model: savedPositionsModel
+                delegate: ItemDelegate {
+
+                }
+            }
+
         }
     }
 
@@ -95,6 +132,17 @@ Page {
             var sb=syncProxyRepeater.itemAt(i);
             sb.syncToDevice();
         }
+    }
+
+    function getPositions() {
+        var p=[];
+        for (var i=0;i<4;i++) {
+            let item=syncProxyRepeater.itemAt(i)
+            p[i]=[];
+            p[i][0]=item.getPositionVector3d();
+            p[i][1]=item.getCropVector4d()
+        }
+        return p;
     }
 
     function savePositions(bid) {

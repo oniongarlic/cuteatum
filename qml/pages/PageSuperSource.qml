@@ -46,6 +46,16 @@ Page {
 
     onCurrentBoxIndexChanged: {
         selectedBox=currentBoxIndex>-1 ? ssBoxParent.itemAt(currentBoxIndex) : null
+
+        var o=ssModel.get(currentBoxIndex);
+        inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(o.src)
+
+        var d;
+        d=syncProxyRepeater.itemAt(currentBoxIndex);
+        easingType.currentIndex=easingType.indexOfValue(d.animateEasing)
+        easingDuration.value=d.animateDuration/1000;
+
+        timelineModel.syncFromProxy(proxies[currentBoxIndex])
     }
 
     Component.onCompleted: {
@@ -209,7 +219,13 @@ Page {
         model: ssModel
         delegate: syncProxyComponent
 
-        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?        
+        property bool keepSync: isLive // XXX or optionally separate toDevice / fromDevice ?
+
+        property int animatingCount: 0
+
+        readonly property bool isAnimating: animatingCount>0
+
+        onIsAnimatingChanged: console.debug("IsAnimating", isAnimating)
 
         Component.onCompleted: {
             if (atem.connected) {
@@ -295,7 +311,7 @@ Page {
             required property AtemSuperSourceBox assb;
             assb: ss.getSuperSourceBox(index)
 
-            readonly property point atemPosition: Qt.point(cx*3200, -cy*1800)
+            readonly property point atemPosition: Qt.point(Math.round(cx*3200), Math.round(-cy*1800))
             readonly property int atemSize: cs*1000
             readonly property vector4d atemCrop: Qt.vector4d(cTop, cBottom, cLeft, cRight)
 
@@ -358,6 +374,14 @@ Page {
                 onValueChanged: {
                     setCropVector4d(value);
                 }
+
+                onStarted: {
+
+                }
+
+                onStopped: {
+
+                }
             }
 
             Vector3dAnimation {
@@ -368,6 +392,14 @@ Page {
                 property: "anim"
                 from: animateFrom
                 to: animateTo
+
+                onStarted: {
+                    syncProxyRepeater.animatingCount++
+                }
+
+                onStopped: {
+                    syncProxyRepeater.animatingCount--
+                }
             }
 
             onCChanged: {
@@ -651,10 +683,7 @@ Page {
     property SuperSourceBox selectedBox;
 
     onSelectedBoxChanged: {
-        inputSourceCombo.currentIndex=inputSourceCombo.indexOfValue(selectedBox.inputSource)
-        easingType.currentIndex=easingType.indexOfValue(selectedBox.animateEasing)
-        easingDuration.value=selectedBox.animateDuration/1000;
-        timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
+
     }
 
     ColumnLayout {
@@ -827,7 +856,10 @@ Page {
                             onBoxCenterChanged: {
                                 model.cx=boxCenter.x
                                 model.cy=boxCenter.y
-                            }                            
+                            }
+                            onBoxSizeChanged: {
+                                model.cs=boxSize
+                            }
                         }
                     }
                 }
@@ -1085,6 +1117,13 @@ Page {
                         onValueModified: ssModel.setProperty(currentBoxIndex, "cBottom", value);
                     }
                     Button {
+                        text: "0%"
+                        onClicked: {
+                            ssModel.setProperty(currentBoxIndex, "cTop", 0)
+                            ssModel.setProperty(currentBoxIndex, "cBottom", 0)
+                        }
+                    }
+                    Button {
                         text: "25%"
                         onClicked: {
                             ssModel.setProperty(currentBoxIndex, "cTop", 2250)
@@ -1123,6 +1162,13 @@ Page {
                         onValueModified: ssModel.setProperty(currentBoxIndex, "cRight", value);
                     }
                     Button {
+                        text: "0%"
+                        onClicked: {
+                            ssModel.setProperty(currentBoxIndex, "cLeft", 0)
+                            ssModel.setProperty(currentBoxIndex, "cRight", 0)
+                        }
+                    }
+                    Button {
                         text: "25%"
                         onClicked: {
                             ssModel.setProperty(currentBoxIndex, "cLeft", 4000)
@@ -1155,7 +1201,7 @@ Page {
 
                         }
                         onActivated: {
-                            selectedBox.animateEasing=currentValue
+                            syncProxyRepeater.itemAt(currentBoxIndex).animateEasing=currentValue
                         }
                         Component.onCompleted: {
                             currentIndex=indexOfValue(Easing.InCubic)
@@ -1172,7 +1218,7 @@ Page {
                         value: 1
                         wheelEnabled: true
                         onValueModified: {
-                            selectedBox.animateDuration=value*1000;
+                            syncProxyRepeater.itemAt(currentBoxIndex).animateDuration=value*1000;
                         }
                         //background.implicitWidth: 100
                     }
@@ -1427,6 +1473,7 @@ Page {
 
             RowLayout {
                 Layout.fillWidth: true
+                enabled: !syncProxyRepeater.isAnimating
                 Button {
                     text: "Set A"
                     onClicked: {

@@ -1269,8 +1269,8 @@ Page {
                                     } else {
                                         ssTimeLine.currentFrame--
                                         if (ssTimeLine.currentFrame==0)
-                                            stop();                                    }
-
+                                            stop();
+                                    }
                                     // Add 1 frame pause if macro recording is on
                                     if (atem.connected && atem.macroRecording) {
                                         console.debug("macroPause")

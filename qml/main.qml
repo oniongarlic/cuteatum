@@ -368,6 +368,26 @@ ApplicationWindow {
         id: macroDrawer
     }
 
+    header: ToolBar {
+        visible: root.height>800 && rootStack.depth==1
+        RowLayout {
+            anchors.fill: parent
+            spacing: 2
+            ToolButton {
+                text: "SS1"
+                onClicked: rootStack.push(superSourceView)
+            }
+            ToolSeparator {
+
+            }
+            ToolButton {
+                text: "MP"
+                enabled: atem.connected && atem.macroRecording
+                onClicked: atem.addMacroPause(30)
+            }
+        }
+    }
+
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent

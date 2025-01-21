@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     Settings settings;
 
-    //QQuickStyle::setStyle("Universal");
+    QQuickStyle::setStyle("Universal");
     //QQuickStyle::setStyle("Material");
 
     QQmlApplicationEngine engine;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("settings", &settings);
 
-    const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
+    const QUrl url(QStringLiteral("qrc:/qt/qml/ca/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)

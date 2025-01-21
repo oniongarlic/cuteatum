@@ -449,6 +449,7 @@ Page {
                 }
             }
             ComboBox {
+                Layout.fillWidth: true
                 textRole: "name"
                 valueRole: "style"
                 model: ListModelTransitions {}

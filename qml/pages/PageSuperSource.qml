@@ -132,7 +132,7 @@ Page {
 
     Connections {
         target: atem
-        onConnected: {
+        function onConnected() {
             console.debug("SuperSource got connected")
         }
     }

@@ -477,9 +477,10 @@ ApplicationWindow {
         }
     }
 
-    Component {
-        id: mainView
+    //Component {
+    //    id: mainViewComponent
         PageMain {
+            id: mainView
             me: !atem.connected ? null : atem.mixEffect(0)
             fl: !atem.connected ? null : fairlight
             dsk: !atem.connected ? null : atem.downstreamKey(0)
@@ -494,7 +495,7 @@ ApplicationWindow {
             mediaModel: atemMediaModel
             keySourceModel: keyAndMasksModel
         }
-    }
+    //}
 
     Component {
         id: settingsView
@@ -506,15 +507,15 @@ ApplicationWindow {
     Action {
         id: actionSuperSource
         shortcut: "Ctrl+F"
+        enabled: rootStack.currentItem!=superSourceView
         onTriggered: rootStack.push(superSourceView)
     }
 
-    Component {
-        id: superSourceView
-        PageSuperSource {
+    PageSuperSource {
+            id: superSourceView
+            visible: false
             ss: superSource
-            superSourceInputModel: superSourceBoxInputModel
-        }
+            superSourceInputModel: superSourceBoxInputModel         
     }
 
     function loadSettings() {

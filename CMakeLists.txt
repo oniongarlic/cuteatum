@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 DBus Mqtt)
+find_package(qatemcontrol)
 
 find_library(ATEM_LIBRARY qatemcontrol HINTS ${ATEM_LIBRARY})
 if( ${ATEM_LIBRARY} STREQUAL "ATEM_LIBRARY-NOTFOUND")
@@ -22,6 +23,7 @@ qt_add_executable(cuteatum
     src/cutemqttclient.cpp src/cutemqttclient.h
     src/servicediscovery.cpp src/servicediscovery.h
     src/settings.cpp src/settings.h
+    src/animationcurve.h src/animationcurve.cpp
 )
 
 qt_add_qml_module(cuteatum
@@ -56,7 +58,7 @@ qt_add_qml_module(cuteatum
     QML_FILES qml/models/ListModelTransitions.qml
     QML_FILES qml/pages/PageMain.qml
     QML_FILES qml/pages/PageSettings.qml
-    QML_FILES qml/pages/PageSuperSource.qml
+    QML_FILES qml/pages/PageSuperSource.qml    
 )
 
 set_target_properties(cuteatum PROPERTIES

@@ -22,6 +22,7 @@
 #include "servicediscovery.h"
 #include "cutemqttclient.h"
 #include "settings.h"
+#include "animationcurve.h"
 
 int main(int argc, char *argv[])
 {
@@ -63,6 +64,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<QAtemRecording>("org.bm", 1, 0, "AtemRecording");
 
     qmlRegisterType<ServiceDiscovery>("org.tal.servicediscovery", 1, 0, "ServiceDiscovery");
+
+    qmlRegisterType<AnimationCurve>("org.animation", 1, 0, "AnimationCurve");
 
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
     qRegisterMetaType<QAtemDownstreamKey*>("AtemDownstreamKey");

@@ -24,6 +24,12 @@ qt_add_executable(cuteatum
     src/servicediscovery.cpp src/servicediscovery.h
     src/settings.cpp src/settings.h
     src/animationcurve.h src/animationcurve.cpp
+
+    src/libcutegenericmodel/abstractobjectmodel.h
+    src/libcutegenericmodel/abstractobjectmodel.cpp
+
+    src/ssboxes.h src/ssboxes.cpp
+    src/ssboxesmodel.h src/ssboxesmodel.cpp
 )
 
 qt_add_qml_module(cuteatum

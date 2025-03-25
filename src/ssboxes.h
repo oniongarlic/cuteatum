@@ -2,11 +2,12 @@
 #define DUMMYITEM_H
 
 #include <QObject>
+#include <QVariant>
 #include <QMap>
-#include <QDateTime>
-#include <QVector2D>
 #include <QVector3D>
 #include <QVector4D>
+
+#include "ssbox.h"
 
 class SuperSourceBoxes : public QObject
 {
@@ -15,14 +16,12 @@ class SuperSourceBoxes : public QObject
     Q_PROPERTY(int id READ id WRITE setId NOTIFY idChanged)    
     Q_PROPERTY(QString key MEMBER m_key)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(bool enabled MEMBER m_enabled NOTIFY enabledChanged)    
-    Q_PROPERTY(QVector2D vec2 MEMBER m_vec2 NOTIFY vec2Changed)
-    Q_PROPERTY(QVector3D vec3 MEMBER m_vec3 NOTIFY vec3Changed)
-    Q_PROPERTY(QVector4D vec4 MEMBER m_vec4 NOTIFY vec4Changed)
 
 public:
     explicit SuperSourceBoxes(QObject *parent = nullptr);
     ~SuperSourceBoxes();
+
+    Q_INVOKABLE SuperSourceBox *getBox(int idx) { return m_boxes.at(idx); };
 
     static SuperSourceBoxes *fromVariantMap(const QVariantMap &map);
 
@@ -30,23 +29,15 @@ private:
     int m_id;
 
     QString m_key;
-    QString m_name;
-    bool m_enabled;    
+    QString m_name;        
 
     int id() const;
     QString name() const;
-    QVector3D m_ssbox[4];
+    QList<SuperSourceBox *> m_boxes;
     
 signals:
-
     void idChanged(int id);
-    void nameChanged(QString name);
-    void categoryChanged(QString category);
-    void enabledChanged();    
-    
-    void vec2Changed();
-    void vec3Changed();
-    void vec4Changed();
+    void nameChanged(QString name);    
     
 public slots:
     void setId(int id);

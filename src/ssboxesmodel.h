@@ -15,6 +15,7 @@ public:
     explicit SuperSourceBoxesModel(QObject *parent = nullptr);
 
     Q_INVOKABLE SuperSourceBoxes *getItem(int index) const;
+    Q_INVOKABLE void appendFromMap(const QVariantMap map);
 
     // AbstractObjectModel interface
 protected:

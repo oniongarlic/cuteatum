@@ -9,6 +9,7 @@ import "../models"
 import "../components"
 
 import org.bm 1.0
+import org.tal.model 1.0
 
 Page {
     id: ssDrawer
@@ -94,13 +95,22 @@ Page {
         }
     }
 
-    ListModel {
+    SuperSourceBoxesModel {
         id: savedPositionsModel
 
         function savePosition() {
-            var p=getPositions();
-            console.debug(p)
-            append(p);
+            var p=getPositions();            
+            var sb={ "name": "Saved testing", "boxes": p }
+            appendFromMap(sb);
+        }
+
+        function loadPosition(idx) {
+            var boxes=getItem(idx);
+            console.debug("load", boxes)
+            for (let i=0;i<4;i++) {
+                let sb=boxes.getBox(i)
+                console.debug(i, sb)
+            }
         }
     }
 
@@ -123,10 +133,18 @@ Page {
                 Layout.fillWidth: true
                 model: savedPositionsModel
                 delegate: ItemDelegate {
-
+                    required property int index
+                    required property string name
+                    text: name
+                    onClicked: {
+                        savedPositionsModel.loadPosition(index)
+                    }
+                    onDoubleClicked: {
+                        savedPositionsModel.loadPosition(index)
+                        savedPositionsDrawer.close()
+                    }
                 }
             }
-
         }
     }
 
@@ -145,14 +163,18 @@ Page {
     }
 
     function getPositions() {
-        var p=[];
+        var boxes=[];
         for (var i=0;i<4;i++) {
             let item=syncProxyRepeater.itemAt(i)
-            p[i]=[];
-            p[i][0]=item.getPositionVector3d();
-            p[i][1]=item.getCropVector4d()
+            boxes[i]={
+                "enabled": item.onair,
+                "source": item.src,
+                "position": item.getPositionVector3d(),
+                "crop": item.c,
+                "cropping": item.getCropVector4d()
+            };
         }
-        return p;
+        return boxes;
     }
 
     function savePositions(bid) {

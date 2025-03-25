@@ -3,9 +3,9 @@
 #include <QJsonObject>
 
 SuperSourceBoxesModel::SuperSourceBoxesModel(QObject *parent) :
-    AbstractObjectModel("DummyItem", parent)
+    AbstractObjectModel("SuperSourceBoxes", parent)
 {
-    m_has_key=true;
+    m_has_key=false;
     m_key_name="key";
     m_iswritable=true;
 }
@@ -13,6 +13,13 @@ SuperSourceBoxesModel::SuperSourceBoxesModel(QObject *parent) :
 SuperSourceBoxes *SuperSourceBoxesModel::getItem(int index) const
 {
     return dynamic_cast<SuperSourceBoxes *>(getObject(index));
+}
+
+void SuperSourceBoxesModel::appendFromMap(const QVariantMap map)
+{
+    qDebug() << "appendFromMap" << map;
+    auto m=dynamic_cast<SuperSourceBoxes *>(fromVariantMap(map));
+    append(m);
 }
 
 QVariant SuperSourceBoxesModel::formatProperty(const QObject *data, const QMetaProperty *meta) const

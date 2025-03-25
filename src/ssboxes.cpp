@@ -2,33 +2,59 @@
 
 #include <QDebug>
 
+/**
+ * Container of 4 Super Source Box definitions
+ *
+ * @brief SuperSourceBoxes::SuperSourceBoxes
+ * @param parent
+ */
+
 SuperSourceBoxes::SuperSourceBoxes(QObject *parent) :
-    QObject(parent),
-    m_category("NSFW")
+    QObject(parent)
 {
-    m_time=QTime::currentTime();
+    m_boxes.resize(4);
+    for (int i=0;i<4;i++) {
+        m_boxes[i]=new SuperSourceBox(i+1, this);
+    }
 }
 
 SuperSourceBoxes::~SuperSourceBoxes()
+{    
+    m_boxes.clear();
+}
+
+void setVector(QVector3D &v, const QString &key, const QVariantMap &map)
 {
-    qDebug() << "Deleted" << m_key;
+    if (!map.contains(key)) {
+        v.setX(0.0);
+        v.setY(0.0);
+        v.setZ(0.0);
+    }
+    QVariantMap m=map[key].toMap();
+    v.setX(m["x"].toFloat());
+    v.setY(m["y"].toFloat());
+    v.setY(m["z"].toFloat());
 }
 
 SuperSourceBoxes *SuperSourceBoxes::fromVariantMap(const QVariantMap &map)
 {
     SuperSourceBoxes *dm=new SuperSourceBoxes();
-    
-    dm->m_id=map["id"].toInt();
-    dm->m_key=map["key"].toString();    
+
+    qDebug() << "SuperSourceBoxes::fromVariantMap" << map.keys();
+
     dm->m_name=map["name"].toString();
-    
-    QVector3D v3;
-    if (map.contains("")) {
-        QVariantMap m=map["vec3"].toMap();
-        v3.setX(m["x"].toFloat());
-        v3.setY(m["y"].toFloat());
-        v3.setY(m["z"].toFloat());
-        dm->m_vec3=v3;
+
+    if (map.contains("boxes")) {
+        QVariantList b=map["boxes"].toList();
+
+        qDebug() << "boxes" << b;
+
+        for (int i=0;i<4;i++) {
+            auto ssb=dm->getBox(i);
+            ssb->fromVariantMap(b.at(i).toMap());
+        }
+    } else {
+        qWarning() << "No boxes defined in super source box data ?";
     }
     
     return dm;

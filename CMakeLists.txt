@@ -64,7 +64,8 @@ qt_add_qml_module(cuteatum
     QML_FILES qml/models/ListModelTransitions.qml
     QML_FILES qml/pages/PageMain.qml
     QML_FILES qml/pages/PageSettings.qml
-    QML_FILES qml/pages/PageSuperSource.qml    
+    QML_FILES qml/pages/PageSuperSource.qml
+    SOURCES src/ssbox.h src/ssbox.cpp
 )
 
 set_target_properties(cuteatum PROPERTIES

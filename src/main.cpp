@@ -23,6 +23,7 @@
 #include "cutemqttclient.h"
 #include "settings.h"
 #include "animationcurve.h"
+#include "ssboxesmodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -66,9 +67,16 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QAtemMixEffect*>("AtemMixEffect");
     qRegisterMetaType<QAtemDownstreamKey*>("AtemDownstreamKey");
     qRegisterMetaType<QAtemSuperSourceBox*>("QAtemSuperSourceBox");
-    qRegisterMetaType<QAtem::SuperSourceBoxSettings>();    
+    qRegisterMetaType<QAtem::SuperSourceBoxSettings>();
 
     qmlRegisterUncreatableType<QList<QAtemSuperSourceBox>*>("org.bm", 1, 0, "AtemSuperSourceBoxes", "Used in C++ only");
+
+    qmlRegisterType<SuperSourceBox>("org.tal.model", 1,0, "SuperBox");
+    qmlRegisterType<SuperSourceBoxes>("org.tal.model", 1,0, "SuperSourceBoxes");
+    qmlRegisterType<SuperSourceBoxesModel>("org.tal.model", 1,0, "SuperSourceBoxesModel");
+
+    qRegisterMetaType<SuperSourceBoxes *>("SuperSourceBoxes");
+    qRegisterMetaType<SuperSourceBoxesModel *>();
 
     qRegisterMetaType<QAtem::InputInfo>();
     qRegisterMetaType<QAtem::Topology>();

@@ -1,6 +1,7 @@
 #include "ssboxesmodel.h"
 
 #include <QJsonObject>
+#include <QJsonArray>
 
 SuperSourceBoxesModel::SuperSourceBoxesModel(QObject *parent) :
     AbstractObjectModel("SuperSourceBoxes", parent)
@@ -45,6 +46,19 @@ QObject *SuperSourceBoxesModel::fromVariantMap(const QVariantMap &map)
 
 bool SuperSourceBoxesModel::formatToJson(const QString &key, const QVariant &value, QJsonValue &jvalue) const
 {
+    if (key=="boxes") {
+        qDebug() << "formatToJson" << key << value;
+        QJsonArray a;
+        auto ssblist=value.value<QList<SuperSourceBox*>>();
+        for (int i=0;i<4;i++) {
+            QJsonObject o;
+            auto ssb=ssblist.at(i);
+            ssb->toJson(o);
+            a.append(o);
+        }
+        jvalue=a;
+        return true;
+    }
     return false;
 }
 

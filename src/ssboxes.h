@@ -16,6 +16,7 @@ class SuperSourceBoxes : public QObject
     Q_PROPERTY(int id READ id WRITE setId NOTIFY idChanged)    
     Q_PROPERTY(QString key MEMBER m_key)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QList<SuperSourceBox *> boxes READ boxes NOTIFY boxesChanged FINAL)
 
 public:
     explicit SuperSourceBoxes(QObject *parent = nullptr);
@@ -24,6 +25,8 @@ public:
     Q_INVOKABLE SuperSourceBox *getBox(int idx) { return m_boxes.at(idx); };
 
     static SuperSourceBoxes *fromVariantMap(const QVariantMap &map);
+
+    QList<SuperSourceBox *> boxes() const;
 
 private:
     int m_id;
@@ -37,8 +40,10 @@ private:
     
 signals:
     void idChanged(int id);
-    void nameChanged(QString name);    
+    void nameChanged(QString name);
     
+    void boxesChanged();
+
 public slots:
     void setId(int id);
     void setName(QString name);

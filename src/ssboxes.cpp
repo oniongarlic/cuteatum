@@ -88,3 +88,8 @@ void SuperSourceBoxes::setName(QString name)
     emit nameChanged(m_name);
 }
 
+
+QList<SuperSourceBox *> SuperSourceBoxes::boxes() const
+{
+    return m_boxes;
+}

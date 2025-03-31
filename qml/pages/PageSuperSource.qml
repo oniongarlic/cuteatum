@@ -109,8 +109,9 @@ Page {
             console.debug("load", boxes)
             for (let i=0;i<4;i++) {
                 let sb=boxes.getBox(i)
-                console.debug(i, sb)
+                console.debug(i, sb, sb.name, sb.enabled, sb.position)
             }
+            console.debug(savedPositionsModel.toJson());
         }
     }
 
@@ -165,8 +166,10 @@ Page {
     function getPositions() {
         var boxes=[];
         for (var i=0;i<4;i++) {
+            let model=ssModel.get(i);
             let item=syncProxyRepeater.itemAt(i)
             boxes[i]={
+                "name": "Dummy",
                 "enabled": item.onair,
                 "source": item.src,
                 "position": item.getPositionVector3d(),

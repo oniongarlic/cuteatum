@@ -13,16 +13,24 @@ class SuperSourceBox : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
+    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged FINAL)
     Q_PROPERTY(int source READ source WRITE setSource NOTIFY sourceChanged FINAL)
     Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged FINAL)
 
-    Q_PROPERTY(QVector4D croping READ croping WRITE setCroping NOTIFY cropingChanged FINAL)
+    Q_PROPERTY(bool crop READ crop WRITE setCrop NOTIFY cropChanged FINAL)
+    Q_PROPERTY(QVector4D cropping READ cropping WRITE setCropping NOTIFY croppingChanged FINAL)
+
+    Q_PROPERTY(bool border READ border WRITE setBorder NOTIFY borderChanged FINAL)
+    Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor NOTIFY borderColorChanged FINAL)
+
+    Q_PROPERTY(int borderWidthInner READ borderWidthInner WRITE setBorderWidthInner NOTIFY borderWidthInnerChanged FINAL)
+    Q_PROPERTY(int borderWidthOuter READ borderWidthOuter WRITE setBorderWidthOuter NOTIFY borderWidthOuterChanged FINAL)
 
 public:
     explicit SuperSourceBox(const int id, QObject *parent = nullptr);
 
     Q_INVOKABLE void setPosition(const QVector3D pos);
-    Q_INVOKABLE void setCrop(const QVector4D croping);
+    Q_INVOKABLE void setCrop(bool crop);
     Q_INVOKABLE void setSource(const int src);
     Q_INVOKABLE void setName(const QString name);
 
@@ -32,7 +40,7 @@ public:
     friend QDebug operator<<(QDebug debug, const SuperSourceBox &c)
     {
         QDebugStateSaver saver(debug);
-        debug.nospace() << c.m_id << c.m_source << c.m_enabled << c.m_position << c.m_crop << c.m_croping;
+        debug.nospace() << c.m_id << c.m_source << c.m_enabled << c.m_position << c.m_crop << c.m_cropping;
 
         return debug;
     }
@@ -41,8 +49,25 @@ public:
     QVector3D position() const;
     QString name() const;
 
-    QVector4D croping() const;
-    void setCroping(const QVector4D &newCroping);
+    QVector4D cropping() const;
+    Q_INVOKABLE void setCropping(const QVector4D &newCropping);
+
+    bool crop() const;
+
+    QColor borderColor() const;
+    Q_INVOKABLE void setBorderColor(const QColor &newBorderColor);
+
+    int borderWidthInner() const;
+    Q_INVOKABLE void setBorderWidthInner(int newBorderWidthInner);
+
+    int borderWidthOuter() const;
+    Q_INVOKABLE void setBorderWidthOuter(int newBorderWidthOuter);
+
+    bool border() const;
+    Q_INVOKABLE void setBorder(bool newBorder);
+
+    bool enabled() const;
+    void setEnabled(bool newEnabled);
 
 private:
     const int m_id;
@@ -52,18 +77,24 @@ private:
     QVector3D m_position;
 
     bool m_crop;
-    QVector4D m_croping;
+    QVector4D m_cropping;
 
     bool m_border;
-    QColor m_border_color;
-    int m_border_inner_width;
-    int m_border_outer_width;
+    QColor m_borderColor;
+    int m_borderWidthInner;
+    int m_borderWidthOuter;
 
 signals:
     void sourceChanged();
     void positionChanged();
     void nameChanged();
-    void cropingChanged();
+    void croppingChanged();
+    void cropChanged();
+    void borderColorChanged();
+    void borderWidthInnerChanged();
+    void borderWidthOuterChanged();
+    void borderChanged();
+    void enabledChanged();
 };
 
 #endif // SSBOX_H

@@ -1,5 +1,5 @@
-#ifndef DUMMYITEM_H
-#define DUMMYITEM_H
+#ifndef SSBOBXES_H
+#define SSBOBXES_H
 
 #include <QObject>
 #include <QVariant>
@@ -12,7 +12,7 @@
 class SuperSourceBoxes : public QObject
 {
     Q_OBJECT
-    // Q_CLASSINFO("Dummy", "Test")
+    // Q_CLASSINFO("ModelItem", "SuperSourceBox")
     Q_PROPERTY(int id READ id WRITE setId NOTIFY idChanged)    
     Q_PROPERTY(QString key MEMBER m_key)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
@@ -32,7 +32,7 @@ private:
     int m_id;
 
     QString m_key;
-    QString m_name;        
+    QString m_name;
 
     int id() const;
     QString name() const;
@@ -49,5 +49,5 @@ public slots:
     void setName(QString name);
 };
 
-#endif // DUMMYITEM_H
+#endif // SSBOBXES_H
 

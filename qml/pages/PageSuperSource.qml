@@ -77,13 +77,12 @@ Page {
             }
             ToolSeparator {}
             ToolButton {
-                text: "Save"
-                onClicked: savedPositionsModel.savePosition();
+                text: "Manage";
+                onClicked: savedPositionsDrawer.open()
             }
             ToolButton {
-                text: "Load...";
-                enabled: savedPositionsModel.count>0
-                onClicked: savedPositionsDrawer.open()
+                text: "Save"
+                onClicked: savedPositionsModel.savePosition();
             }
             ToolSeparator {}
             ToolButton {
@@ -99,19 +98,25 @@ Page {
         id: savedPositionsModel
 
         function savePosition() {
-            var p=getPositions();            
+            var p=getPositions();
             var sb={ "name": "Saved testing", "boxes": p }
             appendFromMap(sb);
         }
 
         function loadPosition(idx) {
-            var boxes=getItem(idx);
-            console.debug("load", boxes)
+            let boxes=getItem(idx);
+            let sboxes=[]
             for (let i=0;i<4;i++) {
                 let sb=boxes.getBox(i)
-                console.debug(i, sb, sb.name, sb.enabled, sb.position)
+                sboxes[i]=sb;
+                console.debug(i, sb, sb.name, sb.source, sb.enabled, sb.position, sb.cropping)
             }
-            console.debug(savedPositionsModel.toJson());
+            return sboxes;
+        }
+
+        function loadPositionBox(idx, box) {
+            var boxes=getItem(idx);
+            return boxes.getBox(box)
         }
     }
 
@@ -129,20 +134,71 @@ Page {
                 text: savedPositionsModel.count
             }
 
+            RowLayout {
+                Layout.fillWidth: true
+                Button {
+                    text: "Export..."
+                    onClicked: {
+                        console.debug(savedPositionsModel.toJson());
+                    }
+                }
+                Button {
+                    text: "Import..."
+                    onClicked: {
+                        // xxx
+                    }
+                }
+                Button {
+                    text: "Clear"
+                    onClicked: savedPositionsModel.clear();
+                }
+            }
+
             ListView {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 model: savedPositionsModel
                 delegate: ItemDelegate {
+                    id: idsbox
                     required property int index
                     required property string name
-                    text: name
-                    onClicked: {
-                        savedPositionsModel.loadPosition(index)
-                    }
-                    onDoubleClicked: {
-                        savedPositionsModel.loadPosition(index)
-                        savedPositionsDrawer.close()
+                    width: ListView.view.width
+                    height: r.height+4
+                    RowLayout {
+                        id: r
+                        width: parent.width
+                        spacing: 4
+                        Text {
+                            text: idsbox.index+1
+                        }
+                        Text {
+                            text: idsbox.name
+                            Layout.fillWidth: true
+                        }                        
+                        Button {
+                            text: "Load"
+                            onClicked: {
+                                savedPositionsModel.loadPosition(index)
+                            }
+                        }
+                        Button {
+                            text: "Set A"
+                            onClicked: {
+
+                            }
+                        }
+                        Button {
+                            text: "Set B"
+                            onClicked: {
+
+                            }
+                        }
+                        Button {
+                            text: "Export..."
+                            onClicked: {
+
+                            }
+                        }
                     }
                 }
             }

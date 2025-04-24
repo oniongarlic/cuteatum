@@ -10,7 +10,7 @@
  */
 
 SuperSourceBoxes::SuperSourceBoxes(QObject *parent) :
-    QObject(parent)
+    QObject(parent), m_id(0)
 {
     m_boxes.resize(4);
     for (int i=0;i<4;i++) {

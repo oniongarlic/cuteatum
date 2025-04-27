@@ -22,11 +22,23 @@ public:
     explicit SuperSourceBoxes(QObject *parent = nullptr);
     ~SuperSourceBoxes();
 
-    Q_INVOKABLE SuperSourceBox *getBox(int idx) { return m_boxes.at(idx); };
+    Q_INVOKABLE SuperSourceBox *getBox(int idx) const { return m_boxes.at(idx); };
 
     static SuperSourceBoxes *fromVariantMap(const QVariantMap &map);
 
     QList<SuperSourceBox *> boxes() const;
+
+    friend QDebug operator<<(QDebug debug, const SuperSourceBoxes &c)
+    {
+        QDebugStateSaver saver(debug);
+
+        for (int i=0;i<4;i++) {
+            auto ssb=c.getBox(i);
+
+            debug.space() << i << c.m_name << c.m_id << ssb;
+        }
+        return debug;
+    }
 
 private:
     int m_id;

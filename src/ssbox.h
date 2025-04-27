@@ -9,6 +9,8 @@
 #include <QVector4D>
 #include <QJsonObject>
 
+#include <QAtemControl/qatemsupersourcebox.h>
+
 class SuperSourceBox : public QObject
 {
     Q_OBJECT
@@ -34,13 +36,15 @@ public:
     Q_INVOKABLE void setSource(const int src);
     Q_INVOKABLE void setName(const QString name);
 
+    Q_INVOKABLE void fromAtemSuperSourceBox(const QAtemSuperSourceBox &sbox);
+
     void fromVariantMap(const QVariantMap &map);
     Q_INVOKABLE void toJson(QJsonObject &obj);
 
     friend QDebug operator<<(QDebug debug, const SuperSourceBox &c)
     {
         QDebugStateSaver saver(debug);
-        debug.nospace() << c.m_id << c.m_source << c.m_enabled << c.m_position << c.m_crop << c.m_cropping;
+        debug.space() << c.m_id << c.m_source << c.m_enabled << c.m_position << c.m_crop << c.m_cropping;
 
         return debug;
     }
@@ -70,7 +74,7 @@ public:
     void setEnabled(bool newEnabled);
 
 private:
-    const int m_id;
+    int m_id;
     int m_source;
     bool m_enabled;
     QString m_name;

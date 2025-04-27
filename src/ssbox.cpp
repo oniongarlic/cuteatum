@@ -30,6 +30,29 @@ void SuperSourceBox::setName(const QString name)
     emit nameChanged();
 }
 
+void SuperSourceBox::fromAtemSuperSourceBox(const QAtemSuperSourceBox &sbox)
+{
+    m_id=sbox.box();
+    m_source=sbox.boxSource();
+    m_enabled=sbox.boxOnAir();
+
+    auto tp=sbox.boxPosition().toPointF(); // -4800-4800
+    auto ts=sbox.boxSize(); // 0-1000
+
+    QVector3D t;
+    t.setX(tp.x()*4800);
+    t.setY(tp.y()*4800);
+    t.setZ(ts/1000.0);
+
+    m_position=t;
+
+    m_crop=sbox.boxCrop();
+    m_cropping=sbox.boxCropRect(); // 0-18000
+
+    m_border=sbox.boxBorder();
+    m_borderColor=sbox.boxBorderColor();
+}
+
 void SuperSourceBox::fromVariantMap(const QVariantMap &map)
 {
     qDebug() << "ssbox" << m_id;

@@ -588,9 +588,12 @@ Page {
 
         function addBoxKeyframe(ki,f,x,y,s) {
             let k=boxes[ki]
-            addKeyframeToGroup(k[0], f, x)
-            addKeyframeToGroup(k[1], f, y)
-            addKeyframeToGroup(k[2], f, s)
+
+            // XXX: property specific easing ?
+            let e=easingType.currentValue
+            addKeyframeToGroup(k[0], f, x, e)
+            addKeyframeToGroup(k[1], f, y, e)
+            addKeyframeToGroup(k[2], f, s, e)
 
             dumpKeyframes(k[2]);
         }
@@ -601,10 +604,11 @@ Page {
             }
         }
 
-        function addKeyframeToGroup(kg, f, v) {
+        function addKeyframeToGroup(kg, f, v, e) {
             console.debug("Frame: "+f+" == "+v)
-            let e=easingType.currentValue
-            kg.keyframes.push(kf.createObject(ssTimeLine, { frame: f, value: v, easing: e }))
+            let k=kf.createObject(ssTimeLine, { frame: f, value: v })
+            k.easing.type=e;
+            kg.keyframes.push(k)
         }
 
         function clearKeyframeGroupsForBox(ki) {

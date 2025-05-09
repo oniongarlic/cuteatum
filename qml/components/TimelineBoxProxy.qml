@@ -1,6 +1,7 @@
 import QtQuick
 
-QtObject {    
+QtObject {
+    property int source: -1
     property double x;
     property double y;
     property double s;
@@ -26,6 +27,7 @@ QtObject {
             "x": x.toFixed(4),
             "y": y.toFixed(4),
             "s": s.toFixed(4),
+            "src": source,
             "c": cropEnabled,
             "cl": cropLeft,
             "cr": cropRight,

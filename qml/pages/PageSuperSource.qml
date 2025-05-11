@@ -232,7 +232,8 @@ Page {
 
     function syncBoxFromProxy(boxid, proxy) {
         var sb=syncProxyRepeater.itemAt(boxid);
-        sb.setPositionVector3d(Qt.vector3d(proxy.x, proxy.y, proxy.s));
+        sb.setPositionVector3d(Qt.vector3d(proxy.x, proxy.y, proxy.s));        
+        sb.setCropVector4d(Qt.vector4d(proxy.cropTop, proxy.cropBottom, proxy.cropLeft, proxy.cropRight));
     }
 
     ListModelSuperSourceBoxes {
@@ -611,7 +612,7 @@ Page {
             return addBoxGroup(createBoxGroup(proxy))
         }
 
-        function addBoxKeyframe(ki,f,x,y,s) {
+        function addBoxKeyframe(ki, f, x, y, s, c, cl, cr, ct, cb) {
             let k=boxes[ki]
 
             // XXX: property specific easing ?
@@ -620,7 +621,10 @@ Page {
             addKeyframeToGroup(k[1], f, y, e)
             addKeyframeToGroup(k[2], f, s, e)
 
-            dumpKeyframes(k[2]);
+            addKeyframeToGroup(k[3], f, cl, e)
+            addKeyframeToGroup(k[4], f, cr, e)
+            addKeyframeToGroup(k[5], f, ct, e)
+            addKeyframeToGroup(k[6], f, cb, e)
         }
 
         function dumpKeyframes(k) {
@@ -653,13 +657,24 @@ Page {
             let tx=kfg.createObject(ssTimeLine, { target: proxy, property: "x" });
             let ty=kfg.createObject(ssTimeLine, { target: proxy, property: "y" });
             let ts=kfg.createObject(ssTimeLine, { target: proxy, property: "s" });
-            return [tx, ty, ts];
+
+            let tcl=kfg.createObject(ssTimeLine, { target: proxy, property: "cropLeft" });
+            let tcr=kfg.createObject(ssTimeLine, { target: proxy, property: "cropRight" });
+            let tct=kfg.createObject(ssTimeLine, { target: proxy, property: "cropTop" });
+            let tcb=kfg.createObject(ssTimeLine, { target: proxy, property: "cropBottom" });
+
+            return [tx, ty, ts, tcl, tcr, tct, tcb];
         }
 
         function addBoxGroup(kg) {
-            keyframeGroups.push(kg[0])
-            keyframeGroups.push(kg[1])
-            keyframeGroups.push(kg[2])
+            keyframeGroups.push(kg[0]) // x
+            keyframeGroups.push(kg[1]) // y
+            keyframeGroups.push(kg[2]) // s
+
+            keyframeGroups.push(kg[3]) // cropLeft
+            keyframeGroups.push(kg[4]) // right
+            keyframeGroups.push(kg[5]) // top
+            keyframeGroups.push(kg[6]) // bottom
 
             return kg;
         }

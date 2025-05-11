@@ -645,10 +645,10 @@ Page {
             sproxy4.clear()
             timelineModel.clear()
 
-            clearKeyframeGroupsForBox(0)
-            clearKeyframeGroupsForBox(1)
-            clearKeyframeGroupsForBox(2)
-            clearKeyframeGroupsForBox(3)
+            //clearKeyframeGroupsForBox(0)
+            //clearKeyframeGroupsForBox(1)
+            //clearKeyframeGroupsForBox(2)
+            //clearKeyframeGroupsForBox(3)
         }
 
         function addKeyframe(box, frame) {
@@ -666,7 +666,8 @@ Page {
                 to: ssTimeLine.endFrame
                 onFinished: {
                     console.debug("Animation done")
-                    timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
+                    if (selectedBox)
+                        timelineModel.syncFromProxy(proxies[selectedBox.boxId-1])
                 }
                 onStarted: {
                     console.debug("Animation starts...")
@@ -1233,6 +1234,7 @@ Page {
                         ToolTip.text: "Add keyframe for selected box"
                         ToolTip.visible: hovered
                         ToolTip.delay: 1000
+                        enabled: ssBoxParent.currentIndex>-1
                         onClicked: {
                             ssTimeLine.addKeyframe(ssBoxParent.currentIndex, ssFrame.value)
                         }
@@ -1382,7 +1384,7 @@ Page {
                             syncView: timelineList
                             clip: true
                             resizableColumns: true
-                            model: [ "Frame", "X", "Y", "Size", "Crop", "CL", "CR", "CT", "CB" ]
+                            model: [ "Frame", "X", "Y", "Size", "Src", "Crop", "CL", "CR", "CT", "CB" ]
                         }
 
                         TableView {

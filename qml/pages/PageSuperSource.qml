@@ -44,6 +44,8 @@ Page {
 
     readonly property bool isLive: ssLiveCheck.checked
 
+    property int fps: 30
+
     onCurrentBoxIndexChanged: {
         selectedBox=currentBoxIndex>-1 ? ssBoxParent.itemAt(currentBoxIndex) : null
 
@@ -91,7 +93,31 @@ Page {
                 checkable: true
                 checked: false
             }
+            ToolSeparator {}
+            ToolButton {
+                text: "30"
+                checked: true
+                checkable: true
+                ButtonGroup.group: fpsGroup
+                onCheckedChanged: if (checked) fps=30
+            }
+            ToolButton {
+                text: "25"
+                checkable: true
+                ButtonGroup.group: fpsGroup
+                onCheckedChanged: if (checked) fps=25
+            }
+            ToolButton {
+                text: "60"
+                checkable: true
+                ButtonGroup.group: fpsGroup
+                onCheckedChanged: if (checked) fps=60
+            }
         }
+    }
+
+    ButtonGroup {
+        id: fpsGroup
     }
 
     ListModel {
@@ -1311,7 +1337,7 @@ Page {
                             Timer {
                                 id: playbackTicker
                                 repeat: true
-                                interval: 100
+                                interval: 1000/fps
                                 onTriggered: {
                                     console.debug("tick", ssTimeLine.currentFrame)
 

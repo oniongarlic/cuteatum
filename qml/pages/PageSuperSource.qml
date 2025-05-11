@@ -206,8 +206,7 @@ Page {
 
     function syncBoxFromProxy(boxid, proxy) {
         var sb=syncProxyRepeater.itemAt(boxid);
-        sb.setItemCenter(proxy.x, proxy.y)
-        sb.setItemSize(proxy.s)
+        sb.setPositionVector3d(Qt.vector3d(proxy.x, proxy.y, proxy.s));
     }
 
     ListModelSuperSourceBoxes {
